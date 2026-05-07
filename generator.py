@@ -7,6 +7,7 @@ import re
 import ast
 
 
+
 def generate_code(spec):
     """Generate both code and tests from a user specification"""
     client = anthropic.Anthropic()
