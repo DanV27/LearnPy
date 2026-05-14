@@ -27,6 +27,7 @@ def generate():
     try:
         # Step 1: Generate code + tests
         code, test_code = generate_code(spec)
+        print(f"[DEBUG] First 200 chars of code:\n{repr(code[:200])}")
 
         result = {
             "code": code,
