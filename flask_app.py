@@ -15,6 +15,11 @@ def index():
     return render_template("main.html")
 
 
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+
 @app.route("/generate", methods=["POST"])
 def generate():
     """Run the full pipeline: generate -> validate -> test -> (optional) fix."""
