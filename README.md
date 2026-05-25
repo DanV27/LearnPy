@@ -2,6 +2,9 @@
 
 An AI-powered code generation tool that writes Python code from plain English descriptions.
 
+## TRY NOW
+https://ai-code-generator--danv27.replit.app/
+
 ## What It Does
 
 1. **You describe what you want** - Write a plain English specification (e.g., "a function that adds two numbers")
