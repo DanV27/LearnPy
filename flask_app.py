@@ -1,4 +1,10 @@
-from flask import Flask, render_template, request, jsonify, Response
+from flask import Flask, Response, render_template, request, jsonify, redirect, url_for, session
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash
+from datetime import datetime
+import os
+
+from models import db, User, Generation
 from generator import (
     generate_code,
     validate_syntax,
@@ -9,6 +15,27 @@ from generator import (
 
 app = Flask(__name__)
 
+#config
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///codegen.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+
+
+# ===== DATABASE & LOGIN =====
+db.init_app(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Redirect to login if not authenticated
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# Create tables on startup
+with app.app_context():
+    db.create_all()
 
 @app.route("/")
 def index():
@@ -19,8 +46,67 @@ def index():
 def about():
     return render_template("about.html")
 
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    """Sign up page"""
+    if request.method == "POST":
+        data = request.get_json(silent=True) or {}
+        username = (data.get("username") or "").strip()
+        email = (data.get("email") or "").strip()
+        password = data.get("password") or ""
+        
+        # Validation
+        if not username or not email or not password:
+            return jsonify({"error": "All fields required"}), 400
+        
+        if len(password) < 6:
+            return jsonify({"error": "Password must be at least 6 characters"}), 400
+        
+        if User.query.filter_by(username=username).first():
+            return jsonify({"error": "Username already exists"}), 400
+        
+        if User.query.filter_by(email=email).first():
+            return jsonify({"error": "Email already exists"}), 400
+        
+        # Create user
+        user = User(username=username, email=email)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        
+        # Log them in
+        login_user(user)
+        return jsonify({"success": True, "redirect": url_for("index")})
+    
+    return render_template("signup.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Login page"""
+    if request.method == "POST":
+        data = request.get_json(silent=True) or {}
+        username = (data.get("username") or "").strip()
+        password = data.get("password") or ""
+        
+        user = User.query.filter_by(username=username).first()
+        
+        if not user or not user.check_password(password):
+            return jsonify({"error": "Invalid username or password"}), 401
+        
+        login_user(user)
+        return jsonify({"success": True, "redirect": url_for("index")})
+    
+    return render_template("login.html")
+
+@app.route("/logout")
+@login_required
+def logout():
+    """Logout user"""
+    logout_user()
+    return redirect(url_for("login"))
 
 @app.route("/generate", methods=["POST"])
+@login_required
 def generate():
     """Run the full pipeline: generate -> validate -> test -> (optional) fix."""
     data = request.get_json(silent=True) or {}
@@ -105,6 +191,13 @@ def download():
         mimetype="text/x-python",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+@app.route("/history")
+@login_required
+def history():
+    """Get user's generation history"""
+    generations = Generation.query.filter_by(user_id=current_user.id).order_by(Generation.created_at.desc()).all()
+    return jsonify([g.to_dict() for g in generations])
 
 
 if __name__ == "__main__":
