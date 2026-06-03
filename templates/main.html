@@ -160,6 +160,11 @@
       </nav>
     </div>
     <div class="flex items-center gap-md">
+      <span class="text-white/60 font-label-technical text-label-technical">{{ current_user.username }}</span>
+      <a href="{{ url_for('logout') }}" class="text-white/60 hover:text-white transition-colors font-label-technical text-label-technical">Logout</a>
+
+
+
       <button class="p-xs text-white/60 hover:text-white transition-colors duration-150 active:opacity-80 scale-95">
         <span class="material-symbols-outlined" data-icon="settings">settings</span>
       </button>

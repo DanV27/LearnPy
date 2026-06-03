@@ -1,7 +1,5 @@
-from flask import Flask, Response, render_template, request, jsonify, redirect, url_for, session
+from flask import Flask, Response, render_template, request, jsonify, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash
-from datetime import datetime
 import os
 
 from models import db, User, Generation
@@ -37,7 +35,23 @@ def load_user(user_id):
 with app.app_context():
     db.create_all()
 
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(err):
+    """Return JSON for fetch() callers; HTML otherwise."""
+    # Re-raise HTTPExceptions (404, 405, etc.) so Flask handles them normally.
+    from werkzeug.exceptions import HTTPException
+    if isinstance(err, HTTPException):
+        return err
+
+    app.logger.exception("Unhandled error")
+    wants_json = request.is_json or 'application/json' in (request.headers.get('Accept') or '')
+    if wants_json:
+        return jsonify({"error": f"Server error: {err}"}), 500
+    raise err  # let Flask render its normal debug page in the browser
+
 @app.route("/")
+@login_required
 def index():
     return render_template("main.html")
 
@@ -50,52 +64,62 @@ def about():
 def signup():
     """Sign up page"""
     if request.method == "POST":
-        data = request.get_json(silent=True) or {}
-        username = (data.get("username") or "").strip()
-        email = (data.get("email") or "").strip()
-        password = data.get("password") or ""
-        
-        # Validation
-        if not username or not email or not password:
-            return jsonify({"error": "All fields required"}), 400
-        
-        if len(password) < 6:
-            return jsonify({"error": "Password must be at least 6 characters"}), 400
-        
-        if User.query.filter_by(username=username).first():
-            return jsonify({"error": "Username already exists"}), 400
-        
-        if User.query.filter_by(email=email).first():
-            return jsonify({"error": "Email already exists"}), 400
-        
-        # Create user
-        user = User(username=username, email=email)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        
-        # Log them in
-        login_user(user)
-        return jsonify({"success": True, "redirect": url_for("index")})
-    
+        try:
+            data = request.get_json(silent=True) or {}
+            username = (data.get("username") or "").strip()
+            email = (data.get("email") or "").strip()
+            password = data.get("password") or ""
+
+            # Validation
+            if not username or not email or not password:
+                return jsonify({"error": "All fields required"}), 400
+
+            if len(password) < 6:
+                return jsonify({"error": "Password must be at least 6 characters"}), 400
+
+            if User.query.filter_by(username=username).first():
+                return jsonify({"error": "Username already exists"}), 400
+
+            if User.query.filter_by(email=email).first():
+                return jsonify({"error": "Email already exists"}), 400
+
+            # Create user
+            user = User(username=username, email=email)
+            user.set_password(password)
+            db.session.add(user)
+            db.session.commit()
+
+            # Log them in
+            login_user(user)
+            return jsonify({"success": True, "redirect": url_for("index")})
+        except Exception as e:
+            db.session.rollback()
+            app.logger.exception("Signup failed")
+            return jsonify({"error": f"Server error: {e}"}), 500
+
     return render_template("signup.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Login page"""
     if request.method == "POST":
-        data = request.get_json(silent=True) or {}
-        username = (data.get("username") or "").strip()
-        password = data.get("password") or ""
-        
-        user = User.query.filter_by(username=username).first()
-        
-        if not user or not user.check_password(password):
-            return jsonify({"error": "Invalid username or password"}), 401
-        
-        login_user(user)
-        return jsonify({"success": True, "redirect": url_for("index")})
-    
+        try:
+            data = request.get_json(silent=True) or {}
+            username = (data.get("username") or "").strip()
+            password = data.get("password") or ""
+
+            user = User.query.filter_by(username=username).first()
+
+            if not user or not user.check_password(password):
+                return jsonify({"error": "Invalid username or password"}), 401
+
+            login_user(user)
+            return jsonify({"success": True, "redirect": url_for("index")})
+        except Exception as e:
+            app.logger.exception("Login failed")
+            return jsonify({"error": f"Server error: {e}"}), 500
+
     return render_template("login.html")
 
 @app.route("/logout")
@@ -168,6 +192,23 @@ def generate():
             result["complexity"] = analyze_complexity(result["code"])
         except Exception as ce:
             result["complexity_error"] = str(ce)
+
+        # Step 6: Persist this generation to the user's history.
+        try:
+            final_tr = result.get("fixed_test_result") or result.get("test_result") or {}
+            generation = Generation(
+                user_id=current_user.id,
+                spec=spec[:500],
+                code=result["code"],
+                test_code=result.get("test_code"),
+                passed=bool(final_tr.get("passed")),
+            )
+            db.session.add(generation)
+            db.session.commit()
+            result["generation_id"] = generation.id
+        except Exception as save_err:
+            db.session.rollback()
+            result["save_error"] = str(save_err)
 
         return jsonify(result)
 
