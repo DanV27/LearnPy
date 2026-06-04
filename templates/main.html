@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html class="light" lang="en">
 
 <head>
   <meta charset="utf-8" />
@@ -9,64 +8,49 @@
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
     rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&amp;family=Geist:wght@400;500;600;700&amp;family=Space+Mono:wght@400;500&amp;display=swap"
-    rel="stylesheet" />
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .code-syntax-keyword { color: #FF7028; }
+    .code-syntax-string  { color: #9aa0a6; }
+    .code-syntax-comment { color: #5e5e5e; font-style: italic; }
+    .code-syntax-number  { color: #c6c6c6; }
+    .hover-lift { transition: transform 0.2s ease, border-color 0.2s ease; }
+    .hover-lift:hover { transform: translateY(-2px); border-color: #000000; }
+    body { font-family: 'Space Grotesk', sans-serif; }
+  </style>
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
       theme: {
         extend: {
           "colors": {
-            "on-primary-fixed-variant": "#474747",
-            "secondary-container": "#fb6d25",
-            "primary": "#000000",
-            "surface-container-high": "#e8e8e8",
-            "on-tertiary-container": "#848484",
-            "on-surface": "#1b1b1b",
-            "background": "#f9f9f9",
-            "on-error": "#ffffff",
-            "on-primary-container": "#848484",
-            "surface-variant": "#e2e2e2",
-            "inverse-primary": "#c6c6c6",
-            "outline": "#7e7576",
-            "on-tertiary-fixed": "#1b1b1b",
-            "outline-variant": "#cfc4c5",
-            "on-primary": "#ffffff",
-            "on-background": "#1b1b1b",
-            "surface-bright": "#f9f9f9",
-            "on-tertiary-fixed-variant": "#474747",
-            "surface": "#f9f9f9",
-            "on-secondary-fixed": "#360f00",
-            "on-secondary-container": "#591e00",
-            "surface-dim": "#dadada",
-            "on-surface-variant": "#4c4546",
-            "surface-tint": "#5e5e5e",
-            "on-secondary": "#ffffff",
-            "secondary-fixed-dim": "#ffb597",
-            "surface-container-low": "#f3f3f3",
-            "error-container": "#ffdad6",
-            "error": "#ba1a1a",
-            "surface-container": "#eeeeee",
-            "secondary-fixed": "#ffdbcd",
-            "primary-fixed": "#e2e2e2",
-            "primary-fixed-dim": "#c6c6c6",
-            "secondary": "#a43d00",
-            "tertiary": "#000000",
             "tertiary-container": "#1b1b1b",
-            "tertiary-fixed": "#e2e2e2",
+            "surface-container": "#eeeeee",
+            "surface-bright": "#f9f9f9",
+            "error": "#ba1a1a",
+            "surface": "#f9f9f9",
+            "outline": "#7e7576",
+            "tertiary": "#000000",
+            "primary": "#000000",
+            "outline-variant": "#cfc4c5",
+            "surface-variant": "#e2e2e2",
+            "background": "#f9f9f9",
+            "on-surface": "#1b1b1b",
+            "surface-container-high": "#e8e8e8",
+            "on-background": "#1b1b1b",
+            "surface-container-low": "#f3f3f3",
             "surface-container-lowest": "#ffffff",
-            "inverse-on-surface": "#f1f1f1",
-            "primary-container": "#fb6d25",
-            "on-secondary-fixed-variant": "#7d2d00",
-            "tertiary-fixed-dim": "#c6c6c6",
-            "inverse-surface": "#303030",
+            "secondary-container": "#fb6d25",
+            "primary-container": "#1b1b1b",
+            "on-surface-variant": "#4c4546",
+            "on-primary": "#ffffff",
             "on-tertiary": "#ffffff",
-            "on-error-container": "#93000a",
-            "surface-container-highest": "#e2e2e2",
-            "on-primary-fixed": "#1b1b1b"
+            "on-tertiary-container": "#848484",
+            "secondary": "#a43d00"
           },
           "borderRadius": {
             "DEFAULT": "0.125rem",
@@ -75,410 +59,487 @@
             "full": "0.75rem"
           },
           "spacing": {
-            "margin": "32px",
-            "md": "24px",
-            "lg": "48px",
-            "gutter": "24px",
-            "xs": "8px",
-            "sm": "16px",
-            "base": "4px",
-            "xl": "80px",
-            "grid-gutter": "1px"
+            "lg": "48px", "sm": "16px", "margin": "32px", "gutter": "24px",
+            "xs": "8px", "md": "24px", "base": "4px", "xl": "80px"
           },
           "fontFamily": {
-            "body-lg": ["Space Grotesk"],
-            "body-md": ["Space Grotesk"],
-            "label-technical": ["Space Mono"],
-            "headline-xl": ["Space Grotesk"],
             "headline-lg": ["Space Grotesk"],
-            "headline-md": ["Space Grotesk"]
+            "body-md": ["Space Grotesk"],
+            "display-xl": ["Space Grotesk"],
+            "label-md": ["Space Grotesk"],
+            "body-lg": ["Space Grotesk"],
+            "headline-md": ["Space Grotesk"],
+            "code": ["JetBrains Mono"]
           },
           "fontSize": {
-            "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
-            "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
-            "label-technical": ["14px", { "lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500" }],
-            "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
             "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-            "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }]
+            "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+            "display-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-md": ["14px", { "lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+            "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+            "code": ["14px", { "lineHeight": "1.6", "fontWeight": "400" }]
           }
         },
-      },
+      }
     }
   </script>
-  <style>
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-      font-size: 20px;
-    }
-
-    .grid-overlay {
-      background-image: radial-gradient(circle, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-      background-size: 24px 24px;
-    }
-
-    .code-glow {
-      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.03);
-    }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #1b1b1b;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #474747;
-      border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #7e7576;
-    }
-
-    body {
-      font-family: 'Space Grotesk', sans-serif;
-    }
-
-    .tech-label {
-      font-family: 'Space Mono', monospace;
-    }
-  </style>
 </head>
 
-<body class="bg-background text-on-background min-h-screen flex flex-col grid-overlay">
-  <!-- TopNavBar: Solid Black -->
-  <header
-    class="flex justify-between items-center w-full px-md h-16 border-b border-white/10 bg-black sticky top-0 z-50">
-    <div class="flex items-center gap-lg">
-      <a href="/" class="flex items-center gap-xs">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo"
-          class="h-9 w-9 rounded-lg" style="image-rendering: pixelated;" />
-        <span class="font-headline-md text-headline-md font-bold text-white uppercase tracking-tighter">LEARNPY</span>
-      </a>
-      <nav class="hidden md:flex gap-md">
-        <a class="text-white border-b-2 border-white pb-1 font-label-technical text-label-technical" href="/">Learn</a>
-        <a class="text-white/60 font-label-technical text-label-technical hover:text-white transition-colors duration-150"
-          href="/about">About</a>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
 
-      </nav>
-    </div>
-    <div class="flex items-center gap-md">
-      <span class="text-white/60 font-label-technical text-label-technical">{{ current_user.username }}</span>
-      <a href="{{ url_for('logout') }}" class="text-white/60 hover:text-white transition-colors font-label-technical text-label-technical">Logout</a>
-
-
-
-      <button class="p-xs text-white/60 hover:text-white transition-colors duration-150 active:opacity-80 scale-95">
-        <span class="material-symbols-outlined" data-icon="settings">settings</span>
-      </button>
-      <button class="p-xs text-white/60 hover:text-white transition-colors duration-150 active:opacity-80 scale-95">
-        <span class="material-symbols-outlined" data-icon="help">help</span>
-      </button>
+  <!-- TopAppBar -->
+  <header class="w-full top-0 bg-surface border-b border-outline-variant z-50 sticky">
+    <div class="flex justify-between items-center px-margin py-sm max-w-7xl mx-auto">
+      <div class="flex items-center gap-lg">
+        <a href="/" class="flex items-center gap-xs">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo"
+            class="h-14 w-14 rounded-lg" style="image-rendering: pixelated;" />
+          <span class="font-headline-md text-headline-md font-bold text-primary">LearnPy</span>
+        </a>
+        <nav class="hidden md:flex gap-md font-body-md text-body-md">
+          <a class="text-primary font-bold border-b-2 border-secondary cursor-pointer" href="/">Learn</a>
+          <a class="text-on-surface-variant hover:text-secondary transition-colors duration-200 cursor-pointer"
+            href="/about">About</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-sm">
+        <span class="text-on-surface-variant font-label-md text-label-md hidden sm:inline">
+          {{ current_user.username }}
+        </span>
+        <a href="{{ url_for('logout') }}"
+          class="bg-primary text-on-primary px-md py-xs font-label-md text-label-md cursor-pointer active:opacity-80 rounded-lg">
+          Logout
+        </a>
+      </div>
     </div>
   </header>
-  <!-- Main Workspace -->
-  <main class="flex-grow flex flex-col md:flex-row overflow-hidden h-[calc(100vh-100px)]">
-    <!-- Left Column: Request Section (40%) -->
-    <section class="w-full md:w-[40%] border-r border-outline-variant bg-surface flex flex-col p-lg gap-lg">
-      <div class="space-y-xs">
-        <div class="flex items-center gap-sm">
-          <span class="material-symbols-outlined text-primary" data-icon="school">school</span>
-          <h2 class="font-headline-md text-headline-md text-on-surface">What do you want to learn?</h2>
+
+  <main class="flex-grow">
+
+    <!-- Hero Section -->
+    <section class="bg-background pt-xl pb-lg px-margin flex flex-col items-center justify-center text-center">
+      <h1 class="font-display-xl text-display-xl text-primary mb-md max-w-2xl">
+        What would you like to learn?
+      </h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant mb-md max-w-xl">
+        Pick a Python concept, data structure, or algorithm. LearnPy implements it, tests it, and walks through how
+        it works.
+      </p>
+
+      <form id="learn-form" class="relative w-full max-w-2xl group">
+        <div class="absolute inset-y-0 left-md flex items-center pointer-events-none">
+          <span class="material-symbols-outlined text-outline">search</span>
         </div>
-        <p class="font-body-md text-on-surface-variant">Pick a specific Python concept, data structure, or algorithm.
-          LearnPy will implement it, test it, and walk through how it works.</p>
-      </div>
-      <div class="flex-grow flex flex-col gap-md">
-        <div class="relative flex-grow group">
-          <label
-            class="absolute top-sm left-md font-label-technical text-label-technical text-outline uppercase tracking-wider">Lesson
-            Topic</label>
-          <textarea id="prompt-input"
-            class="w-full h-full bg-surface-container-low border border-outline-variant rounded-lg p-lg pt-lg font-label-technical text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none placeholder:text-outline/50"
-            placeholder="What do you want to learn?
-Examples:
-- Implement a binary search tree
-- Create a hash map
-- Parse a JSON file
-- Implement bubble sort
-- How do I validate an email?"></textarea>
-        </div>
-        <div class="flex flex-col gap-sm">
-          <div class="flex justify-between items-center px-xs">
-            <span class="font-label-technical text-label-technical text-outline uppercase">MODEL: Claude-Opus-4-6</span>
-            <span class="font-label-technical text-label-technical text-outline uppercase">TOKENS: <span
-                id="token-count">0</span>/2048</span>
-          </div>
-          <!-- Primary Button: Orange -->
-          <button id="generate-btn"
-            class="w-full bg-secondary-container text-white h-14 rounded-lg font-headline-md text-headline-md font-bold hover:brightness-110 transition-all flex items-center justify-center gap-sm shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
-            <span id="generate-btn-icon" class="material-symbols-outlined" data-icon="school"
-              style="font-variation-settings: 'FILL' 1;">school</span>
-            <span id="generate-btn-label">TEACH ME</span>
-          </button>
-          <!-- Status / Stats Panel -->
-          <div id="status-panel" class="hidden flex-wrap gap-xs pt-xs">
-            <span id="status-syntax"
-              class="hidden font-label-technical text-label-technical px-xs py-[2px] rounded-lg"></span>
-            <span id="status-tests"
-              class="hidden font-label-technical text-label-technical px-xs py-[2px] rounded-lg"></span>
-            <span id="status-fixed"
-              class="hidden font-label-technical text-label-technical px-xs py-[2px] rounded-lg bg-yellow-100 text-yellow-800"></span>
-            <span id="status-complexity"
-              class="hidden font-label-technical text-label-technical px-xs py-[2px] rounded-lg bg-surface-container-high text-on-surface"></span>
-            <span id="status-lines"
-              class="hidden font-label-technical text-label-technical px-xs py-[2px] rounded-lg bg-surface-container-high text-on-surface"></span>
-          </div>
-        </div>
+        <input id="prompt-input" type="text" autocomplete="off"
+          class="w-full bg-surface-container-lowest border border-outline-variant py-md pl-xl pr-[140px] font-body-md focus:border-primary focus:ring-0 transition-all outline-none rounded-lg"
+          placeholder="e.g. Implement a binary search tree" />
+        <button id="generate-btn" type="submit"
+          class="absolute right-sm top-1/2 -translate-y-1/2 bg-secondary-container text-primary font-bold px-md py-base hover:brightness-110 transition-all rounded-lg flex items-center gap-xs disabled:opacity-50 disabled:cursor-not-allowed">
+          <span id="generate-btn-icon" class="material-symbols-outlined" style="font-size: 18px;">school</span>
+          <span id="generate-btn-label">Teach Me</span>
+        </button>
+      </form>
+
+      <div class="mt-md flex gap-xs flex-wrap justify-center">
+        <span class="text-label-md font-label-md text-on-surface-variant">Popular:</span>
+        <button class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
+          data-prompt="Implement a binary search tree in Python">Binary search tree</button>
+        <button class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
+          data-prompt="Implement a hash map from scratch in Python">Hash map</button>
+        <button class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
+          data-prompt="Implement bubble sort in Python with type hints">Bubble sort</button>
+        <button class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
+          data-prompt="Parse a JSON file in Python and pretty-print it">Parse JSON</button>
+        <button class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
+          data-prompt="How do I validate an email address in Python?">Validate email</button>
       </div>
     </section>
-    <!-- Right Column: Output Section (60%) -->
-    <section class="w-full md:w-[60%] bg-[#1b1b1b] flex flex-col">
-      <div class="h-12 border-b border-white/5 flex items-center justify-between px-lg bg-[#2a2a2a]">
-        <div class="flex items-center gap-md">
+
+    <!-- Output Section (hidden until results) -->
+    <section id="output-section" class="hidden max-w-7xl mx-auto px-margin pb-lg">
+      <div class="bg-tertiary-container rounded-xl overflow-hidden border border-outline shadow-2xl">
+        <!-- Editor chrome -->
+        <div class="flex items-center justify-between px-md py-sm border-b border-outline-variant/20">
           <div class="flex items-center gap-xs">
-            <div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
-            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
-            <div class="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+            <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+            <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+            <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+            <span id="code-filename" class="ml-sm font-code text-[12px] text-on-tertiary-container">lesson.py</span>
           </div>
-          <div class="h-8 px-md bg-[#1b1b1b] border-x border-t border-white/10 rounded-t-lg flex items-center gap-sm">
-            <span class="material-symbols-outlined text-sm text-blue-400" data-icon="python">python</span>
-            <span id="code-filename" class="font-label-technical text-label-technical text-white/90">generated.py</span>
+          <div class="flex items-center gap-md">
+            <button id="copy-btn"
+              class="flex items-center gap-xs text-on-tertiary-container hover:text-white transition-colors disabled:opacity-30"
+              disabled>
+              <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
+              <span id="copy-btn-label" class="font-code text-[12px]">COPY</span>
+            </button>
+            <button id="export-btn"
+              class="flex items-center gap-xs text-on-tertiary-container hover:text-white transition-colors disabled:opacity-30"
+              disabled>
+              <span class="material-symbols-outlined" style="font-size: 16px;">download</span>
+              <span class="font-code text-[12px]">EXPORT</span>
+            </button>
           </div>
         </div>
-        <div class="flex items-center gap-md">
-          <button id="copy-btn"
-            class="flex items-center gap-xs text-white/60 hover:text-white transition-colors disabled:opacity-30"
-            disabled>
-            <span class="material-symbols-outlined" data-icon="content_copy">content_copy</span>
-            <span id="copy-btn-label" class="font-label-technical text-label-technical">COPY</span>
-          </button>
-          <button id="export-btn"
-            class="flex items-center gap-xs text-white/60 hover:text-white transition-colors disabled:opacity-30"
-            disabled>
-            <span class="material-symbols-outlined" data-icon="download">download</span>
-            <span class="font-label-technical text-label-technical">EXPORT</span>
-          </button>
+        <!-- Code body -->
+        <div class="p-md overflow-auto max-h-[60vh]">
+          <pre id="code-output" class="font-code text-code text-on-tertiary-container leading-relaxed whitespace-pre"><span class="code-syntax-comment"># Your lesson will appear here.</span></pre>
         </div>
-      </div>
-      <!-- Code Editor Surface: Dark contrast -->
-      <div class="flex-grow p-lg overflow-auto bg-[#1b1b1b] code-glow">
-        <pre id="code-output" class="font-label-technical text-white/80 text-body-md leading-relaxed whitespace-pre"><span class="text-white/40"># Your Python lesson will appear here.
-# Pick a topic on the left, then press TEACH ME.</span></pre>
+        <!-- Status footer -->
+        <div id="status-bar" class="hidden mt-base px-md py-sm border-t border-outline-variant/20 flex flex-wrap gap-xs items-center">
+          <span id="status-syntax" class="hidden font-code text-[12px] px-xs py-[2px] rounded-lg"></span>
+          <span id="status-tests" class="hidden font-code text-[12px] px-xs py-[2px] rounded-lg"></span>
+          <span id="status-fixed" class="hidden font-code text-[12px] px-xs py-[2px] rounded-lg bg-yellow-100 text-yellow-800"></span>
+          <span id="status-complexity" class="hidden font-code text-[12px] px-xs py-[2px] rounded-lg bg-surface-container-high text-primary"></span>
+          <span id="status-lines" class="hidden font-code text-[12px] px-xs py-[2px] rounded-lg bg-surface-container-high text-primary"></span>
+        </div>
       </div>
     </section>
+
+    <!-- Topic Grid (hidden once results exist) -->
+    <section id="topics-section" class="max-w-7xl mx-auto px-margin py-lg">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer"
+          data-prompt="Teach me Python core syntax — variables, loops, and control flow with examples">
+          <div class="flex justify-between items-start mb-sm">
+            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">terminal</span>
+            <span class="text-[10px] font-code px-xs py-[2px] bg-primary text-on-primary">BEGINNER</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Core Syntax</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Master variables, loops, and control flow with clinical precision.</p>
+          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </div>
+        </div>
+        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer"
+          data-prompt="Implement common data structures in Python — linked list, stack, queue, and hash map">
+          <div class="flex justify-between items-start mb-sm">
+            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">database</span>
+            <span class="text-[10px] font-code px-xs py-[2px] bg-primary text-on-primary">INTERMEDIATE</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Data Structures</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Build linked lists, stacks, queues, hash maps, and trees from scratch.</p>
+          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </div>
+        </div>
+        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer"
+          data-prompt="Implement classic sorting algorithms in Python — bubble sort, merge sort, quicksort">
+          <div class="flex justify-between items-start mb-sm">
+            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">sort</span>
+            <span class="text-[10px] font-code px-xs py-[2px] bg-surface-variant text-primary border border-outline-variant">ADVANCED</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Algorithms</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Sort, search, and traverse — the algorithms behind every interview.</p>
+          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </div>
+        </div>
+        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer md:col-span-2 lg:col-span-1"
+          data-prompt="Show me how to use Python's standard library — collections, itertools, datetime, json">
+          <div class="flex justify-between items-start mb-sm">
+            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">inventory_2</span>
+            <span class="text-[10px] font-code px-xs py-[2px] bg-primary text-on-primary">UTILITY</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Standard Library</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">collections, itertools, datetime, json — the batteries that come included.</p>
+          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </div>
+        </div>
+        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer"
+          data-prompt="Teach me Python decorators, generators, and context managers with examples">
+          <div class="flex justify-between items-start mb-sm">
+            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">bolt</span>
+            <span class="text-[10px] font-code px-xs py-[2px] bg-surface-variant text-primary border border-outline-variant">ADVANCED</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Pythonic Tricks</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Decorators, generators, and context managers — write code like a Pythonista.</p>
+          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </div>
+        </div>
+        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer"
+          data-prompt="Common everyday Python how-tos — validate email, retry HTTP, debounce a function, read a file">
+          <div class="flex justify-between items-start mb-sm">
+            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">lightbulb</span>
+            <span class="text-[10px] font-code px-xs py-[2px] bg-primary text-on-primary">PRACTICAL</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Everyday How-Tos</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Validate an email, retry an HTTP call, debounce a function, read a file.</p>
+          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Code Preview (static demo) -->
+    <section class="max-w-7xl mx-auto px-margin py-xl grid lg:grid-cols-2 gap-lg items-center">
+      <div class="space-y-md">
+        <span class="font-code text-label-md text-secondary tracking-widest uppercase">System Status</span>
+        <h2 class="font-display-xl text-headline-lg text-primary">Every Lesson Is Verified</h2>
+        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">
+          LearnPy doesn't just write code — it writes pytest tests for the code, runs them in a sandbox, and only
+          shows you the lesson once it passes. If the first attempt fails, it tries again.
+        </p>
+        <div class="flex gap-md pt-sm">
+          <button onclick="document.getElementById('prompt-input').focus()"
+            class="bg-tertiary text-on-tertiary px-lg py-xs font-label-md text-label-md rounded-lg">Try It Now</button>
+          <a href="/about"
+            class="border border-primary text-primary px-lg py-xs font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors flex items-center">How
+            It Works</a>
+        </div>
+      </div>
+      <div class="bg-tertiary-container rounded-xl overflow-hidden border border-outline p-md shadow-2xl">
+        <div class="flex items-center gap-xs mb-md">
+          <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+          <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+          <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+          <span class="ml-sm font-code text-[12px] text-on-tertiary-container">binary_search.py</span>
+        </div>
+<pre class="font-code text-code leading-relaxed text-on-tertiary-container"><span class="code-syntax-keyword">def</span> <span class="text-[#5cbcf9]">binary_search</span>(arr: <span class="code-syntax-keyword">list</span>, target: <span class="code-syntax-keyword">int</span>) -&gt; <span class="code-syntax-keyword">int</span>:
+    low, high = <span class="code-syntax-number">0</span>, <span class="code-syntax-keyword">len</span>(arr) - <span class="code-syntax-number">1</span>
+    <span class="code-syntax-keyword">while</span> low &lt;= high:
+        mid = (low + high) // <span class="code-syntax-number">2</span>
+        <span class="code-syntax-keyword">if</span> arr[mid] == target:
+            <span class="code-syntax-keyword">return</span> mid
+        <span class="code-syntax-keyword">elif</span> arr[mid] &lt; target:
+            low = mid + <span class="code-syntax-number">1</span>
+        <span class="code-syntax-keyword">else</span>:
+            high = mid - <span class="code-syntax-number">1</span>
+    <span class="code-syntax-keyword">return</span> -<span class="code-syntax-number">1</span></pre>
+        <div class="mt-lg pt-md border-t border-outline-variant/20">
+          <div class="flex items-center gap-sm text-[12px] font-code text-on-tertiary-container opacity-60">
+            <span class="material-symbols-outlined text-[14px]">check_circle</span>
+            Execution complete. 4/4 tests passed.
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
-  <!-- Footer: Solid Black -->
-  <footer
-    class="fixed bottom-0 w-full flex justify-between items-center px-sm py-xs border-t border-white/10 bg-black z-50">
-    <div class="flex items-center gap-lg">
 
-
-      <a class="text-white hover:text-white/80 transition-colors font-label-technical text-label-technical underline decoration-white/20"
-        href="https://github.com/danv27" target="_blank">Created by Daniel Valenzuela</a>
-      <span class="font-label-technical text-label-technical text-white/60">©2026</span>
-    </div>
-    <div class="flex gap-md">
-      <span class="font-label-technical text-label-technical text-white/60">Status: Optimal</span>
-      <span class="font-label-technical text-label-technical text-white/60">Latency: 24ms</span>
-      <span class="font-label-technical text-label-technical text-white">V:1.1</span>
+  <!-- Footer -->
+  <footer class="w-full mt-auto bg-tertiary">
+    <div class="flex flex-col md:flex-row justify-between items-center px-margin py-lg w-full max-w-7xl mx-auto">
+      <div class="flex flex-col gap-xs mb-md md:mb-0">
+        <span class="font-headline-md text-headline-md text-on-tertiary">LearnPy</span>
+        <p class="font-label-md text-label-md text-outline-variant">© 2026 LearnPy. Built for technical precision.</p>
+        <p class="font-label-md text-label-md text-outline-variant">
+          Created by <a class="text-secondary hover:text-white transition-colors underline decoration-secondary/30 underline-offset-4"
+            href="https://github.com/danv27" target="_blank">Daniel Valenzuela</a>
+        </p>
+      </div>
+      <div class="flex gap-lg font-label-md text-label-md">
+        <a class="text-outline-variant hover:text-white transition-colors" href="/about">About</a>
+        <a class="text-outline-variant hover:text-white transition-colors" href="{{ url_for('logout') }}">Logout</a>
+      </div>
     </div>
   </footer>
-  <!-- Empty spacer for mobile UI considerations -->
-  <div class="md:hidden h-20"></div>
+
   <script>
-      (function () {
-        const promptInput = document.getElementById('prompt-input');
-        const tokenCount = document.getElementById('token-count');
-        const generateBtn = document.getElementById('generate-btn');
-        const generateBtnIcon = document.getElementById('generate-btn-icon');
-        const generateBtnLabel = document.getElementById('generate-btn-label');
-        const codeOutput = document.getElementById('code-output');
-        const codeFilename = document.getElementById('code-filename');
-        const copyBtn = document.getElementById('copy-btn');
-        const copyBtnLabel = document.getElementById('copy-btn-label');
-        const exportBtn = document.getElementById('export-btn');
+    (function () {
+      const form = document.getElementById('learn-form');
+      const promptInput = document.getElementById('prompt-input');
+      const generateBtn = document.getElementById('generate-btn');
+      const generateBtnIcon = document.getElementById('generate-btn-icon');
+      const generateBtnLabel = document.getElementById('generate-btn-label');
 
-        const statusPanel = document.getElementById('status-panel');
-        const statusSyntax = document.getElementById('status-syntax');
-        const statusTests = document.getElementById('status-tests');
-        const statusFixed = document.getElementById('status-fixed');
-        const statusComplexity = document.getElementById('status-complexity');
-        const statusLines = document.getElementById('status-lines');
+      const outputSection = document.getElementById('output-section');
+      const codeOutput = document.getElementById('code-output');
+      const codeFilename = document.getElementById('code-filename');
+      const copyBtn = document.getElementById('copy-btn');
+      const copyBtnLabel = document.getElementById('copy-btn-label');
+      const exportBtn = document.getElementById('export-btn');
+      const topicsSection = document.getElementById('topics-section');
 
-        let currentCode = '';
+      const statusBar = document.getElementById('status-bar');
+      const statusSyntax = document.getElementById('status-syntax');
+      const statusTests = document.getElementById('status-tests');
+      const statusFixed = document.getElementById('status-fixed');
+      const statusComplexity = document.getElementById('status-complexity');
+      const statusLines = document.getElementById('status-lines');
 
-        // Rough token estimate: ~4 chars per token. Good enough for a UI counter.
-        function estimateTokens(text) {
-          return Math.ceil((text || '').length / 4);
+      let currentCode = '';
+
+      const PYTHON_KEYWORDS = [
+        'False','None','True','and','as','assert','async','await','break',
+        'class','continue','def','del','elif','else','except','finally','for',
+        'from','global','if','import','in','is','lambda','nonlocal','not','or',
+        'pass','raise','return','try','while','with','yield','self'
+      ];
+
+      function escapeHTML(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function highlightPython(code) {
+        const lines = code.split('\n');
+        return lines.map((rawLine, i) => {
+          let line = escapeHTML(rawLine);
+          // strings
+          line = line.replace(/('[^']*'|"[^"]*")/g, '<span class="code-syntax-string">$1</span>');
+          // comments (anything from # to end)
+          line = line.replace(/(#.*)$/, '<span class="code-syntax-comment">$1</span>');
+          // keywords
+          const kwRe = new RegExp('\\b(' + PYTHON_KEYWORDS.join('|') + ')\\b', 'g');
+          line = line.replace(kwRe, '<span class="code-syntax-keyword">$1</span>');
+          // numbers
+          line = line.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="code-syntax-number">$1</span>');
+          const num = String(i + 1).padStart(3, ' ');
+          return '<span class="code-syntax-comment">' + num + '</span>  ' + line;
+        }).join('\n');
+      }
+
+      function setStatus(el, text, classes) {
+        el.textContent = text;
+        el.className = 'font-code text-[12px] px-xs py-[2px] rounded-lg ' + classes;
+        el.classList.remove('hidden');
+      }
+
+      function clearStatus() {
+        statusBar.classList.add('hidden');
+        [statusSyntax, statusTests, statusFixed, statusComplexity, statusLines]
+          .forEach(el => el.classList.add('hidden'));
+      }
+
+      function setLoading(loading) {
+        generateBtn.disabled = loading;
+        promptInput.disabled = loading;
+        if (loading) {
+          generateBtnIcon.textContent = 'progress_activity';
+          generateBtnIcon.classList.add('animate-spin');
+          generateBtnLabel.textContent = 'Teaching...';
+        } else {
+          generateBtnIcon.textContent = 'school';
+          generateBtnIcon.classList.remove('animate-spin');
+          generateBtnLabel.textContent = 'Teach Me';
         }
+      }
 
-        function updateTokens() {
-          tokenCount.textContent = estimateTokens(promptInput.value);
+      function showOutput() {
+        outputSection.classList.remove('hidden');
+        topicsSection.classList.add('hidden');
+        outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function renderCode(code) {
+        currentCode = code;
+        codeOutput.innerHTML = highlightPython(code);
+        copyBtn.disabled = false;
+        exportBtn.disabled = false;
+      }
+
+      function renderStatus(data) {
+        statusBar.classList.remove('hidden');
+        statusBar.classList.add('flex');
+        if (data.valid_syntax) {
+          setStatus(statusSyntax, '✓ SYNTAX OK', 'bg-green-100 text-green-800');
+        } else {
+          setStatus(statusSyntax, '✗ SYNTAX ERROR', 'bg-red-100 text-red-800');
         }
-        promptInput.addEventListener('input', updateTokens);
-
-        function escapeHTML(s) {
-          return s
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
+        const tr = data.fixed_test_result || data.test_result;
+        if (tr) {
+          setStatus(statusTests, 'TESTS: ' + tr.passed_count + '/' + tr.total + ' PASSED',
+            tr.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800');
         }
-
-        // Very light Python syntax highlighter — keeps the dark template style.
-        function highlightPython(code) {
-          const lines = code.split('\n');
-          const html = lines.map((rawLine, i) => {
-            let line = escapeHTML(rawLine);
-            const num = String(i + 1).padEnd(3, ' ');
-            return `<span class="text-white/30">${num}</span>${line}`;
-          }).join('\n');
-          return html;
+        if (data.fixed) {
+          setStatus(statusFixed, '⚙ AUTO-FIXED', 'bg-yellow-100 text-yellow-800');
         }
-
-        function setStatus(el, text, classes) {
-          el.textContent = text;
-          el.className = 'font-label-technical text-label-technical px-xs py-[2px] rounded-lg ' + classes;
-          el.classList.remove('hidden');
+        if (data.complexity) {
+          setStatus(statusComplexity, 'COMPLEXITY: ' + data.complexity.cyclomatic_complexity,
+            'bg-surface-container-high text-primary');
+          setStatus(statusLines, 'LINES: ' + data.complexity.lines_of_code,
+            'bg-surface-container-high text-primary');
         }
+      }
 
-        function clearStatus() {
-          statusPanel.classList.add('hidden');
-          [statusSyntax, statusTests, statusFixed, statusComplexity, statusLines]
-            .forEach(el => el.classList.add('hidden'));
+      async function generate() {
+        const prompt = promptInput.value.trim();
+        if (!prompt) {
+          promptInput.focus();
+          return;
         }
+        clearStatus();
+        copyBtn.disabled = true;
+        exportBtn.disabled = true;
+        codeOutput.innerHTML = '<span class="code-syntax-comment"># Preparing your Python lesson...</span>';
+        showOutput();
+        setLoading(true);
 
-        function setLoading(loading) {
-          generateBtn.disabled = loading;
-          promptInput.disabled = loading;
-          if (loading) {
-            generateBtnIcon.textContent = 'progress_activity';
-            generateBtnIcon.classList.add('animate-spin');
-            generateBtnLabel.textContent = 'TEACHING...';
-          } else {
-            generateBtnIcon.textContent = 'school';
-            generateBtnIcon.classList.remove('animate-spin');
-            generateBtnLabel.textContent = 'TEACH ME';
-          }
-        }
+        try {
+          const res = await fetch('/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt }),
+          });
+          const data = await res.json();
 
-        function renderCode(code) {
-          currentCode = code;
-          codeOutput.innerHTML = highlightPython(code);
-          copyBtn.disabled = false;
-          exportBtn.disabled = false;
-        }
-
-        function renderStatus(data) {
-          statusPanel.classList.remove('hidden');
-          statusPanel.classList.add('flex');
-
-          if (data.valid_syntax) {
-            setStatus(statusSyntax, '✓ SYNTAX OK', 'bg-green-100 text-green-800');
-          } else {
-            setStatus(statusSyntax, '✗ SYNTAX ERROR', 'bg-red-100 text-red-800');
-          }
-
-          const tr = data.fixed_test_result || data.test_result;
-          if (tr) {
-            const label = `TESTS: ${tr.passed_count}/${tr.total} PASSED`;
-            setStatus(statusTests, label,
-              tr.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800');
-          }
-
-          if (data.fixed) {
-            setStatus(statusFixed, '⚙ AUTO-FIXED', 'bg-yellow-100 text-yellow-800');
-          }
-
-          if (data.complexity) {
-            setStatus(statusComplexity,
-              `COMPLEXITY: ${data.complexity.cyclomatic_complexity}`,
-              'bg-surface-container-high text-on-surface');
-            setStatus(statusLines,
-              `LINES: ${data.complexity.lines_of_code}`,
-              'bg-surface-container-high text-on-surface');
-          }
-        }
-
-        async function generate() {
-          const prompt = promptInput.value.trim();
-          if (!prompt) {
-            promptInput.focus();
+          if (!res.ok) {
+            codeOutput.innerHTML =
+              '<span class="text-red-400"># Error: ' + escapeHTML(data.error || res.statusText) + '</span>';
             return;
           }
-          clearStatus();
-          copyBtn.disabled = true;
-          exportBtn.disabled = true;
-          codeOutput.innerHTML = '<span class="text-white/40"># Preparing your Python lesson...</span>';
-          setLoading(true);
 
-          try {
-            const res = await fetch('/generate', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ prompt }),
-            });
-            const data = await res.json();
+          renderCode(data.code || '');
+          renderStatus(data);
 
-            if (!res.ok) {
-              codeOutput.innerHTML =
-                '<span class="text-red-400">Error: ' + escapeHTML(data.error || res.statusText) + '</span>';
-              return;
-            }
-
-            renderCode(data.code || '');
-            renderStatus(data);
-
-            // Update filename based on first function detected, fall back to generated.py
-            const match = (data.code || '').match(/def\s+([A-Za-z_][A-Za-z0-9_]*)/);
-            codeFilename.textContent = (match ? match[1] : 'generated') + '.py';
-          } catch (err) {
-            codeOutput.innerHTML =
-              '<span class="text-red-400">Network error: ' + escapeHTML(err.message) + '</span>';
-          } finally {
-            setLoading(false);
-          }
+          // Auto-name file from first def
+          const match = (data.code || '').match(/def\s+([A-Za-z_][A-Za-z0-9_]*)/);
+          codeFilename.textContent = (match ? match[1] : 'lesson') + '.py';
+        } catch (err) {
+          codeOutput.innerHTML =
+            '<span class="text-red-400"># Network error: ' + escapeHTML(err.message) + '</span>';
+        } finally {
+          setLoading(false);
         }
+      }
 
-        generateBtn.addEventListener('click', generate);
+      form.addEventListener('submit', (e) => { e.preventDefault(); generate(); });
 
-        // Cmd/Ctrl + Enter triggers generation
-        promptInput.addEventListener('keydown', (e) => {
-          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-            e.preventDefault();
-            generate();
-          }
+      promptInput.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          e.preventDefault();
+          generate();
+        }
+      });
+
+      // Popular chips + topic cards pre-fill the input and run
+      document.querySelectorAll('.suggestion, .suggestion-card').forEach(el => {
+        el.addEventListener('click', () => {
+          const text = el.getAttribute('data-prompt') || el.textContent.trim();
+          promptInput.value = text;
+          generate();
         });
+      });
 
-        copyBtn.addEventListener('click', async () => {
-          if (!currentCode) return;
-          try {
-            await navigator.clipboard.writeText(currentCode);
-            copyBtnLabel.textContent = 'COPIED!';
-            setTimeout(() => (copyBtnLabel.textContent = 'COPY'), 1500);
-          } catch (e) {
-            copyBtnLabel.textContent = 'FAILED';
-            setTimeout(() => (copyBtnLabel.textContent = 'COPY'), 1500);
-          }
-        });
+      copyBtn.addEventListener('click', async () => {
+        if (!currentCode) return;
+        try {
+          await navigator.clipboard.writeText(currentCode);
+          copyBtnLabel.textContent = 'COPIED!';
+          setTimeout(() => (copyBtnLabel.textContent = 'COPY'), 1500);
+        } catch (e) {
+          copyBtnLabel.textContent = 'FAILED';
+          setTimeout(() => (copyBtnLabel.textContent = 'COPY'), 1500);
+        }
+      });
 
-        exportBtn.addEventListener('click', () => {
-          if (!currentCode) return;
-          const blob = new Blob([currentCode], { type: 'text/x-python' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = codeFilename.textContent || 'generated.py';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        });
-
-        updateTokens();
-      })();
+      exportBtn.addEventListener('click', () => {
+        if (!currentCode) return;
+        const blob = new Blob([currentCode], { type: 'text/x-python' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = codeFilename.textContent || 'lesson.py';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    })();
   </script>
 </body>
 
