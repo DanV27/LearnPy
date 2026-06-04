@@ -5,7 +5,8 @@
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>PythonAid — Learn Python by Building</title>
+  <title>LearnPy — Learn Python by Building</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -151,7 +152,11 @@
   <header
     class="flex justify-between items-center w-full px-md h-16 border-b border-white/10 bg-black sticky top-0 z-50">
     <div class="flex items-center gap-lg">
-      <a href="/" class="font-headline-md text-headline-md font-bold text-white uppercase tracking-tighter">PYTHONAID</a>
+      <a href="/" class="flex items-center gap-xs">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo"
+          class="h-9 w-9 rounded-lg" style="image-rendering: pixelated;" />
+        <span class="font-headline-md text-headline-md font-bold text-white uppercase tracking-tighter">LEARNPY</span>
+      </a>
       <nav class="hidden md:flex gap-md">
         <a class="text-white border-b-2 border-white pb-1 font-label-technical text-label-technical" href="/">Learn</a>
         <a class="text-white/60 font-label-technical text-label-technical hover:text-white transition-colors duration-150"
@@ -183,7 +188,7 @@
           <h2 class="font-headline-md text-headline-md text-on-surface">What do you want to learn?</h2>
         </div>
         <p class="font-body-md text-on-surface-variant">Pick a specific Python concept, data structure, or algorithm.
-          PythonAid will implement it, test it, and walk through how it works.</p>
+          LearnPy will implement it, test it, and walk through how it works.</p>
       </div>
       <div class="flex-grow flex flex-col gap-md">
         <div class="relative flex-grow group">

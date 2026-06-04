@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>Sign Up — PythonAid</title>
+  <title>Sign Up — LearnPy</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
     rel="stylesheet" />
@@ -82,7 +83,11 @@
   <!-- TopNavBar -->
   <header class="flex justify-between items-center w-full px-md h-16 border-b border-white/10 bg-black sticky top-0 z-50">
     <div class="flex items-center gap-lg">
-      <a href="/" class="font-headline-md text-headline-md font-bold text-white uppercase tracking-tighter">PYTHONAID</a>
+      <a href="/" class="flex items-center gap-xs">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo"
+          class="h-9 w-9 rounded-lg" style="image-rendering: pixelated;" />
+        <span class="font-headline-md text-headline-md font-bold text-white uppercase tracking-tighter">LEARNPY</span>
+      </a>
     </div>
     <div class="flex items-center gap-md">
       <a href="{{ url_for('login') }}"
@@ -93,10 +98,15 @@
   <!-- Centered card -->
   <main class="flex-grow flex items-center justify-center px-md py-lg">
     <div class="w-full max-w-md flex flex-col gap-md">
-      <div class="flex flex-col gap-xs">
-        <span class="font-label-technical text-label-technical text-outline uppercase tracking-wider">// New User</span>
-        <h1 class="font-headline-xl text-headline-xl text-on-surface">Create Account</h1>
-        <p class="font-body-md text-on-surface-variant">Join PythonAid and start learning Python — one verified lesson at a time.</p>
+      <div class="flex items-center gap-md">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy mascot"
+          class="h-20 w-20 rounded-xl border border-outline-variant bg-[#1b1b1b] shadow-md"
+          style="image-rendering: pixelated;" />
+        <div class="flex flex-col gap-xs">
+          <span class="font-label-technical text-label-technical text-outline uppercase tracking-wider">// New User</span>
+          <h1 class="font-headline-xl text-headline-xl text-on-surface">Create Account</h1>
+          <p class="font-body-md text-on-surface-variant">Join LearnPy and start learning Python — one verified lesson at a time.</p>
+        </div>
       </div>
 
       <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">

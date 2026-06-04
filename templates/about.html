@@ -5,7 +5,8 @@
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>About — PythonAid</title>
+  <title>About — LearnPy</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
     rel="stylesheet" />
@@ -146,8 +147,11 @@
   <header
     class="flex justify-between items-center w-full px-md h-16 border-b border-white/10 bg-black sticky top-0 z-50">
     <div class="flex items-center gap-lg">
-      <a href="/"
-        class="font-headline-md text-headline-md font-bold text-white uppercase tracking-tighter">PYTHONAID</a>
+      <a href="/" class="flex items-center gap-xs">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo"
+          class="h-9 w-9 rounded-lg" style="image-rendering: pixelated;" />
+        <span class="font-headline-md text-headline-md font-bold text-white uppercase tracking-tighter">LEARNPY</span>
+      </a>
       <nav class="hidden md:flex gap-md">
         <a class="text-white/60 font-label-technical text-label-technical hover:text-white transition-colors duration-150"
           href="/">Learn</a>
@@ -178,26 +182,33 @@
     <div class="w-full max-w-4xl flex flex-col gap-lg">
 
       <!-- Hero -->
-      <section class="flex flex-col gap-sm">
-        <span class="font-label-technical text-label-technical text-outline uppercase tracking-wider">// About PythonAid</span>
-        <h1 class="font-headline-xl text-headline-xl text-on-surface">PythonAid</h1>
-        <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
-          Learn Python by building the things you keep reading about. Type a topic — a data structure,
-          an algorithm, a standard-library trick — and PythonAid implements it, tests it, and walks you
-          through how it actually works.
-        </p>
-        <p class="font-body-md text-on-surface-variant max-w-2xl">
-          Think of it as a personal Python tutor focused on one language done well — an alternative to the
-          ad-heavy, copy-paste-friendly reference sites. Every lesson is a working, tested implementation
-          you can run.
-        </p>
-        <div class="flex flex-wrap gap-xs pt-xs">
-          <span
-            class="font-label-technical text-label-technical px-xs py-[2px] rounded-lg bg-green-100 text-green-800 uppercase">Status:
-            In Development</span>
-          <span
-            class="font-label-technical text-label-technical px-xs py-[2px] rounded-lg bg-surface-container-high text-on-surface uppercase">Python
-            3.9+</span>
+      <section class="flex flex-col-reverse md:flex-row gap-lg items-center">
+        <div class="flex flex-col gap-sm flex-1">
+          <span class="font-label-technical text-label-technical text-outline uppercase tracking-wider">// About LearnPy</span>
+          <h1 class="font-headline-xl text-headline-xl text-on-surface">LearnPy</h1>
+          <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+            Learn Python by building the things you keep reading about. Type a topic — a data structure,
+            an algorithm, a standard-library trick — and LearnPy implements it, tests it, and walks you
+            through how it actually works.
+          </p>
+          <p class="font-body-md text-on-surface-variant max-w-2xl">
+            Think of it as a personal Python tutor focused on one language done well — an alternative to the
+            ad-heavy, copy-paste-friendly reference sites. Every lesson is a working, tested implementation
+            you can run.
+          </p>
+          <div class="flex flex-wrap gap-xs pt-xs">
+            <span
+              class="font-label-technical text-label-technical px-xs py-[2px] rounded-lg bg-green-100 text-green-800 uppercase">Status:
+              In Development</span>
+            <span
+              class="font-label-technical text-label-technical px-xs py-[2px] rounded-lg bg-surface-container-high text-on-surface uppercase">Python
+              3.9+</span>
+          </div>
+        </div>
+        <div class="shrink-0">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy mascot — a python at a coding desk"
+            class="w-48 h-48 md:w-56 md:h-56 rounded-xl border border-outline-variant bg-[#1b1b1b] shadow-lg"
+            style="image-rendering: pixelated;" />
         </div>
       </section>
 
@@ -221,7 +232,7 @@
             <span
               class="shrink-0 w-7 h-7 rounded-lg bg-secondary-container text-white flex items-center justify-center font-label-technical text-label-technical font-bold">2</span>
             <div>
-              <p class="font-body-md text-on-surface font-semibold">PythonAid writes the implementation</p>
+              <p class="font-body-md text-on-surface font-semibold">LearnPy writes the implementation</p>
               <p class="font-body-md text-on-surface-variant">Clean, idiomatic Python with type hints and
                 docstrings — the way it should be written, not the shortest possible version.</p>
             </div>
@@ -241,7 +252,7 @@
             <div>
               <p class="font-body-md text-on-surface font-semibold">Everything runs in a sandbox</p>
               <p class="font-body-md text-on-surface-variant">Syntax is checked and the tests are executed
-                before you see the lesson. If they fail, PythonAid revises the code until they pass.</p>
+                before you see the lesson. If they fail, LearnPy revises the code until they pass.</p>
             </div>
           </li>
           <li class="flex gap-sm">
@@ -256,11 +267,11 @@
         </ol>
       </section>
 
-      <!-- Why PythonAid -->
+      <!-- Why LearnPy -->
       <section class="flex flex-col gap-sm">
         <div class="flex items-center gap-sm">
           <span class="material-symbols-outlined text-primary" data-icon="stars">stars</span>
-          <h2 class="font-headline-lg text-headline-lg text-on-surface">Why PythonAid</h2>
+          <h2 class="font-headline-lg text-headline-lg text-on-surface">Why LearnPy</h2>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-sm">
           <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-xs">
@@ -285,7 +296,7 @@
           <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-xs">
             <span class="material-symbols-outlined text-secondary-container" data-icon="build">build</span>
             <p class="font-headline-md text-headline-md text-on-surface">Self-Healing</p>
-            <p class="font-body-md text-on-surface-variant">If a first attempt fails its tests, PythonAid
+            <p class="font-body-md text-on-surface-variant">If a first attempt fails its tests, LearnPy
               regenerates it until it passes.</p>
           </div>
           <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-xs">
