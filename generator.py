@@ -1,319 +1,117 @@
-import tempfile
-import os
-import anthropic
-import subprocess
-import sys
+"""
+LearnPy's only AI entry point.
+
+`generate_lesson(spec)` is called by the `/generate` Flask endpoint whenever
+a user types into the free-form search bar. It sends one request to Claude
+asking for a short Python lesson and returns it as a structured dict.
+
+Hand-authored canonical lessons (the ones in the sidebar) live in
+`lessons/*.md` and are loaded by `lessons.py` — they never hit this module.
+"""
+
+import json
 import re
-import ast
+import anthropic
 
 
+# Claude model used for lesson generation. Bump this when a newer model
+# is released and you want users to benefit from it.
+MODEL = "claude-opus-4-6"
+MAX_TOKENS = 2048
 
 
-def generate_code(spec):
-    """Generate both code and tests from a user specification"""
+def generate_lesson(spec: str) -> dict:
+    """Ask Claude for a short Python lesson on `spec` and return it as a dict.
+
+    Returns a dict shaped like:
+        {
+            "title":           "Short title",
+            "summary":         "One- or two-sentence intro",
+            "lesson_markdown": "Full markdown body, includes a ```python``` block",
+            "code":            "The primary code snippet as plain Python",
+            "related_topics":  [{"label": "...", "prompt": "..."}, ...]
+        }
+
+    If Claude returns malformed JSON, the whole response is exposed as
+    `lesson_markdown` and the other fields get sensible defaults so the UI
+    can still render something useful.
+    """
     client = anthropic.Anthropic()
 
-    # Generate the code
-    code_prompt = f"""You are a python code generator.
-Generate clean, valid Python code based on this specification: {spec}
-Requirements:
-1. Code must be syntactically valid
-2. Include proper function signatures with type hints
-3. Include docstrings
-4. Use typing.Union for type hints (not the | operator) for Python 3.9+ compatibility
-Output ONLY the code in a ```python code block, no explanation."""
+    prompt = f"""You are a friendly Python tutor writing a SHORT lesson on a single topic.
+
+Topic: {spec}
+
+Write a focused, beginner-friendly Python lesson. Your output MUST be a single
+valid JSON object — no prose before or after — with EXACTLY these fields:
+
+{{
+  "title": "Short topic title, max ~60 chars",
+  "summary": "One or two plain-text sentences introducing the topic.",
+  "lesson_markdown": "Full lesson body in GitHub-flavored markdown. Should include: a short explanation, a working Python code example in a ```python fenced block, and a few bullet points about how it works. Keep the whole lesson under ~400 words. You may include inline cross-references to related Python topics using the syntax [topic name](#topic:Full prompt for that topic) — these will become clickable links in the UI.",
+  "code": "The primary Python code example as PLAIN Python (no markdown fencing). Must be the same code shown in the lesson_markdown.",
+  "related_topics": [
+    {{"label": "Short topic name", "prompt": "Full search prompt for that topic"}},
+    {{"label": "Short topic name", "prompt": "Full search prompt for that topic"}},
+    {{"label": "Short topic name", "prompt": "Full search prompt for that topic"}}
+  ]
+}}
+
+Rules:
+- Output ONLY the JSON object. No prose, no markdown fencing around the JSON itself.
+- Include 3 to 4 related_topics that flow naturally from this lesson.
+- Code must be valid Python 3.9+ with type hints where useful.
+"""
 
     message = client.messages.create(
-        model="claude-opus-4-6",
-        max_tokens=2048,
-        messages=[{"role": "user", "content": code_prompt}]
+        model=MODEL,
+        max_tokens=MAX_TOKENS,
+        messages=[{"role": "user", "content": prompt}],
     )
-    code = extract_code(message.content[0].text)
-    print("✓ Code generated")
+    raw = message.content[0].text.strip()
 
-    # Generate the tests
-    test_prompt = f"""You are a pytest test generator.
-Generate pytest tests for this code specification: {spec}
-Your tests should:
-1. Import the function from the 'generated' module
-2. Test normal cases
-3. Test edge cases
-4. Test error cases
-Output ONLY the pytest code in a ```python code block, no explanation."""
+    # Claude sometimes wraps its JSON in a markdown code fence even when
+    # asked not to. Strip those off so json.loads doesn't choke.
+    if raw.startswith("```"):
+        raw = re.sub(r"^```[a-zA-Z]*\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw)
 
-    message = client.messages.create(
-        model="claude-opus-4-6",
-        max_tokens=2048,
-        messages=[{"role": "user", "content": test_prompt}]
-    )
-    test_code = extract_code(message.content[0].text)
-    print("✓ Tests generated")
-
-    return code, test_code
-
-
-def extract_code(response_text):
-    """Extract code from markdown code blocks"""
-    
-    # Just find the first ``` and last ```
-    if "```" not in response_text:
-        return response_text.strip()
-    
-    # Find start of code block (skip the language identifier)
-    start = response_text.find("```")
-    start = response_text.find("\n", start) + 1
-    
-    # Find end of code block
-    end = response_text.rfind("```")
-    
-    # Extract and clean
-    if end > start:
-        code = response_text[start:end].strip()
-        return code
-    
-    # Fallback
-    return response_text.strip()
-
-
-def validate_syntax(code):
-    """Check if code is valid Python"""
     try:
-        compile(code, '<string>', 'exec')
-        print("✓ Syntax valid")
-        return True
-    except SyntaxError as e:
-        print(f"✗ Syntax error: {e}")
-        return False
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        # Fallback: the model didn't return valid JSON. Surface whatever
+        # it sent as markdown so the user still sees something useful.
+        return {
+            "title": spec[:60],
+            "summary": "",
+            "lesson_markdown": raw,
+            "code": _extract_first_python_block(raw),
+            "related_topics": [],
+        }
 
-
-def run_test(generated_code, test_code, timeout=10):
-    """Run pytest tests against generated code"""
-    try:
-        # Create temporary directory
-        with tempfile.TemporaryDirectory() as tmpdir:
-            # Write code to file
-            code_path = os.path.join(tmpdir, 'generated.py')
-            with open(code_path, 'w') as f:
-                f.write(generated_code)
-
-            # Write tests to file
-            test_path = os.path.join(tmpdir, 'test_generated.py')
-            with open(test_path, 'w') as f:
-                f.write(test_code)
-            
-            # Run pytest
-            result = subprocess.run(
-                [sys.executable, '-m', 'pytest', test_path, '-v'],
-                capture_output=True,
-                timeout=timeout,
-                text=True,
-                cwd=tmpdir
-            )
-
-            #complexity = analyze_complexity(generated_code)
-
-            complexity_data = analyze_complexity(generated_code)
-
-            print('--Complexity analyzed--') #THIS IS NOT WORKING
-            print(f"complexity: {complexity_data['cyclomatic_complexity']}, "
-                  f"lines: {complexity_data['lines_of_code']}, "
-                  f"func: {complexity_data['num_functions']}, "
-                  f"names: {complexity_data['function_names']}, "
-                  f"Decisions: {complexity_data['decision_points']}")
-            
-            
-            output = result.stdout
-            errors = result.stderr
-            
-            # Count passed/failed
-            passed_count = output.count(' PASSED')
-            failed_count = output.count(' FAILED')
-            total = passed_count + failed_count
-
-            # Print results NEEDS FIXING TOO MUCH ON TERMINAL
-            if output:
-                print("\nTest Results:")
-                print(output)
-            
-            if errors:
-                print("\nErrors:")
-                print(errors)
-            
-            return {
-                'passed': failed_count == 0 and total > 0,
-                'passed_count': passed_count,
-                'failed_count': failed_count,
-                'total': total,
-                'output': output,
-                'errors': errors
-                
+    # Defensive normalization — guarantee the shape regardless of model drift.
+    # Each field is coerced to the right type and clamped to a reasonable size.
+    return {
+        "title": (data.get("title") or spec)[:120],
+        "summary": data.get("summary") or "",
+        "lesson_markdown": data.get("lesson_markdown") or "",
+        "code": data.get("code") or _extract_first_python_block(data.get("lesson_markdown") or ""),
+        "related_topics": [
+            {
+                "label": str(t.get("label", ""))[:80],
+                "prompt": str(t.get("prompt", ""))[:300],
             }
-    
-    except subprocess.TimeoutExpired:
-        return {
-            'passed': False,
-            'passed_count': 0,
-            'failed_count': 1,
-            'total': 1,
-            'output': '',
-            'errors': f'Timeout after {timeout}s'
-        }
-    except Exception as e:
-        return {
-            'passed': False,
-            'passed_count': 0,
-            'failed_count': 1,
-            'total': 1,
-            'output': '',
-            'errors': str(e)
-        }
-    
-def analyze_complexity(code):
-    #using AST anaylze code complexity
+            for t in (data.get("related_topics") or [])
+            if isinstance(t, dict) and t.get("label")
+        ][:6],
+    }
 
-    #Count FUnctions
-    tree = ast.parse(code)
-    
-    functions = [
-        node.name for node in ast.walk(tree)
-        if isinstance(node, ast.FunctionDef)
-    ]
-    
-    decisions = sum(1 for node in ast.walk(tree)
-        if isinstance(node, (ast.If, ast.For, ast.While, ast.ExceptHandler)))
-    
-    cyclomatic = 1 + decisions
 
-    return { 
-            'cyclomatic_complexity': cyclomatic,
-            'lines_of_code': len(code.split('\n')),
-            'num_functions': len(functions),
-            'function_names': functions,
-            'decision_points': decisions
-        }
+def _extract_first_python_block(markdown: str) -> str:
+    """Pull the first ```python ...``` fenced block out of a markdown body.
 
-def fix_code(code, test_code, test_result):
+    Used as a fallback when Claude forgets to populate the `code` field
+    separately — we just lift the code out of the lesson body instead.
     """
-    Generate a fixed version of the code based on test failures
-    
-    Returns: fixed_code (string)
-    """
-    client = anthropic.Anthropic()
-    
-    # Extract error patterns
-    failures = test_result['output']
-    
-    # Identify the issue
-    if "AttributeError" in failures:
-        issue = "Type mismatch: code expects objects, tests use dictionaries"
-    elif "ImportError" in failures:
-        issue = "Missing imports or import errors"
-    elif "ValueError" in failures:
-        issue = "Logic error: validation too strict"
-    elif "TypeError" in failures:
-        issue = "Type error: wrong argument types"
-    else:
-        issue = "Test failure: incompatibility between code and tests"
-    
-    # Ask Claude to fix
-    fix_prompt = f"""The generated code has test failures. Fix it to pass all tests.
-
-    Issue: {issue}
-
-    Original code:
-    {code}
-
-    Test failures (first 1000 chars):
-    {failures[:1000]}
-
-    Tests:
-    {test_code[:500]}
-
-    Requirements:
-    1. Fix ONLY the code, not the tests
-    2. Keep the same function signatures
-    3. Make it compatible with how tests use it
-    4. Be conservative - minimal changes"""
-    
-    message = client.messages.create(
-        model="claude-opus-4-6",
-        max_tokens=2048,
-        messages=[{"role": "user", "content": fix_prompt}]
-    )
-    
-    fixed_code = extract_code(message.content[0].text)
-    return fixed_code
-
-
-def run_pipeline():
-    print("="*60)
-    print("CODE GENERATION PIPELINE")
-    print("="*60)
-    
-    user_request = input("\nWhat would you like me to code?\n> ")
-
-    # Step 1: Generate
-    print("\n[1/4] Generating code and tests...")
-    code, test_code = generate_code(user_request)
-
-    # DEBUG: Check what we got back
-    print("\n[DEBUG]")
-    print(f"Code starts with: {repr(code[:40])}")
-    print(f"Has backticks at start? {code.startswith('```')}")
-    print(f"Code is valid Python? {code.startswith('from') or code.startswith('def') or code.startswith('class')}")
-    
-    # Step 2: Display generated code
-    print("\n[2/4] Generated code:")
-    print("-" * 60)
-    print(code)  # ← NO extract_code() call
-    print("-" * 60)
-
-    # Step 3: Validate
-    print("\n[3/4] Validating syntax...")
-    if not validate_syntax(code):
-        print("Code is not valid, stopping.")
-        exit(1)
-
-    # Step 4: Run tests
-    print("\n[4/4] Running tests...")
-    result = run_test(code, test_code)
-    
-    # Print summary
-    print("\n" + "="*60)
-    if result['passed']:
-        print(f"✓ SUCCESS - All {result['total']} tests passed!")
-    else:
-        print(f"✗ FAILED - {result['failed_count']}/{result['total']} tests failed")
-        print("\nAttempting to fix...")
-        
-        new_code = fix_code(code, test_code, result)
-        
-        # Validate the fixed code
-        if not validate_syntax(new_code):
-            print("Fixed code has syntax errors.")
-            exit(1)
-        
-        # Test the fixed code
-        new_result = run_test(new_code, test_code)
-        
-        print("\n" + "="*60)
-        if new_result['passed']:
-            print(f"✓ SUCCESS AFTER FIX - All {new_result['total']} tests passed!")
-            code = new_code  # Use the fixed code
-        else: 
-            print(f"✗ STILL FAILED - {new_result['failed_count']}/{new_result['total']} tests failed")
-
-    print("="*60)
-    return code
-
-
-
-# Main execution
-if __name__ == "__main__":
-    run_pipeline()
-
-
-
-
-
-
+    m = re.search(r"```python\s*\n(.*?)\n```", markdown, re.DOTALL)
+    return m.group(1).strip() if m else ""
