@@ -10,7 +10,7 @@ https://ai-code-generator--danv27.replit.app/
 1. **You pick a topic** — e.g. "implement a binary search tree", "how do I parse JSON?", "build a hash map from scratch".
 2. **LearnPy writes the implementation** — clean, idiomatic Python with type hints and docstrings.
 3. **Tests are generated alongside** — a pytest suite covering normal, edge, and error cases.
-4. **Everything runs in a sandbox** — syntax is checked and the tests are executed before you see the lesson. If they fail, LearnPy revises the code until they pass.
+4. **Everything runs in a sandbox** — syntax is checked.
 5. **You get a verified lesson** — working code, the tests that prove it, and complexity stats so you know what you're looking at.
 
 ## Why LearnPy
