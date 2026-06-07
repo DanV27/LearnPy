@@ -29,7 +29,7 @@ from werkzeug.exceptions import HTTPException
 
 from models import db, User, Generation
 from generator import generate_lesson
-from topics import TOPICS, get_topic
+from topics import TOPICS, get_topic, visible_in_sidebar
 from lessons import load_lesson
 
 
@@ -100,7 +100,9 @@ def handle_unexpected_error(err):
 
 @app.context_processor
 def inject_topics():
-    return {"all_topics": TOPICS}
+    # Only the visible (non-hidden) topics show up in the sidebar drawer.
+    # Hidden topics (Basics sub-topics) are still routable directly.
+    return {"all_topics": visible_in_sidebar()}
 
 
 # ---------------------------------------------------------------------------
@@ -145,11 +147,43 @@ def lesson_page(slug):
     # into the {slug, name, url} dicts the template expects.
     lesson["related_topics"] = _resolve_related(lesson.pop("related_slugs", []))
 
+    # Resolve the topic's `children` slug list (if any) into full topic dicts
+    # with their URL attached. This is what powers the sub-topic grid on
+    # parent pages like /lesson/basics.
+    children_topics = _resolve_children(topic.get("children") or [])
+
+    # Follow-up question buttons shown at the bottom of every lesson.
+    # Topics can override the defaults by setting their own `followups`.
+    followups = topic.get("followups") or _default_followups(topic["name"])
+
     return render_template(
         "main.html",
         active_topic=topic,
         active_lesson=lesson,
+        children_topics=children_topics,
+        followups=followups,
     )
+
+
+def _resolve_children(slugs):
+    """Turn a list of child topic slugs into full topic dicts with URLs.
+
+    Unknown slugs are silently skipped so a typo in a parent's `children`
+    list can't break the index page.
+    """
+    resolved = []
+    for s in slugs or []:
+        topic = get_topic(s)
+        if topic:
+            resolved.append({
+                "slug": s,
+                "name": topic["name"],
+                "icon": topic.get("icon", "menu_book"),
+                "level": topic.get("level", ""),
+                "description": topic.get("description", ""),
+                "url": url_for("lesson_page", slug=s),
+            })
+    return resolved
 
 
 def _resolve_related(slugs):
@@ -168,6 +202,32 @@ def _resolve_related(slugs):
                 "url": url_for("lesson_page", slug=s),
             })
     return resolved
+
+
+def _default_followups(topic_name: str):
+    """Generic follow-up question buttons shown at the bottom of every lesson.
+
+    Used when a topic doesn't define its own `followups` list. The prompts
+    are built from the topic name so Claude knows what we're elaborating on.
+    """
+    return [
+        {
+            "label": "Explain more",
+            "prompt": f"Explain {topic_name} in more depth with additional examples.",
+        },
+        {
+            "label": "Why do I need this?",
+            "prompt": f"Why is understanding {topic_name} important for a Python developer? Give real-world use cases.",
+        },
+        {
+            "label": "Show a real example",
+            "prompt": f"Show me a complete, real-world example that uses {topic_name} in Python.",
+        },
+        {
+            "label": "Common pitfalls",
+            "prompt": f"What are common mistakes and pitfalls when working with {topic_name} in Python?",
+        },
+    ]
 
 
 # ---------------------------------------------------------------------------
