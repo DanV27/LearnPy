@@ -31,6 +31,7 @@ from models import db, User, Generation
 from generator import generate_lesson
 from topics import TOPICS, get_topic, visible_in_sidebar
 from lessons import load_lesson
+from challenges import get_challenge
 
 
 # ---------------------------------------------------------------------------
@@ -156,12 +157,18 @@ def lesson_page(slug):
     # Topics can override the defaults by setting their own `followups`.
     followups = topic.get("followups") or _default_followups(topic["name"])
 
+    # Coding challenge for this lesson, if one is defined in challenges_data.py.
+    # The template renders an in-browser code editor + Pyodide-powered test
+    # runner when this is present.
+    challenge = get_challenge(slug)
+
     return render_template(
         "main.html",
         active_topic=topic,
         active_lesson=lesson,
         children_topics=children_topics,
         followups=followups,
+        challenge=challenge,
     )
 
 

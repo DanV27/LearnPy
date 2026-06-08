@@ -8,6 +8,9 @@
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Pyodide: Python in the browser (WebAssembly). Loaded only when the
+       user first clicks "Run Tests" on a lesson with a challenge. -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
     rel="stylesheet" />
@@ -326,6 +329,61 @@
     </section>
 
     {% if active_topic %}
+    <!-- ===========================================================
+         Challenge (lesson page only, if a challenge exists)
+         The user types Python into a textarea editor. Clicking
+         "Run Tests" lazily loads Pyodide (Python-in-WebAssembly)
+         and runs each test in a fresh globals dict. Pass / fail
+         results render below the editor.
+         =========================================================== -->
+    {% if challenge %}
+    <section class="max-w-4xl mx-auto px-margin pb-lg">
+      <div class="bg-tertiary-container border border-outline rounded-xl overflow-hidden shadow-lg">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-md py-sm border-b border-outline-variant/20">
+          <div class="flex items-center gap-xs">
+            <span class="material-symbols-outlined text-secondary">flag</span>
+            <h2 class="font-headline-md text-headline-md text-on-tertiary">Challenge</h2>
+            <span id="challenge-status"
+              class="hidden font-code text-[11px] px-xs py-[2px] rounded-lg bg-green-100 text-green-800 ml-xs">✓ CHALLENGE COMPLETE</span>
+          </div>
+          <button id="challenge-reset"
+            class="flex items-center gap-xs text-on-tertiary-container hover:text-white transition-colors font-code text-[12px]">
+            <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
+            RESET
+          </button>
+        </div>
+        <!-- Prompt -->
+        <div class="px-md pt-md">
+          <p class="font-body-md text-body-md text-on-tertiary-container leading-relaxed">{{ challenge.prompt }}</p>
+        </div>
+        <!-- Code editor -->
+        <div class="p-md">
+          <textarea id="challenge-editor" spellcheck="false"
+            class="w-full bg-[#1b1b1b] text-on-tertiary border border-outline-variant/30 rounded-lg p-md font-code text-code leading-relaxed focus:outline-none focus:border-secondary resize-y"
+            rows="10">{{ challenge.starter_code }}</textarea>
+        </div>
+        <!-- Run button + results -->
+        <div class="px-md pb-md flex flex-col gap-md">
+          <div class="flex items-center gap-md">
+            <button id="challenge-run"
+              class="bg-secondary-container text-primary font-bold px-md py-xs hover:brightness-110 transition-all rounded-lg flex items-center gap-xs disabled:opacity-50 disabled:cursor-not-allowed">
+              <span id="challenge-run-icon" class="material-symbols-outlined" style="font-size: 18px;">play_arrow</span>
+              <span id="challenge-run-label">Run Tests</span>
+            </button>
+            <span id="challenge-pyodide-status" class="font-code text-[12px] text-on-tertiary-container"></span>
+          </div>
+          <ul id="challenge-results" class="flex flex-col gap-xs"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Embed challenge data for the JS runner. -->
+    <script id="challenge-data" type="application/json">
+      {{ challenge | tojson }}
+    </script>
+    {% endif %}
+
     <!-- ===========================================================
          Sub-topics grid (parent topics only — e.g. Basics)
          Renders only when this topic's `children` list resolves to
@@ -906,6 +964,163 @@
           setTimeout(() => (copyBtnLabel.textContent = 'COPY CODE'), 1500);
         }
       });
+
+      // -----------------------------------------------------------------
+      // 6. Challenge runner (Pyodide)
+      // -----------------------------------------------------------------
+      // Loads Pyodide lazily on the first "Run Tests" click and caches it.
+      // Each test runs in a fresh Python globals dict so tests don't
+      // contaminate one another.
+      const challengeDataEl = document.getElementById('challenge-data');
+      if (challengeDataEl) {
+        let challenge = null;
+        try { challenge = JSON.parse(challengeDataEl.textContent.trim()); }
+        catch (e) { challenge = null; }
+
+        const editor = document.getElementById('challenge-editor');
+        const runBtn = document.getElementById('challenge-run');
+        const runIcon = document.getElementById('challenge-run-icon');
+        const runLabel = document.getElementById('challenge-run-label');
+        const resetBtn = document.getElementById('challenge-reset');
+        const resultsEl = document.getElementById('challenge-results');
+        const completeBadge = document.getElementById('challenge-status');
+        const pyStatus = document.getElementById('challenge-pyodide-status');
+
+        const STARTER_CODE = challenge ? challenge.starter_code : '';
+
+        // Cache the Pyodide instance across runs.
+        let pyodidePromise = null;
+        async function getPyodide() {
+          if (!pyodidePromise) {
+            pyStatus.textContent = 'Loading Python (~10 MB, one-time)...';
+            pyodidePromise = loadPyodide().then(py => {
+              pyStatus.textContent = '';
+              return py;
+            }).catch(err => {
+              pyStatus.textContent = 'Failed to load Python: ' + err.message;
+              pyodidePromise = null;
+              throw err;
+            });
+          }
+          return pyodidePromise;
+        }
+
+        function setRunning(running) {
+          runBtn.disabled = running;
+          if (running) {
+            runIcon.textContent = 'progress_activity';
+            runIcon.classList.add('animate-spin');
+            runLabel.textContent = 'Running...';
+          } else {
+            runIcon.textContent = 'play_arrow';
+            runIcon.classList.remove('animate-spin');
+            runLabel.textContent = 'Run Tests';
+          }
+        }
+
+        // Render one test row. Pass = green check, fail = red x + error msg.
+        function renderResultRow(test, result) {
+          const li = document.createElement('li');
+          li.className = 'flex items-start gap-sm font-code text-[13px]';
+          const icon = document.createElement('span');
+          icon.className = 'material-symbols-outlined shrink-0';
+          icon.style.fontSize = '18px';
+          if (result.passed) {
+            icon.textContent = 'check_circle';
+            icon.classList.add('text-green-400');
+          } else {
+            icon.textContent = 'cancel';
+            icon.classList.add('text-red-400');
+          }
+          const text = document.createElement('div');
+          text.className = 'flex flex-col gap-base text-on-tertiary-container';
+          const name = document.createElement('div');
+          name.className = result.passed ? 'text-green-300' : 'text-red-300';
+          name.textContent = test.name;
+          text.appendChild(name);
+          if (!result.passed && result.error) {
+            const err = document.createElement('div');
+            err.className = 'text-on-tertiary-container/70 whitespace-pre-wrap';
+            err.textContent = result.error;
+            text.appendChild(err);
+          }
+          li.appendChild(icon);
+          li.appendChild(text);
+          return li;
+        }
+
+        // Strip Pyodide's long traceback down to the last meaningful line —
+        // usually "AssertionError: ...".
+        function cleanError(msg) {
+          if (!msg) return 'failed';
+          const lines = msg.trim().split('\n').filter(l => l.trim());
+          return lines[lines.length - 1] || 'failed';
+        }
+
+        async function runChallenge() {
+          if (!challenge) return;
+          resultsEl.innerHTML = '';
+          completeBadge.classList.add('hidden');
+          setRunning(true);
+
+          let py;
+          try {
+            py = await getPyodide();
+          } catch (e) {
+            setRunning(false);
+            return;
+          }
+
+          const userCode = editor.value;
+          let allPassed = true;
+
+          for (const test of challenge.tests) {
+            // Fresh globals dict per test, so a previous test can't leak
+            // state into the next one.
+            const globalsDict = py.toPy({});
+            let result;
+            try {
+              await py.runPythonAsync(userCode, { globals: globalsDict });
+              await py.runPythonAsync(test.code, { globals: globalsDict });
+              result = { passed: true };
+            } catch (err) {
+              result = { passed: false, error: cleanError(err.message) };
+              allPassed = false;
+            } finally {
+              globalsDict.destroy();
+            }
+            resultsEl.appendChild(renderResultRow(test, result));
+          }
+
+          if (allPassed) {
+            completeBadge.classList.remove('hidden');
+          }
+          setRunning(false);
+        }
+
+        runBtn.addEventListener('click', runChallenge);
+
+        resetBtn.addEventListener('click', () => {
+          editor.value = STARTER_CODE;
+          resultsEl.innerHTML = '';
+          completeBadge.classList.add('hidden');
+        });
+
+        // Cmd/Ctrl + Enter inside the editor runs the tests.
+        editor.addEventListener('keydown', (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+            e.preventDefault();
+            runChallenge();
+          }
+          // Tab inserts spaces instead of leaving the textarea.
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            const s = editor.selectionStart, e2 = editor.selectionEnd;
+            editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(e2);
+            editor.selectionStart = editor.selectionEnd = s + 4;
+          }
+        });
+      }
 
       // Download the lesson's primary code snippet as a .py file.
       // Built entirely in the browser — no server round trip.
