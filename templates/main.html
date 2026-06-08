@@ -407,81 +407,34 @@
     <section id="answers-section" class="max-w-4xl mx-auto px-margin pb-lg"></section>
     {% endif %}
 
-    <!-- Topic Grid (home page only, hidden once results exist) -->
+    <!-- ===========================================================
+         Topic Grid (home page only)
+         Iterates over `all_topics` (the same list that powers the
+         sidebar drawer). Every card is a real link to /lesson/<slug>
+         — no AI involved. Hidden when active_topic is set so the
+         section disappears on lesson pages and on the search-result
+         view that takes over the home page after a search.
+         =========================================================== -->
     <section id="topics-section" class="max-w-7xl mx-auto px-margin py-lg {% if active_topic %}hidden{% endif %}">
+      <div class="flex items-center gap-xs mb-md">
+        <span class="material-symbols-outlined text-primary">grid_view</span>
+        <h2 class="font-headline-md text-headline-md text-primary">Browse topics</h2>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer"
-          data-prompt="Teach me Python core syntax — variables, loops, and control flow with examples">
+        {% for t in all_topics %}
+        <a href="{{ url_for('lesson_page', slug=t.slug) }}"
+          class="bg-surface-container-low border border-outline-variant p-md hover-lift group no-underline block">
           <div class="flex justify-between items-start mb-sm">
-            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">terminal</span>
-            <span class="text-[10px] font-code px-xs py-[2px] bg-primary text-on-primary">BEGINNER</span>
+            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">{{ t.icon }}</span>
+            <span class="text-[10px] font-code px-xs py-[2px] {% if t.level == 'BEGINNER' %}bg-primary text-on-primary{% elif t.level == 'INTERMEDIATE' %}bg-surface-variant text-primary border border-outline-variant{% else %}bg-secondary-container text-on-primary{% endif %}">{{ t.level }}</span>
           </div>
-          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Core Syntax</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">Master variables, loops, and control flow with clinical precision.</p>
+          <h3 class="font-headline-md text-headline-md text-primary mb-xs">{{ t.name }}</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">{{ t.description }}</p>
           <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            OPEN LESSON <span class="material-symbols-outlined text-sm">arrow_forward</span>
           </div>
-        </div>
-        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer"
-          data-prompt="Implement common data structures in Python — linked list, stack, queue, and hash map">
-          <div class="flex justify-between items-start mb-sm">
-            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">database</span>
-            <span class="text-[10px] font-code px-xs py-[2px] bg-primary text-on-primary">INTERMEDIATE</span>
-          </div>
-          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Data Structures</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">Build linked lists, stacks, queues, hash maps, and trees from scratch.</p>
-          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </div>
-        </div>
-        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer"
-          data-prompt="Implement classic sorting algorithms in Python — bubble sort, merge sort, quicksort">
-          <div class="flex justify-between items-start mb-sm">
-            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">sort</span>
-            <span class="text-[10px] font-code px-xs py-[2px] bg-surface-variant text-primary border border-outline-variant">ADVANCED</span>
-          </div>
-          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Algorithms</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">Sort, search, and traverse — the algorithms behind every interview.</p>
-          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </div>
-        </div>
-        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer md:col-span-2 lg:col-span-1"
-          data-prompt="Show me how to use Python's standard library — collections, itertools, datetime, json">
-          <div class="flex justify-between items-start mb-sm">
-            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">inventory_2</span>
-            <span class="text-[10px] font-code px-xs py-[2px] bg-primary text-on-primary">UTILITY</span>
-          </div>
-          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Standard Library</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">collections, itertools, datetime, json — the batteries that come included.</p>
-          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </div>
-        </div>
-        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer"
-          data-prompt="Teach me Python decorators, generators, and context managers with examples">
-          <div class="flex justify-between items-start mb-sm">
-            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">bolt</span>
-            <span class="text-[10px] font-code px-xs py-[2px] bg-surface-variant text-primary border border-outline-variant">ADVANCED</span>
-          </div>
-          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Pythonic Tricks</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">Decorators, generators, and context managers — write code like a Pythonista.</p>
-          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </div>
-        </div>
-        <div class="suggestion-card bg-surface-container-low border border-outline-variant p-md hover-lift group cursor-pointer"
-          data-prompt="Common everyday Python how-tos — validate email, retry HTTP, debounce a function, read a file">
-          <div class="flex justify-between items-start mb-sm">
-            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">lightbulb</span>
-            <span class="text-[10px] font-code px-xs py-[2px] bg-primary text-on-primary">PRACTICAL</span>
-          </div>
-          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Everyday How-Tos</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">Validate an email, retry an HTTP call, debounce a function, read a file.</p>
-          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-            EXPLORE MODULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </div>
-        </div>
+        </a>
+        {% endfor %}
       </div>
     </section>
 

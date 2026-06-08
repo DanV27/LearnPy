@@ -83,7 +83,25 @@ TOPICS = [
         "name": "Data Structures",
         "icon": "database",
         "level": "INTERMEDIATE",
-        "description": "List, dict, set, tuple — when to use each.",
+        "description": "Advanced data structures — stacks, queues, heaps, tries, and more.",
+        # Reuses the existing `hash-map` and `binary-search-tree` top-level
+        # topics — they naturally fit under Data Structures too.
+        "children": [
+            "stack",
+            "queue",
+            "deque",
+            "linked-list",
+            "doubly-linked-list",
+            "priority-queue",
+            "hash-map",
+            "binary-search-tree",
+            "trie",
+            "graph",
+            "counter",
+            "defaultdict",
+            "namedtuple",
+            "frozenset",
+        ],
     },
     {
         "slug": "binary-search-tree",
@@ -202,6 +220,23 @@ TOPICS = [
     {"slug": "python-none",              "name": "Python None",              "icon": "block",           "level": "BEGINNER", "description": "Python's null value.", "hide_from_sidebar": True},
     {"slug": "python-user-input",        "name": "Python User Input",        "icon": "keyboard",        "level": "BEGINNER", "description": "Reading input() from users.", "hide_from_sidebar": True},
     {"slug": "python-virtualenv",        "name": "Python VirtualEnv",        "icon": "folder_managed",  "level": "BEGINNER", "description": "Isolated dependency environments.", "hide_from_sidebar": True},
+
+    # =========================================================================
+    # Data Structures sub-topics — hidden from sidebar; reached via
+    # /lesson/data-structures.
+    # =========================================================================
+    {"slug": "stack",              "name": "Stack",              "icon": "table_rows",       "level": "INTERMEDIATE", "description": "Last-in-first-out — push and pop.",                 "hide_from_sidebar": True},
+    {"slug": "queue",              "name": "Queue",              "icon": "linear_scale",     "level": "INTERMEDIATE", "description": "First-in-first-out — enqueue and dequeue.",        "hide_from_sidebar": True},
+    {"slug": "deque",              "name": "Deque",              "icon": "swap_horiz",       "level": "INTERMEDIATE", "description": "Double-ended queue from collections.",             "hide_from_sidebar": True},
+    {"slug": "linked-list",        "name": "Linked List",        "icon": "link",             "level": "INTERMEDIATE", "description": "Nodes pointing to nodes.",                         "hide_from_sidebar": True},
+    {"slug": "doubly-linked-list", "name": "Doubly Linked List", "icon": "compare_arrows",   "level": "ADVANCED",     "description": "Linked list with prev pointers too.",              "hide_from_sidebar": True},
+    {"slug": "priority-queue",     "name": "Priority Queue",     "icon": "priority_high",    "level": "INTERMEDIATE", "description": "Heap-backed queue with the heapq module.",         "hide_from_sidebar": True},
+    {"slug": "trie",               "name": "Trie",               "icon": "schema",           "level": "ADVANCED",     "description": "Prefix tree — fast string lookups.",               "hide_from_sidebar": True},
+    {"slug": "graph",              "name": "Graph",              "icon": "polyline",         "level": "ADVANCED",     "description": "Nodes and edges with an adjacency list.",          "hide_from_sidebar": True},
+    {"slug": "counter",            "name": "Counter",            "icon": "tag",              "level": "BEGINNER",     "description": "Count occurrences — collections.Counter.",         "hide_from_sidebar": True},
+    {"slug": "defaultdict",        "name": "defaultdict",        "icon": "folder_special",   "level": "BEGINNER",     "description": "Auto-default dict — collections.defaultdict.",     "hide_from_sidebar": True},
+    {"slug": "namedtuple",         "name": "namedtuple",         "icon": "label_important",  "level": "BEGINNER",     "description": "Tuples with named fields — collections.namedtuple.","hide_from_sidebar": True},
+    {"slug": "frozenset",          "name": "frozenset",          "icon": "ac_unit",          "level": "INTERMEDIATE", "description": "Immutable, hashable sets.",                        "hide_from_sidebar": True},
 ]
 
 
