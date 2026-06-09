@@ -143,39 +143,76 @@
 </head>
 
 <body class="bg-background text-on-background min-h-screen flex flex-col grid-overlay">
-  <!-- TopNavBar: Solid Black -->
-  <header
-    class="flex justify-between items-center w-full px-md h-20 border-b border-white/10 bg-black sticky top-0 z-50">
-    <div class="flex items-center gap-lg">
-      <a href="/" class="flex items-center gap-xs">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo"
-          class="h-14 w-14 rounded-lg" style="image-rendering: pixelated;" />
-        <span class="font-headline-md text-headline-md font-bold text-white uppercase tracking-tighter">LEARNPY</span>
-      </a>
-      <nav class="hidden md:flex gap-md">
-        <a class="text-white/60 font-label-technical text-label-technical hover:text-white transition-colors duration-150"
-          href="/">Learn</a>
-        <a class="text-white border-b-2 border-white pb-1 font-label-technical text-label-technical"
-          href="/about">About</a>
-      </nav>
-    </div>
-    <div class="flex items-center gap-md">
-      {% if current_user.is_authenticated %}
-      <span class="text-white/60 font-label-technical text-label-technical">{{ current_user.username }}</span>
-      <a href="{{ url_for('logout') }}"
-        class="text-white/60 hover:text-white transition-colors font-label-technical text-label-technical">Logout</a>
-      {% else %}
-      <a href="{{ url_for('login') }}"
-        class="text-white/60 hover:text-white transition-colors font-label-technical text-label-technical">Login</a>
-      {% endif %}
-      <button class="p-xs text-white/60 hover:text-white transition-colors duration-150 active:opacity-80 scale-95">
-        <span class="material-symbols-outlined" data-icon="settings">settings</span>
-      </button>
-      <button class="p-xs text-white/60 hover:text-white transition-colors duration-150 active:opacity-80 scale-95">
-        <span class="material-symbols-outlined" data-icon="help">help</span>
-      </button>
+  <!-- TopAppBar — matches the Learn page styling -->
+  <header class="w-full top-0 bg-surface border-b border-outline-variant z-40 sticky">
+    <div class="flex justify-between items-center px-margin py-sm max-w-7xl mx-auto">
+      <div class="flex items-center gap-md">
+        <button id="open-sidebar" aria-label="Open topics"
+          class="p-xs rounded-lg hover:bg-surface-container transition-colors flex items-center gap-xs text-primary">
+          <span class="material-symbols-outlined" style="font-size: 24px;">menu</span>
+          <span class="hidden sm:inline font-label-md text-label-md">Topics</span>
+        </button>
+        <a href="/" class="flex items-center gap-xs">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo"
+            class="h-20 w-20 rounded-lg" style="image-rendering: pixelated;" />
+          <span class="font-headline-md text-headline-md font-bold text-primary">LearnPy</span>
+        </a>
+        <nav class="hidden md:flex gap-md font-body-md text-body-md ml-md">
+          <a class="text-on-surface-variant hover:text-secondary transition-colors duration-200 cursor-pointer"
+            href="/">Learn</a>
+          <a class="text-primary font-bold border-b-2 border-secondary cursor-pointer" href="/about">About</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-sm">
+        {% if current_user.is_authenticated %}
+        <span class="text-on-surface-variant font-label-md text-label-md hidden sm:inline">
+          {{ current_user.username }}
+        </span>
+        <a href="{{ url_for('logout') }}"
+          class="bg-primary text-on-primary px-md py-xs font-label-md text-label-md cursor-pointer active:opacity-80 rounded-lg">
+          Logout
+        </a>
+        {% else %}
+        <a href="{{ url_for('login') }}"
+          class="bg-primary text-on-primary px-md py-xs font-label-md text-label-md cursor-pointer active:opacity-80 rounded-lg">
+          Log In
+        </a>
+        {% endif %}
+      </div>
     </div>
   </header>
+
+  <!-- Sidebar overlay -->
+  <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/40 z-40 transition-opacity"></div>
+
+  <!-- Sidebar drawer -->
+  <aside id="sidebar"
+    class="fixed top-0 left-0 h-full w-72 bg-surface-container-lowest border-r border-outline-variant shadow-2xl z-50 transform -translate-x-full transition-transform duration-200 ease-out flex flex-col">
+    <div class="flex items-center justify-between px-md py-md border-b border-outline-variant">
+      <div class="flex items-center gap-xs">
+        <span class="material-symbols-outlined text-primary">menu_book</span>
+        <span class="font-headline-md text-headline-md text-primary">Topics</span>
+      </div>
+      <button id="close-sidebar" aria-label="Close topics"
+        class="p-xs rounded-lg hover:bg-surface-container transition-colors text-on-surface-variant">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-xs">
+      {% for t in all_topics %}
+      <a href="{{ url_for('lesson_page', slug=t.slug) }}"
+        class="flex items-center gap-sm px-md py-sm transition-colors text-on-surface-variant hover:bg-surface-container-low border-l-4 border-transparent">
+        <span class="material-symbols-outlined shrink-0" style="font-size: 22px;">{{ t.icon }}</span>
+        <span class="font-body-md text-body-md truncate">{{ t.name }}</span>
+      </a>
+      {% endfor %}
+    </nav>
+    <div class="border-t border-outline-variant px-md py-sm">
+      <p class="font-label-md text-label-md text-on-surface-variant">
+        Can't find your topic? Use the search to ask anything.
+      </p>
+    </div>
+  </aside>
 
   <!-- Main Content -->
   <main class="flex-grow flex justify-center px-md py-lg pb-24">
@@ -212,152 +249,181 @@
         </div>
       </section>
 
-      <!-- What It Does -->
+      <!-- How a Lesson Works -->
       <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-md">
         <div class="flex items-center gap-sm">
-          <span class="material-symbols-outlined text-primary" data-icon="school">school</span>
+          <span class="material-symbols-outlined text-primary">school</span>
           <h2 class="font-headline-lg text-headline-lg text-on-surface">How a Lesson Works</h2>
         </div>
         <ol class="flex flex-col gap-sm">
           <li class="flex gap-sm">
-            <span
-              class="shrink-0 w-7 h-7 rounded-lg bg-secondary-container text-white flex items-center justify-center font-label-technical text-label-technical font-bold">1</span>
+            <span class="shrink-0 w-7 h-7 rounded-lg bg-secondary-container text-white flex items-center justify-center font-label-technical text-label-technical font-bold">1</span>
             <div>
-              <p class="font-body-md text-on-surface font-semibold">You pick a topic</p>
-              <p class="font-body-md text-on-surface-variant">Anything specific in Python — "implement a binary
-                search tree", "how do I parse JSON?", "build a hash map from scratch".</p>
+              <p class="font-body-md text-on-surface font-semibold">Browse the sidebar (or search)</p>
+              <p class="font-body-md text-on-surface-variant">Open the <strong>Topics</strong> drawer to see the curated catalog,
+                or type a question into the search bar on the home page. The catalog covers Python fundamentals,
+                data structures, algorithms, and standard-library tools.</p>
             </div>
           </li>
           <li class="flex gap-sm">
-            <span
-              class="shrink-0 w-7 h-7 rounded-lg bg-secondary-container text-white flex items-center justify-center font-label-technical text-label-technical font-bold">2</span>
+            <span class="shrink-0 w-7 h-7 rounded-lg bg-secondary-container text-white flex items-center justify-center font-label-technical text-label-technical font-bold">2</span>
             <div>
-              <p class="font-body-md text-on-surface font-semibold">LearnPy writes the implementation</p>
-              <p class="font-body-md text-on-surface-variant">Clean, idiomatic Python with type hints and
-                docstrings — the way it should be written, not the shortest possible version.</p>
+              <p class="font-body-md text-on-surface font-semibold">Read the hand-authored lesson</p>
+              <p class="font-body-md text-on-surface-variant">Every lesson page is a short, focused write-up with at
+                least one working code example. No ads, no SEO bloat, no "scroll past 40 paragraphs to find the
+                snippet you want".</p>
             </div>
           </li>
           <li class="flex gap-sm">
-            <span
-              class="shrink-0 w-7 h-7 rounded-lg bg-secondary-container text-white flex items-center justify-center font-label-technical text-label-technical font-bold">3</span>
+            <span class="shrink-0 w-7 h-7 rounded-lg bg-secondary-container text-white flex items-center justify-center font-label-technical text-label-technical font-bold">3</span>
             <div>
-              <p class="font-body-md text-on-surface font-semibold">Tests are generated alongside</p>
-              <p class="font-body-md text-on-surface-variant">A matching pytest suite covers normal,
-                edge, and error cases — so you can see what the code is supposed to do.</p>
+              <p class="font-body-md text-on-surface font-semibold">Try the challenge</p>
+              <p class="font-body-md text-on-surface-variant">Every lesson has a coding challenge that runs in your browser.
+                Write Python, click <em>Run Tests</em>, and see pass/fail per test instantly. No setup, no server,
+                no risk — your code never leaves your machine.</p>
             </div>
           </li>
           <li class="flex gap-sm">
-            <span
-              class="shrink-0 w-7 h-7 rounded-lg bg-secondary-container text-white flex items-center justify-center font-label-technical text-label-technical font-bold">4</span>
+            <span class="shrink-0 w-7 h-7 rounded-lg bg-secondary-container text-white flex items-center justify-center font-label-technical text-label-technical font-bold">4</span>
             <div>
-              <p class="font-body-md text-on-surface font-semibold">Everything runs in a sandbox</p>
-              <p class="font-body-md text-on-surface-variant">Syntax is checked and the tests are executed
-                before you see the lesson. If they fail, LearnPy revises the code until they pass.</p>
-            </div>
-          </li>
-          <li class="flex gap-sm">
-            <span
-              class="shrink-0 w-7 h-7 rounded-lg bg-secondary-container text-white flex items-center justify-center font-label-technical text-label-technical font-bold">5</span>
-            <div>
-              <p class="font-body-md text-on-surface font-semibold">You get a verified lesson</p>
-              <p class="font-body-md text-on-surface-variant">Working code, the tests that prove it, and
-                complexity stats so you know what you're looking at.</p>
+              <p class="font-body-md text-on-surface font-semibold">Keep exploring</p>
+              <p class="font-body-md text-on-surface-variant">Every page ends with related-topic links and four
+                follow-up question buttons ("Explain more", "Why do I need this?", and so on) that summon an
+                AI tutor for a deeper take when you want it.</p>
             </div>
           </li>
         </ol>
       </section>
 
-      <!-- Why LearnPy -->
+      <!-- Features -->
       <section class="flex flex-col gap-sm">
         <div class="flex items-center gap-sm">
-          <span class="material-symbols-outlined text-primary" data-icon="stars">stars</span>
-          <h2 class="font-headline-lg text-headline-lg text-on-surface">Why LearnPy</h2>
+          <span class="material-symbols-outlined text-primary">stars</span>
+          <h2 class="font-headline-lg text-headline-lg text-on-surface">What's Inside</h2>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-sm">
           <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-xs">
-            <span class="material-symbols-outlined text-secondary-container" data-icon="school"
-              style="font-variation-settings: 'FILL' 1;">school</span>
-            <p class="font-headline-md text-headline-md text-on-surface">Learning-First</p>
-            <p class="font-body-md text-on-surface-variant">Every output is meant to be read and understood,
-              not just copied.</p>
+            <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+            <p class="font-headline-md text-headline-md text-on-surface">Curated Lessons</p>
+            <p class="font-body-md text-on-surface-variant">55+ hand-authored Python lessons, organized into
+              Basics, Data Structures, Algorithms, and Standard Library sections.</p>
           </div>
           <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-xs">
-            <span class="material-symbols-outlined text-secondary-container" data-icon="code">code</span>
-            <p class="font-headline-md text-headline-md text-on-surface">Python Only</p>
-            <p class="font-body-md text-on-surface-variant">No language tabs to flip through. One language,
-              done well.</p>
+            <span class="material-symbols-outlined text-secondary-container">flag</span>
+            <p class="font-headline-md text-headline-md text-on-surface">In-Browser Challenges</p>
+            <p class="font-body-md text-on-surface-variant">Every lesson has a coding challenge with real tests.
+              Powered by Pyodide — Python runs in your browser, no install needed.</p>
           </div>
           <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-xs">
-            <span class="material-symbols-outlined text-secondary-container" data-icon="science">science</span>
-            <p class="font-headline-md text-headline-md text-on-surface">Verified Examples</p>
-            <p class="font-body-md text-on-surface-variant">Tests run before you see the lesson, so the
-              code you're studying actually works.</p>
+            <span class="material-symbols-outlined text-secondary-container">menu</span>
+            <p class="font-headline-md text-headline-md text-on-surface">Sidebar Navigator</p>
+            <p class="font-body-md text-on-surface-variant">A slide-out drawer with every top-level topic. One
+              click and you're in the lesson.</p>
           </div>
           <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-xs">
-            <span class="material-symbols-outlined text-secondary-container" data-icon="build">build</span>
-            <p class="font-headline-md text-headline-md text-on-surface">Self-Healing</p>
-            <p class="font-body-md text-on-surface-variant">If a first attempt fails its tests, LearnPy
-              regenerates it until it passes.</p>
+            <span class="material-symbols-outlined text-secondary-container">search</span>
+            <p class="font-headline-md text-headline-md text-on-surface">AI Fallback Search</p>
+            <p class="font-body-md text-on-surface-variant">Can't find what you need in the catalog? Type a
+              question. The AI tutor writes you a custom lesson on the spot.</p>
           </div>
           <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-xs">
-            <span class="material-symbols-outlined text-secondary-container" data-icon="analytics">analytics</span>
-            <p class="font-headline-md text-headline-md text-on-surface">Complexity Stats</p>
-            <p class="font-body-md text-on-surface-variant">Cyclomatic complexity, line count, and
-              functions so you can compare implementations.</p>
+            <span class="material-symbols-outlined text-secondary-container">help</span>
+            <p class="font-headline-md text-headline-md text-on-surface">Follow-Up Questions</p>
+            <p class="font-body-md text-on-surface-variant">Every lesson has buttons to dig deeper — "Explain
+              more", "Why do I need this?", "Real-world example", "Common pitfalls".</p>
           </div>
           <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-xs">
-            <span class="material-symbols-outlined text-secondary-container" data-icon="block">block</span>
+            <span class="material-symbols-outlined text-secondary-container">block</span>
             <p class="font-headline-md text-headline-md text-on-surface">No Ad Walls</p>
-            <p class="font-body-md text-on-surface-variant">No popups, no SEO sludge — just the code and the
-              explanation.</p>
+            <p class="font-body-md text-on-surface-variant">No popups, no cookie banners, no SEO sludge — just
+              the lesson, the code, and the challenge.</p>
           </div>
         </div>
       </section>
 
-      <!-- Example topics -->
+      <!-- Challenges spotlight -->
+      <section class="bg-[#1b1b1b] text-white rounded-xl p-lg flex flex-col gap-md border border-white/10 code-glow">
+        <div class="flex items-center gap-sm">
+          <span class="material-symbols-outlined text-secondary-container">flag</span>
+          <h2 class="font-headline-lg text-headline-lg text-white">Hands-On Challenges</h2>
+        </div>
+        <p class="font-body-md text-white/80 max-w-2xl">
+          Reading code isn't enough — you have to write some. Every lesson ends with a small coding challenge
+          that you solve right on the page.
+        </p>
+        <ul class="font-body-md text-white/80 flex flex-col gap-xs pl-md list-disc">
+          <li>A prompt explains what to build, with starter code pre-filled in the editor.</li>
+          <li>Click <span class="font-code text-secondary-container">Run Tests</span> and your code is executed
+            in the browser via <strong>Pyodide</strong> — real Python, no server, no upload.</li>
+          <li>Each test reports pass or fail with a clear error message when something's off.</li>
+          <li>Hit a green <span class="font-code text-green-400">✓ CHALLENGE COMPLETE</span> badge when every test passes.</li>
+          <li><span class="font-code text-secondary-container">Reset</span> rolls back to the starter; <span class="font-code">Cmd/Ctrl + Enter</span> runs the tests.</li>
+        </ul>
+      </section>
+
+      <!-- AI Search fallback -->
       <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-md">
         <div class="flex items-center gap-sm">
-          <span class="material-symbols-outlined text-primary" data-icon="lightbulb">lightbulb</span>
-          <h2 class="font-headline-lg text-headline-lg text-on-surface">Things You Can Learn</h2>
+          <span class="material-symbols-outlined text-primary">manage_search</span>
+          <h2 class="font-headline-lg text-headline-lg text-on-surface">Can't find your topic? Just search it.</h2>
+        </div>
+        <p class="font-body-md text-on-surface-variant max-w-2xl">
+          The catalog can't cover everything. If you don't see your topic in the sidebar, head to the home page,
+          type a question into the search bar, and the AI tutor will write you a custom lesson — short, focused, and
+          linked to whichever canonical lessons relate.
+        </p>
+        <p class="font-body-md text-on-surface-variant max-w-2xl">
+          Examples that work great: <em>"How do I read CSV files in Python?"</em>, <em>"Implement Dijkstra's algorithm"</em>,
+          <em>"What's the difference between == and is?"</em>.
+        </p>
+      </section>
+
+      <!-- Things You Can Learn -->
+      <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-md">
+        <div class="flex items-center gap-sm">
+          <span class="material-symbols-outlined text-primary">lightbulb</span>
+          <h2 class="font-headline-lg text-headline-lg text-on-surface">What's in the Catalog</h2>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-sm">
           <div class="flex flex-col gap-xs">
+            <span class="font-label-technical text-label-technical text-outline uppercase">Basics</span>
+            <p class="font-body-md text-on-surface">Variables, types, casting, strings, control flow, functions,
+              modules, comprehensions, virtual environments — 31 sub-topics.</p>
+          </div>
+          <div class="flex flex-col gap-xs">
             <span class="font-label-technical text-label-technical text-outline uppercase">Data Structures</span>
-            <p class="font-body-md text-on-surface">Linked lists, binary search trees, hash maps, heaps,
-              tries, graphs.</p>
+            <p class="font-body-md text-on-surface">Stack, queue, deque, linked list, heap, trie, graph, hash map,
+              BST, Counter, defaultdict, namedtuple, frozenset — 14 sub-topics.</p>
           </div>
           <div class="flex flex-col gap-xs">
             <span class="font-label-technical text-label-technical text-outline uppercase">Algorithms</span>
-            <p class="font-body-md text-on-surface">Bubble sort, quicksort, merge sort, binary search,
-              BFS, DFS, dynamic programming.</p>
+            <p class="font-body-md text-on-surface">Bubble sort, merge sort, quicksort, binary search — with
+              complexity notes and working code.</p>
           </div>
           <div class="flex flex-col gap-xs">
-            <span class="font-label-technical text-label-technical text-outline uppercase">Standard Library</span>
-            <p class="font-body-md text-on-surface">Parsing JSON, working with files, regex, datetime,
-              collections, itertools.</p>
-          </div>
-          <div class="flex flex-col gap-xs">
-            <span class="font-label-technical text-label-technical text-outline uppercase">Everyday How-Tos</span>
-            <p class="font-body-md text-on-surface">Validate an email, debounce a function, retry an HTTP
-              call, write a decorator.</p>
+            <span class="font-label-technical text-label-technical text-outline uppercase">Pythonic Power Tools</span>
+            <p class="font-body-md text-on-surface">Decorators, generators, context managers, asyncio,
+              file I/O, JSON, regex, email validation.</p>
           </div>
         </div>
       </section>
 
       <!-- How to Use -->
-      <section
-        class="bg-[#1b1b1b] text-white rounded-xl p-lg flex flex-col gap-sm border border-white/10 code-glow">
+      <section class="bg-[#1b1b1b] text-white rounded-xl p-lg flex flex-col gap-sm border border-white/10 code-glow">
         <div class="flex items-center gap-sm">
-          <span class="material-symbols-outlined text-secondary-container" data-icon="terminal">terminal</span>
+          <span class="material-symbols-outlined text-secondary-container">terminal</span>
           <h2 class="font-headline-lg text-headline-lg text-white">How To Use</h2>
         </div>
         <ol class="font-label-technical text-label-technical text-white/80 flex flex-col gap-xs pl-sm">
-          <li><span class="text-white/40">$ </span>open the <a class="underline decoration-white/30 hover:text-white"
-              href="/">Learn</a> page</li>
-          <li><span class="text-white/40">$ </span>type a topic — e.g. "implement a binary search tree"</li>
-          <li><span class="text-white/40">$ </span>click <span class="text-secondary-container">TEACH ME</span></li>
-          <li><span class="text-white/40">$ </span>read the implementation and the tests that verify it</li>
-          <li><span class="text-white/40">$ </span>copy or export the lesson for your notes</li>
+          <li><span class="text-white/40">$ </span>click <span class="text-secondary-container">Topics</span> in the
+            header to open the sidebar — or hit the <a class="underline decoration-white/30 hover:text-white" href="/">Learn</a>
+            page for the topic grid</li>
+          <li><span class="text-white/40">$ </span>pick a lesson — read the explanation and run the code example</li>
+          <li><span class="text-white/40">$ </span>scroll to <span class="text-secondary-container">Challenge</span>,
+            write your solution, click <span class="text-secondary-container">Run Tests</span></li>
+          <li><span class="text-white/40">$ </span>stuck? hit a follow-up button or ask in
+            <span class="text-secondary-container">Continue exploring</span></li>
+          <li><span class="text-white/40">$ </span>topic not in the catalog? type it into the home-page search bar</li>
         </ol>
       </section>
 
@@ -419,6 +485,31 @@
 
   <!-- Empty spacer for mobile UI considerations -->
   <div class="md:hidden h-20"></div>
+
+  <!-- Sidebar drawer open/close — same behavior as the Learn page -->
+  <script>
+    (function () {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      const openBtn = document.getElementById('open-sidebar');
+      const closeBtn = document.getElementById('close-sidebar');
+
+      function openSidebar() {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      }
+      function closeSidebar() {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+      openBtn.addEventListener('click', openSidebar);
+      closeBtn.addEventListener('click', closeSidebar);
+      overlay.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSidebar(); });
+    })();
+  </script>
 </body>
 
 </html>
