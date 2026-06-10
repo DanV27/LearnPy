@@ -297,6 +297,20 @@
 
   <main class="flex-grow">
 
+    <!-- Breadcrumb strip — only on sub-topic pages, sits flush left above   -->
+    <!-- the centered hero. Mirrors the page's max-w-7xl content container. -->
+    {% if parent_topic %}
+    <div class="bg-surface-container-low border-b border-outline-variant">
+      <div class="max-w-7xl mx-auto px-margin py-xs">
+        <a href="{{ url_for('lesson_page', slug=parent_topic.slug) }}"
+          class="inline-flex items-center gap-xs font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors no-underline">
+          <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+          Back to {{ parent_topic.name }}
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Hero Section -->
     <!-- On the home page (no active_topic), this is the big search hero.   -->
     <!-- On a lesson page, only the title + subhead show — the search bar   -->
@@ -309,13 +323,6 @@
       </span>
       {% endif %}
       <h1 class="font-display-xl text-display-xl text-primary mb-md max-w-2xl">
-        {% if parent_topic %}
-        <a href="{{ url_for('lesson_page', slug=parent_topic.slug) }}"
-          class="inline-flex items-center gap-xs font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors mb-sm no-underline">
-          <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
-          Back to {{ parent_topic.name }}
-        </a>
-        {% endif %}
         {% if active_topic %}{{ active_topic.name }}{% else %}What would you like to learn?{% endif %}
       </h1>
       <p class="font-body-lg text-body-lg text-on-surface-variant mb-md max-w-xl">
