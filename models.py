@@ -82,3 +82,27 @@ class Generation(db.Model):
             "code": self.code,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
+
+
+class LessonProgress(db.Model):
+    """Tracks each user's progress on each canonical lesson.
+
+    One row per (user, slug) pair. `viewed_at` is set the first time the
+    user lands on the lesson page; `completed_at` is set the first time
+    the user passes every test in that lesson's challenge.
+
+    Used to render the eyeball + green check icons on topic cards and to
+    pre-light the CHALLENGE COMPLETE badge on lesson pages the user has
+    already beaten.
+    """
+
+    __tablename__ = "lesson_progress"
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "slug", name="uq_lesson_progress_user_slug"),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    slug = db.Column(db.String(80), nullable=False, index=True)
+    viewed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_at = db.Column(db.DateTime, nullable=True)

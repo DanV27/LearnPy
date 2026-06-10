@@ -345,7 +345,7 @@
             <span class="material-symbols-outlined text-secondary">flag</span>
             <h2 class="font-headline-md text-headline-md text-on-tertiary">Challenge</h2>
             <span id="challenge-status"
-              class="hidden font-code text-[11px] px-xs py-[2px] rounded-lg bg-green-100 text-green-800 ml-xs">✓ CHALLENGE COMPLETE</span>
+              class="{% if not challenge_completed %}hidden {% endif %}font-code text-[11px] px-xs py-[2px] rounded-lg bg-green-100 text-green-800 ml-xs">✓ CHALLENGE COMPLETE</span>
           </div>
           <button id="challenge-reset"
             class="flex items-center gap-xs text-on-tertiary-container hover:text-white transition-colors font-code text-[12px]">
@@ -402,12 +402,21 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-xs">
           {% for ct in children_topics %}
+          {% set cprog = user_progress.get(ct.slug, {}) %}
           <a href="{{ ct.url }}"
             class="group flex items-center gap-sm px-sm py-sm border border-outline-variant rounded-lg hover:border-primary hover:bg-surface-container-low transition-colors no-underline">
             <span class="material-symbols-outlined text-secondary shrink-0" style="font-size: 22px;">{{ ct.icon }}</span>
             <div class="min-w-0 flex-1">
               <p class="font-body-md text-body-md text-on-surface font-semibold truncate">{{ ct.name }}</p>
               <p class="font-label-md text-label-md text-on-surface-variant truncate">{{ ct.description }}</p>
+            </div>
+            <div class="flex items-center gap-xs shrink-0">
+              {% if cprog.viewed %}
+              <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 16px;" title="Viewed">visibility</span>
+              {% endif %}
+              {% if cprog.completed %}
+              <span class="material-symbols-outlined text-green-600" style="font-size: 16px; font-variation-settings: 'FILL' 1;" title="Challenge completed">check_circle</span>
+              {% endif %}
             </div>
             <span class="material-symbols-outlined text-outline opacity-0 group-hover:opacity-100 transition-opacity shrink-0" style="font-size: 18px;">arrow_forward</span>
           </a>
@@ -480,11 +489,20 @@
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
         {% for t in all_topics %}
+        {% set prog = user_progress.get(t.slug, {}) %}
         <a href="{{ url_for('lesson_page', slug=t.slug) }}"
           class="bg-surface-container-low border border-outline-variant p-md hover-lift group no-underline block">
           <div class="flex justify-between items-start mb-sm">
             <span class="material-symbols-outlined text-primary" style="font-size: 32px;">{{ t.icon }}</span>
-            <span class="text-[10px] font-code px-xs py-[2px] {% if t.level == 'BEGINNER' %}bg-primary text-on-primary{% elif t.level == 'INTERMEDIATE' %}bg-surface-variant text-primary border border-outline-variant{% else %}bg-secondary-container text-on-primary{% endif %}">{{ t.level }}</span>
+            <div class="flex items-center gap-xs">
+              {% if prog.viewed %}
+              <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 18px;" title="Viewed">visibility</span>
+              {% endif %}
+              {% if prog.completed %}
+              <span class="material-symbols-outlined text-green-600" style="font-size: 18px; font-variation-settings: 'FILL' 1;" title="Challenge completed">check_circle</span>
+              {% endif %}
+              <span class="text-[10px] font-code px-xs py-[2px] {% if t.level == 'BEGINNER' %}bg-primary text-on-primary{% elif t.level == 'INTERMEDIATE' %}bg-surface-variant text-primary border border-outline-variant{% else %}bg-secondary-container text-on-primary{% endif %}">{{ t.level }}</span>
+            </div>
           </div>
           <h3 class="font-headline-md text-headline-md text-primary mb-xs">{{ t.name }}</h3>
           <p class="font-body-md text-body-md text-on-surface-variant">{{ t.description }}</p>
@@ -1137,6 +1155,15 @@
 
           if (allPassed) {
             completeBadge.classList.remove('hidden');
+            // Persist the win so the eyeball + check icons stay lit across
+            // sessions and on every grid that lists this topic.
+            if (activeTopic && activeTopic.slug) {
+              fetch('/api/progress/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ slug: activeTopic.slug }),
+              }).catch(() => { /* network errors don't break the UI */ });
+            }
           }
           setRunning(false);
         }

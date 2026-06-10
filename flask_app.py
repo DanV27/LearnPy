@@ -27,7 +27,9 @@ from flask_login import (
 )
 from werkzeug.exceptions import HTTPException
 
-from models import db, User, Generation
+from datetime import datetime
+
+from models import db, User, Generation, LessonProgress
 from generator import generate_lesson
 from topics import TOPICS, get_topic, visible_in_sidebar
 from lessons import load_lesson
@@ -106,6 +108,63 @@ def inject_topics():
     return {"all_topics": visible_in_sidebar()}
 
 
+@app.context_processor
+def inject_user_progress():
+    """Inject `user_progress` into every template: a {slug: {viewed, completed}}
+    dict. Empty for anonymous users so templates can call it unconditionally."""
+    if current_user.is_authenticated:
+        return {"user_progress": _user_progress_dict(current_user.id)}
+    return {"user_progress": {}}
+
+
+# ---------------------------------------------------------------------------
+# Progress tracking helpers
+# ---------------------------------------------------------------------------
+
+def _user_progress_dict(user_id: int) -> dict:
+    """Return {slug: {'viewed': True, 'completed': bool}} for a user."""
+    rows = LessonProgress.query.filter_by(user_id=user_id).all()
+    return {
+        r.slug: {"viewed": True, "completed": r.completed_at is not None}
+        for r in rows
+    }
+
+
+def _mark_viewed(user_id: int, slug: str) -> None:
+    """Upsert a LessonProgress row marking this slug as viewed.
+
+    Safe to call on every page load — does nothing if the row already exists.
+    Any DB error is swallowed (logged) so a failed write never prevents the
+    lesson from rendering.
+    """
+    try:
+        existing = LessonProgress.query.filter_by(user_id=user_id, slug=slug).first()
+        if existing is None:
+            db.session.add(LessonProgress(user_id=user_id, slug=slug, viewed_at=datetime.utcnow()))
+            db.session.commit()
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Failed to mark lesson viewed: user=%s slug=%s", user_id, slug)
+
+
+def _mark_completed(user_id: int, slug: str) -> None:
+    """Upsert a LessonProgress row marking this slug's challenge as completed.
+
+    If the row exists with completed_at already set, this is a no-op.
+    """
+    try:
+        existing = LessonProgress.query.filter_by(user_id=user_id, slug=slug).first()
+        now = datetime.utcnow()
+        if existing is None:
+            db.session.add(LessonProgress(user_id=user_id, slug=slug, viewed_at=now, completed_at=now))
+        elif existing.completed_at is None:
+            existing.completed_at = now
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        app.logger.exception("Failed to mark challenge completed: user=%s slug=%s", user_id, slug)
+
+
 # ---------------------------------------------------------------------------
 # Page routes
 # ---------------------------------------------------------------------------
@@ -162,6 +221,17 @@ def lesson_page(slug):
     # runner when this is present.
     challenge = get_challenge(slug)
 
+    # Record that the current user has viewed this lesson. Adds an eyeball
+    # icon to the topic on every grid where it appears.
+    _mark_viewed(current_user.id, slug)
+
+    # Pre-light the CHALLENGE COMPLETE badge on lesson pages the user has
+    # already beaten in a previous session.
+    progress = LessonProgress.query.filter_by(
+        user_id=current_user.id, slug=slug
+    ).first()
+    challenge_completed = progress is not None and progress.completed_at is not None
+
     return render_template(
         "main.html",
         active_topic=topic,
@@ -169,6 +239,7 @@ def lesson_page(slug):
         children_topics=children_topics,
         followups=followups,
         challenge=challenge,
+        challenge_completed=challenge_completed,
     )
 
 
@@ -360,6 +431,29 @@ def generate():
             jsonify({"error": str(e), "trace": traceback.format_exc()}),
             500,
         )
+
+
+# ---------------------------------------------------------------------------
+# Progress API — called by the challenge runner when all tests pass.
+# ---------------------------------------------------------------------------
+
+@app.route("/api/progress/complete", methods=["POST"])
+@login_required
+def api_progress_complete():
+    """Record that the current user passed the challenge for `slug`.
+
+    Idempotent — calling again on an already-completed lesson is a no-op.
+    Validates the slug exists in the catalog so the client can't insert
+    arbitrary keys into the table.
+    """
+    data = request.get_json(silent=True) or {}
+    slug = (data.get("slug") or "").strip()
+
+    if not slug or get_topic(slug) is None:
+        return jsonify({"error": "Unknown slug"}), 400
+
+    _mark_completed(current_user.id, slug)
+    return jsonify({"ok": True})
 
 
 # ---------------------------------------------------------------------------
