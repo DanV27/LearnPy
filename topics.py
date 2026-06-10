@@ -191,7 +191,7 @@ TOPICS = [
     # =========================================================================
     # Basics sub-topics — hidden from the sidebar; reached via /lesson/basics.
     # =========================================================================
-    {"slug": "python-comments",          "name": "Python Comments",          "icon": "comment",         "level": "BEGINNER", "description": "Single-line and multi-line comments.", "hide_from_sidebar": True},
+    {"slug": "python-comments",          "name": "Python Comments",          "icon": "comment",         "level": "BEGINNER", "description": "Single-line and multi-line comments.", "hide_from_sidebar": True,},
     {"slug": "python-variables",         "name": "Python Variables",         "icon": "label",           "level": "BEGINNER", "description": "Assignment, naming, and scope.", "hide_from_sidebar": True},
     {"slug": "python-data-types",        "name": "Python Data Types",        "icon": "category",        "level": "BEGINNER", "description": "Built-in types at a glance.", "hide_from_sidebar": True},
     {"slug": "python-numbers",           "name": "Python Numbers",           "icon": "pin",             "level": "BEGINNER", "description": "int, float, complex.", "hide_from_sidebar": True},
@@ -252,3 +252,10 @@ def visible_in_sidebar():
     """Return the topics that should appear in the sidebar drawer (i.e.
     everything that isn't marked `hide_from_sidebar`)."""
     return [t for t in TOPICS if not t.get("hide_from_sidebar")]
+
+def get_parent(slug: str):
+    """Return the parent topic, if none, return None"""
+    for t in TOPICS:
+        if slug in (t.get("children") or []):
+            return t
+    return None
