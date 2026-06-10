@@ -1,7 +1,7 @@
 ---
 title: Priority Queue
 summary: Items come out in priority order, not arrival order. Backed by a heap.
-related: queue, sorting, graph
+related: queue, graph, algorithms
 ---
 
 A **priority queue** lets you push items in any order and always pop the highest-priority one. The standard way to implement one is a **binary heap** — and Python's `heapq` module does exactly that, treating a plain list as a min-heap.

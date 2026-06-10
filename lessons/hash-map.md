@@ -1,7 +1,7 @@
 ---
 title: Hash Map
 summary: A dictionary built from scratch — hashing, buckets, and how collisions get handled.
-related: data-structures, binary-search-tree
+related: data-structures, python-dictionaries
 ---
 
 Python's `dict` is the most-used data structure in the language, and under the hood it's a **hash map**. The idea: convert a key into an integer with a hash function, take that integer modulo the size of an array, and store the value at that index. Lookups become O(1) on average.

@@ -1,7 +1,7 @@
 ---
 title: Python Basics
 summary: Pick a topic below to learn a fundamental Python concept — one short, focused lesson at a time.
-related: data-structures, file-io
+related: data-structures, algorithms
 ---
 
 Welcome to the Python Basics section. Everything here is a building block — you can read it top to bottom or jump straight to whatever you need.

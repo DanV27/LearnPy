@@ -1,7 +1,7 @@
 ---
 title: JSON
 summary: Parse and emit JSON with Python's built-in json module.
-related: file-io, basics, regex
+related: basics, regex, python-dictionaries
 ---
 
 JSON is the lingua franca of web APIs and config files. Python's standard library has a `json` module that handles both directions — turning JSON text into Python objects and vice versa.
@@ -73,4 +73,4 @@ except json.JSONDecodeError as e:
     print(f"Bad JSON at line {e.lineno}: {e.msg}")
 ```
 
-For working with the underlying files, see [File I/O](/lesson/file-io). For more strict parsing patterns, see [Regular Expressions](/lesson/regex).
+For more strict parsing patterns, see [Regular Expressions](/lesson/regex).

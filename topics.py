@@ -94,7 +94,6 @@ TOPICS = [
             "doubly-linked-list",
             "priority-queue",
             "hash-map",
-            "binary-search-tree",
             "trie",
             "graph",
             "counter",
@@ -162,6 +161,15 @@ TOPICS = [
     {"slug": "defaultdict",        "name": "defaultdict",        "icon": "folder_special",   "level": "BEGINNER",     "description": "Auto-default dict — collections.defaultdict.",     "hide_from_sidebar": True},
     {"slug": "namedtuple",         "name": "namedtuple",         "icon": "label_important",  "level": "BEGINNER",     "description": "Tuples with named fields — collections.namedtuple.","hide_from_sidebar": True},
     {"slug": "frozenset",          "name": "frozenset",          "icon": "ac_unit",          "level": "INTERMEDIATE", "description": "Immutable, hashable sets.",                        "hide_from_sidebar": True},
+
+    # =========================================================================
+    # Shared / cross-section sub-topics — referenced from more than one
+    # parent's `children` list. Kept hidden from the sidebar so they don't
+    # clutter top-level navigation.
+    # =========================================================================
+    {"slug": "json",               "name": "JSON",                "icon": "data_object",      "level": "BEGINNER",     "description": "Parse and emit JSON.",                              "hide_from_sidebar": True},
+    {"slug": "regex",              "name": "Regular Expressions", "icon": "find_in_page",     "level": "INTERMEDIATE", "description": "Pattern matching with the re module.",              "hide_from_sidebar": True},
+    {"slug": "hash-map",           "name": "Hash Map",            "icon": "key",              "level": "INTERMEDIATE", "description": "Build a hash map from scratch.",                    "hide_from_sidebar": True},
 ]
 
 

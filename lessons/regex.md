@@ -1,7 +1,7 @@
 ---
 title: Regular Expressions
 summary: Match patterns in text with the re module — search, capture, and replace.
-related: validate-email, json, basics
+related: json, basics, python-strings
 ---
 
 A **regular expression** is a small language for describing patterns in text. Python's `re` module is how you use them. They're powerful and easy to overuse — when something simpler would do (like `str.startswith` or `str.split`), reach for that first.
@@ -80,4 +80,4 @@ if m:
     print(level, source, message)
 ```
 
-When you're done here, try [Validate Email](/lesson/validate-email) for a real-world regex pattern, or revisit [Basics](/lesson/basics) if string slicing would have been enough.
+When you're done here, revisit [Python Strings](/lesson/python-strings) if string slicing would have been enough, or read [JSON](/lesson/json) for another common parsing pattern.

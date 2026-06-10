@@ -1,7 +1,7 @@
 ---
 title: Python Functions
 summary: Reusable blocks of code defined with `def`. Parameters, return values, defaults, and *args/**kwargs.
-related: python-variables, python-modules, decorators
+related: python-variables, python-modules, python-try-except
 ---
 
 A function packages a chunk of work so you can call it by name. Use `def`:

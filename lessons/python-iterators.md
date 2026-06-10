@@ -1,7 +1,7 @@
 ---
 title: Python Iterators
 summary: The protocol behind every for-loop — iter() and next().
-related: python-for-loops, generators, python-range
+related: python-for-loops, python-range, python-while-loops
 ---
 
 An iterator is an object that produces values one at a time on demand. Anything you can put in a `for` loop is **iterable**. The iterator itself is what `for` walks through.
@@ -49,6 +49,6 @@ for x in CountDown(3):
     print(x)            # 3, 2, 1
 ```
 
-- For most cases, a [generator](/lesson/generators) (`yield`) is much cleaner than a class.
+- For most cases, a generator function (`yield`) is much cleaner than writing an iterator class by hand.
 - Iterators are single-use: once exhausted, you have to make a new one.
 - `iter()`, `next()`, `StopIteration` are the three pieces of the iterator protocol.

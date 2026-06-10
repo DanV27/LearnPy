@@ -1,7 +1,7 @@
 ---
 title: Trie
 summary: A tree where each edge is a character — built for fast prefix lookups.
-related: hash-map, graph, binary-search-tree
+related: hash-map, graph, data-structures
 ---
 
 A **trie** (pronounced "try") is a tree-shaped data structure where each path from the root spells out a string. It's the workhorse behind autocomplete, spell-check, and dictionary apps because prefix lookups are O(length-of-prefix) regardless of how many words you've stored.

@@ -17,23 +17,6 @@ CHALLENGES = { 'basics': { 'prompt': 'Define a function `add(a, b)` that returns
                                     'code': "assert unique_in_order(['A','A','B','C','C','A']) == ['A','B','C','A']"},
                                   {'name': '[] -> []', 'code': 'assert unique_in_order([]) == []'},
                                   {'name': '[1,1,1,1] -> [1]', 'code': 'assert unique_in_order([1,1,1,1]) == [1]'}]},
-  'binary-search-tree': { 'prompt': 'Implement an `insert(root, value)` function that inserts into a BST and returns '
-                                    'the (possibly new) root. A Node class is provided.',
-                          'starter_code': 'class Node:\n'
-                                          '    def __init__(self, value):\n'
-                                          '        self.value = value\n'
-                                          '        self.left = None\n'
-                                          '        self.right = None\n'
-                                          '\n'
-                                          'def insert(root, value):\n'
-                                          '    # your code here\n'
-                                          '    return root\n',
-                          'tests': [ { 'name': 'insert into empty tree returns a Node',
-                                       'code': 'r = insert(None, 5); assert r.value == 5'},
-                                     { 'name': 'smaller value goes left',
-                                       'code': 'r = insert(None, 5); r = insert(r, 3); assert r.left.value == 3'},
-                                     { 'name': 'larger value goes right',
-                                       'code': 'r = insert(None, 5); r = insert(r, 8); assert r.right.value == 8'}]},
   'hash-map': { 'prompt': 'Without using `dict`, build a tiny `HashMap` class with `put(key, value)` and `get(key)` '
                           'methods.',
                 'starter_code': 'class HashMap:\n'
@@ -53,46 +36,6 @@ CHALLENGES = { 'basics': { 'prompt': 'Define a function `add(a, b)` that returns
                              'code': "h = HashMap(); assert h.get('missing') is None"},
                            { 'name': 'put twice updates the value',
                              'code': "h = HashMap(); h.put('a', 1); h.put('a', 2); assert h.get('a') == 2"}]},
-  'sorting': { 'prompt': "Write `bubble_sort(arr)` that returns a new sorted list. Don't mutate the input.",
-               'starter_code': 'def bubble_sort(arr):\n    # your code here\n    return arr\n',
-               'tests': [ {'name': 'sorts a small list', 'code': 'assert bubble_sort([3, 1, 2]) == [1, 2, 3]'},
-                          {'name': 'handles an empty list', 'code': 'assert bubble_sort([]) == []'},
-                          { 'name': "doesn't mutate the input",
-                            'code': 'orig = [3, 1, 2]; _ = bubble_sort(orig); assert orig == [3, 1, 2]'}]},
-  'binary-search': { 'prompt': 'Write `binary_search(arr, target)` that returns the index of `target` in a sorted '
-                               'list, or -1 if not found.',
-                     'starter_code': 'def binary_search(arr, target):\n    # your code here\n    return -1\n',
-                     'tests': [ { 'name': 'finds an item in the middle',
-                                  'code': 'assert binary_search([1, 3, 5, 7, 9], 5) == 2'},
-                                { 'name': 'returns -1 when missing',
-                                  'code': 'assert binary_search([1, 3, 5, 7, 9], 4) == -1'},
-                                { 'name': 'finds an item at the end',
-                                  'code': 'assert binary_search([1, 2, 3, 4, 5], 5) == 4'},
-                                {'name': 'handles empty list', 'code': 'assert binary_search([], 1) == -1'}]},
-  'decorators': { 'prompt': 'Write a `@double` decorator that doubles whatever the wrapped function returns.',
-                  'starter_code': 'def double(fn):\n    # your code here\n    return fn\n',
-                  'tests': [ { 'name': 'doubles a number return',
-                               'code': '@double\ndef five(): return 5\nassert five() == 10'},
-                             { 'name': 'doubles a string return',
-                               'code': "@double\ndef hi(): return 'hi'\nassert hi() == 'hihi'"},
-                             { 'name': 'passes args through',
-                               'code': '@double\ndef add(a, b): return a + b\nassert add(3, 4) == 14'}]},
-  'generators': { 'prompt': 'Write a generator `count_up(n)` that yields integers from 1 up to and including n.',
-                  'starter_code': 'def count_up(n):\n    # your code here\n    pass\n',
-                  'tests': [ {'name': 'yields 1 to n', 'code': 'assert list(count_up(5)) == [1, 2, 3, 4, 5]'},
-                             {'name': 'yields nothing when n is 0', 'code': 'assert list(count_up(0)) == []'},
-                             { 'name': 'is a generator, not a list',
-                               'code': 'import types; assert isinstance(count_up(3), types.GeneratorType)'}]},
-  'context-managers': { 'prompt': "Write a context manager class `Tag(name)` whose `__enter__` returns `'<name>'` and "
-                                  'whose `__exit__` does nothing.',
-                        'starter_code': 'class Tag:\n'
-                                        '    def __init__(self, name):\n'
-                                        '        self.name = name\n'
-                                        '    # add __enter__ and __exit__\n',
-                        'tests': [ { 'name': 'with-block returns the open tag',
-                                     'code': "with Tag('p') as t: assert t == '<p>'"},
-                                   { 'name': 'different name, different tag',
-                                     'code': "with Tag('div') as t: assert t == '<div>'"}]},
   'json': { 'prompt': 'Given the string `raw = \'{"name": "Alice", "age": 30}\'`, parse it into a dict named `data` '
                       'and increment its `age` by 1.',
             'starter_code': 'import json\nraw = \'{"name": "Alice", "age": 30}\'\n# your code here\ndata = {}\n',
@@ -108,44 +51,6 @@ CHALLENGES = { 'basics': { 'prompt': 'Define a function `add(a, b)` that returns
                           'code': "assert find_emails('a@b.com and c@d.org') == ['a@b.com', 'c@d.org']"},
                         { 'name': 'returns [] when none found',
                           'code': "assert find_emails('no addresses here') == []"}]},
-  'asyncio': { 'prompt': 'Write an async function `gather_results()` that runs two async tasks concurrently and '
-                         'returns their results as a list.',
-               'starter_code': 'import asyncio\n'
-                               '\n'
-                               'async def one(): await asyncio.sleep(0); return 1\n'
-                               'async def two(): await asyncio.sleep(0); return 2\n'
-                               '\n'
-                               'async def gather_results():\n'
-                               '    # your code here — return a list of results from one() and two()\n'
-                               '    return []\n',
-               'tests': [ { 'name': 'returns [1, 2]',
-                            'code': 'import asyncio; assert asyncio.run(gather_results()) == [1, 2]'},
-                          { 'name': 'returns a list',
-                            'code': 'import asyncio; assert isinstance(asyncio.run(gather_results()), list)'}]},
-  'validate-email': { 'prompt': 'Write `is_valid_email(email)` that returns True only if `email` contains exactly one '
-                                "'@', a non-empty local part, and a domain with at least one '.' followed by 2+ "
-                                'letters.',
-                      'starter_code': 'import re\n'
-                                      '\n'
-                                      'def is_valid_email(email):\n'
-                                      '    # your code here\n'
-                                      '    return False\n',
-                      'tests': [ { 'name': 'accepts a normal address',
-                                   'code': "assert is_valid_email('alice@example.com') is True"},
-                                 { 'name': 'rejects missing @',
-                                   'code': "assert is_valid_email('alice.example.com') is False"},
-                                 { 'name': 'rejects missing TLD',
-                                   'code': "assert is_valid_email('alice@example.') is False"},
-                                 {'name': 'rejects empty', 'code': "assert is_valid_email('') is False"}]},
-  'file-io': { 'prompt': 'Define a function `write_then_read(path, content)` that writes `content` to `path` then '
-                         'reads it back and returns it. Use a `with` block.',
-               'starter_code': "def write_then_read(path, content):\n    # your code here\n    return ''\n",
-               'tests': [ { 'name': 'round-trips content',
-                            'code': "import tempfile, os; p = os.path.join(tempfile.gettempdir(), 'lp.txt'); assert "
-                                    "write_then_read(p, 'hello') == 'hello'"},
-                          { 'name': 'round-trips empty',
-                            'code': "import tempfile, os; p = os.path.join(tempfile.gettempdir(), 'lp.txt'); assert "
-                                    "write_then_read(p, '') == ''"}]},
   'python-comments': { 'prompt': 'Write a function `square(n)` that has a docstring describing what it does, and '
                                  'returns n squared.',
                        'starter_code': 'def square(n):\n    # add a docstring AND return n squared\n    pass\n',

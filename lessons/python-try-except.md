@@ -50,4 +50,4 @@ def withdraw(amount):
 
 - Catch the most specific exception class you can. `except Exception` swallows bugs.
 - The `as e` binds the exception to a name so you can read `e.args`, the message, etc.
-- For automatic cleanup (files, locks, db connections), `with` blocks ([context managers](/lesson/context-managers)) are cleaner than `try/finally`.
+- For automatic cleanup (files, locks, db connections), `with` blocks (context managers) are cleaner than `try/finally`.
