@@ -169,6 +169,7 @@ def _mark_completed(user_id: int, slug: str) -> None:
 # Page routes
 # ---------------------------------------------------------------------------
 
+
 @app.route("/")
 @login_required
 def index():
@@ -181,6 +182,11 @@ def about():
     """Public About page. No login required."""
     return render_template("about.html")
 
+@app.route("/profile")
+@login_required
+def profile():
+    """Profile page"""
+    return render_template("profile.html")
 
 @app.route("/lesson/<slug>")
 @login_required

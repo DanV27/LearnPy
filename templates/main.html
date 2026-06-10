@@ -249,7 +249,10 @@
       </div>
       <div class="flex items-center gap-sm">
         <span class="text-on-surface-variant font-label-md text-label-md hidden sm:inline">
-          {{ current_user.username }}
+          <a href="{{ url_for('profile') }}"
+            class="text-on-surface-variant font-label-md text-label-md hidden sm:inline hover:text-secondary transition-colors">
+            {{ current_user.username }}
+          </a>
         </span>
         <a href="{{ url_for('logout') }}"
           class="bg-primary text-on-primary px-md py-xs font-label-md text-label-md cursor-pointer active:opacity-80 rounded-lg">
