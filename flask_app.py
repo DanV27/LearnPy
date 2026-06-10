@@ -31,7 +31,7 @@ from datetime import datetime
 
 from models import db, User, Generation, LessonProgress
 from generator import generate_lesson
-from topics import TOPICS, get_topic, visible_in_sidebar
+from topics import TOPICS, get_topic, visible_in_sidebar, get_parent
 from lessons import load_lesson
 from challenges import get_challenge
 
@@ -194,6 +194,10 @@ def lesson_page(slug):
     Unknown slugs (not in `topics.py`, or no matching `.md` file) redirect
     back to the home page.
     """
+
+
+
+
     topic = get_topic(slug)
     if not topic:
         return redirect(url_for("index"))
@@ -211,6 +215,9 @@ def lesson_page(slug):
     # with their URL attached. This is what powers the sub-topic grid on
     # parent pages like /lesson/basics.
     children_topics = _resolve_children(topic.get("children") or [])
+
+    #gets parent topic for child topic
+    parent_topic = get_parent(slug)
 
     # Follow-up question buttons shown at the bottom of every lesson.
     # Topics can override the defaults by setting their own `followups`.
@@ -232,6 +239,8 @@ def lesson_page(slug):
     ).first()
     challenge_completed = progress is not None and progress.completed_at is not None
 
+
+
     return render_template(
         "main.html",
         active_topic=topic,
@@ -240,6 +249,7 @@ def lesson_page(slug):
         followups=followups,
         challenge=challenge,
         challenge_completed=challenge_completed,
+        parent_topic = parent_topic
     )
 
 

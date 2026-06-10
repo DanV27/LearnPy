@@ -18,16 +18,41 @@
     .material-symbols-outlined {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
-    .code-syntax-keyword { color: #FF7028; }
-    .code-syntax-string  { color: #9aa0a6; }
-    .code-syntax-comment { color: #5e5e5e; font-style: italic; }
-    .code-syntax-number  { color: #c6c6c6; }
-    .hover-lift { transition: transform 0.2s ease, border-color 0.2s ease; }
-    .hover-lift:hover { transform: translateY(-2px); border-color: #000000; }
-    body { font-family: 'Space Grotesk', sans-serif; }
+
+    .code-syntax-keyword {
+      color: #FF7028;
+    }
+
+    .code-syntax-string {
+      color: #9aa0a6;
+    }
+
+    .code-syntax-comment {
+      color: #5e5e5e;
+      font-style: italic;
+    }
+
+    .code-syntax-number {
+      color: #c6c6c6;
+    }
+
+    .hover-lift {
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-2px);
+      border-color: #000000;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+    }
 
     /* Lesson markdown styling */
-    .lesson-body h1, .lesson-body h2, .lesson-body h3 {
+    .lesson-body h1,
+    .lesson-body h2,
+    .lesson-body h3 {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 600;
       letter-spacing: -0.01em;
@@ -35,13 +60,41 @@
       margin-bottom: 8px;
       color: #1b1b1b;
     }
-    .lesson-body h1 { font-size: 28px; }
-    .lesson-body h2 { font-size: 22px; }
-    .lesson-body h3 { font-size: 18px; }
-    .lesson-body p  { margin: 12px 0; line-height: 1.6; color: #4c4546; }
-    .lesson-body ul, .lesson-body ol { margin: 12px 0; padding-left: 24px; color: #4c4546; }
-    .lesson-body li { margin: 4px 0; line-height: 1.5; }
-    .lesson-body strong { color: #1b1b1b; }
+
+    .lesson-body h1 {
+      font-size: 28px;
+    }
+
+    .lesson-body h2 {
+      font-size: 22px;
+    }
+
+    .lesson-body h3 {
+      font-size: 18px;
+    }
+
+    .lesson-body p {
+      margin: 12px 0;
+      line-height: 1.6;
+      color: #4c4546;
+    }
+
+    .lesson-body ul,
+    .lesson-body ol {
+      margin: 12px 0;
+      padding-left: 24px;
+      color: #4c4546;
+    }
+
+    .lesson-body li {
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+
+    .lesson-body strong {
+      color: #1b1b1b;
+    }
+
     .lesson-body code {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px;
@@ -50,6 +103,7 @@
       border-radius: 4px;
       color: #1b1b1b;
     }
+
     .lesson-body pre {
       background: #1b1b1b;
       color: #f1f1f1;
@@ -61,19 +115,26 @@
       line-height: 1.6;
       margin: 16px 0;
     }
+
     .lesson-body pre code {
       background: transparent;
       padding: 0;
       color: inherit;
       font-size: 14px;
     }
+
     .lesson-body a {
       color: #a43d00;
       text-decoration: underline;
       text-decoration-color: rgba(164, 61, 0, 0.4);
       text-underline-offset: 3px;
     }
-    .lesson-body a:hover { color: #fb6d25; text-decoration-color: #fb6d25; }
+
+    .lesson-body a:hover {
+      color: #fb6d25;
+      text-decoration-color: #fb6d25;
+    }
+
     /* Inline topic chip (rendered from [text](#topic:...) ) */
     .lesson-body a.topic-link {
       display: inline-flex;
@@ -87,7 +148,12 @@
       font-weight: 500;
       text-decoration: none;
     }
-    .lesson-body a.topic-link:hover { filter: brightness(1.1); color: #ffffff; }
+
+    .lesson-body a.topic-link:hover {
+      filter: brightness(1.1);
+      color: #ffffff;
+    }
+
     .lesson-body a.topic-link::before {
       content: "→";
       font-family: 'JetBrains Mono', monospace;
@@ -170,8 +236,8 @@
           <span class="hidden sm:inline font-label-md text-label-md">Topics</span>
         </button>
         <a href="/" class="flex items-center gap-xs">
-          <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo"
-            class="h-28 w-28 rounded-lg" style="image-rendering: pixelated;" />
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo" class="h-28 w-28 rounded-lg"
+            style="image-rendering: pixelated;" />
           <span class="font-headline-md text-headline-md font-bold text-primary">LearnPy</span>
         </a>
         <nav class="hidden md:flex gap-md font-body-md text-body-md ml-md">
@@ -194,8 +260,7 @@
   </header>
 
   <!-- Sidebar overlay -->
-  <div id="sidebar-overlay"
-    class="hidden fixed inset-0 bg-black/40 z-40 transition-opacity"></div>
+  <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/40 z-40 transition-opacity"></div>
 
   <!-- Sidebar drawer -->
   <aside id="sidebar"
@@ -212,8 +277,7 @@
     </div>
     <nav class="flex-1 overflow-y-auto py-xs">
       {% for t in all_topics %}
-      <a href="{{ url_for('lesson_page', slug=t.slug) }}"
-        class="flex items-center gap-sm px-md py-sm transition-colors
+      <a href="{{ url_for('lesson_page', slug=t.slug) }}" class="flex items-center gap-sm px-md py-sm transition-colors
                {% if active_topic and active_topic.slug == t.slug %}
                  bg-surface-container-high text-primary font-bold border-l-4 border-secondary
                {% else %}
@@ -237,21 +301,29 @@
     <!-- On the home page (no active_topic), this is the big search hero.   -->
     <!-- On a lesson page, only the title + subhead show — the search bar   -->
     <!-- moves to the bottom of the lesson under "Continue exploring".      -->
-    <section class="bg-background {% if active_topic %}pt-lg{% else %}pt-xl{% endif %} pb-lg px-margin flex flex-col items-center justify-center text-center">
+    <section
+      class="bg-background {% if active_topic %}pt-lg{% else %}pt-xl{% endif %} pb-lg px-margin flex flex-col items-center justify-center text-center">
       {% if active_topic %}
       <span class="font-code text-label-md text-secondary tracking-widest uppercase mb-xs">
         {{ active_topic.level }}
       </span>
       {% endif %}
       <h1 class="font-display-xl text-display-xl text-primary mb-md max-w-2xl">
+        {% if parent_topic %}
+        <a href="{{ url_for('lesson_page', slug=parent_topic.slug) }}"
+          class="inline-flex items-center gap-xs font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors mb-sm no-underline">
+          <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+          Back to {{ parent_topic.name }}
+        </a>
+        {% endif %}
         {% if active_topic %}{{ active_topic.name }}{% else %}What would you like to learn?{% endif %}
       </h1>
       <p class="font-body-lg text-body-lg text-on-surface-variant mb-md max-w-xl">
         {% if active_topic %}
-          {{ active_topic.description }}
+        {{ active_topic.description }}
         {% else %}
-          Pick a Python concept, data structure, or algorithm. LearnPy writes a short lesson and links you to
-          related topics.
+        Pick a Python concept, data structure, or algorithm. LearnPy writes a short lesson and links you to
+        related topics.
         {% endif %}
       </p>
 
@@ -273,15 +345,20 @@
 
       <div class="mt-md flex gap-xs flex-wrap justify-center">
         <span class="text-label-md font-label-md text-on-surface-variant">Popular:</span>
-        <button class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
+        <button
+          class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
           data-prompt="Implement a binary search tree in Python">Binary search tree</button>
-        <button class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
+        <button
+          class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
           data-prompt="Implement a hash map from scratch in Python">Hash map</button>
-        <button class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
+        <button
+          class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
           data-prompt="Implement bubble sort in Python with type hints">Bubble sort</button>
-        <button class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
+        <button
+          class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
           data-prompt="Parse a JSON file in Python and pretty-print it">Parse JSON</button>
-        <button class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
+        <button
+          class="suggestion text-label-md font-label-md bg-surface-container px-xs py-[2px] border border-outline-variant cursor-pointer hover:border-primary"
           data-prompt="How do I validate an email address in Python?">Validate email</button>
       </div>
       {% endif %}
@@ -291,11 +368,14 @@
     <section id="output-section" class="hidden max-w-4xl mx-auto px-margin pb-lg">
       <div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant shadow-lg">
         <!-- Lesson chrome -->
-        <div class="flex items-center justify-between px-md py-sm border-b border-outline-variant bg-surface-container-low">
+        <div
+          class="flex items-center justify-between px-md py-sm border-b border-outline-variant bg-surface-container-low">
           <div class="flex items-center gap-xs min-w-0">
             <span class="material-symbols-outlined text-secondary shrink-0" style="font-size: 18px;">school</span>
             <span id="lesson-title" class="font-headline-md text-headline-md text-primary truncate">Lesson</span>
-            <span id="status-ready" class="hidden font-code text-[11px] px-xs py-[2px] rounded-lg bg-green-100 text-green-800 ml-sm shrink-0">✓ LESSON READY</span>
+            <span id="status-ready"
+              class="hidden font-code text-[11px] px-xs py-[2px] rounded-lg bg-green-100 text-green-800 ml-sm shrink-0">✓
+              LESSON READY</span>
           </div>
           <div class="flex items-center gap-md shrink-0">
             <button id="copy-btn"
@@ -345,7 +425,8 @@
             <span class="material-symbols-outlined text-secondary">flag</span>
             <h2 class="font-headline-md text-headline-md text-on-tertiary">Challenge</h2>
             <span id="challenge-status"
-              class="{% if not challenge_completed %}hidden {% endif %}font-code text-[11px] px-xs py-[2px] rounded-lg bg-green-100 text-green-800 ml-xs">✓ CHALLENGE COMPLETE</span>
+              class="{% if not challenge_completed %}hidden {% endif %}font-code text-[11px] px-xs py-[2px] rounded-lg bg-green-100 text-green-800 ml-xs">✓
+              CHALLENGE COMPLETE</span>
           </div>
           <button id="challenge-reset"
             class="flex items-center gap-xs text-on-tertiary-container hover:text-white transition-colors font-code text-[12px]">
@@ -405,20 +486,26 @@
           {% set cprog = user_progress.get(ct.slug, {}) %}
           <a href="{{ ct.url }}"
             class="group flex items-center gap-sm px-sm py-sm border border-outline-variant rounded-lg hover:border-primary hover:bg-surface-container-low transition-colors no-underline">
-            <span class="material-symbols-outlined text-secondary shrink-0" style="font-size: 22px;">{{ ct.icon }}</span>
+            <span class="material-symbols-outlined text-secondary shrink-0" style="font-size: 22px;">{{ ct.icon
+              }}</span>
             <div class="min-w-0 flex-1">
               <p class="font-body-md text-body-md text-on-surface font-semibold truncate">{{ ct.name }}</p>
               <p class="font-label-md text-label-md text-on-surface-variant truncate">{{ ct.description }}</p>
             </div>
             <div class="flex items-center gap-xs shrink-0">
               {% if cprog.viewed %}
-              <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 16px;" title="Viewed">visibility</span>
+              <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 16px;"
+                title="Viewed">visibility</span>
               {% endif %}
               {% if cprog.completed %}
-              <span class="material-symbols-outlined text-green-600" style="font-size: 16px; font-variation-settings: 'FILL' 1;" title="Challenge completed">check_circle</span>
+              <span class="material-symbols-outlined text-green-600"
+                style="font-size: 16px; font-variation-settings: 'FILL' 1;"
+                title="Challenge completed">check_circle</span>
               {% endif %}
             </div>
-            <span class="material-symbols-outlined text-outline opacity-0 group-hover:opacity-100 transition-opacity shrink-0" style="font-size: 18px;">arrow_forward</span>
+            <span
+              class="material-symbols-outlined text-outline opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+              style="font-size: 18px;">arrow_forward</span>
           </a>
           {% endfor %}
         </div>
@@ -496,17 +583,23 @@
             <span class="material-symbols-outlined text-primary" style="font-size: 32px;">{{ t.icon }}</span>
             <div class="flex items-center gap-xs">
               {% if prog.viewed %}
-              <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 18px;" title="Viewed">visibility</span>
+              <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 18px;"
+                title="Viewed">visibility</span>
               {% endif %}
               {% if prog.completed %}
-              <span class="material-symbols-outlined text-green-600" style="font-size: 18px; font-variation-settings: 'FILL' 1;" title="Challenge completed">check_circle</span>
+              <span class="material-symbols-outlined text-green-600"
+                style="font-size: 18px; font-variation-settings: 'FILL' 1;"
+                title="Challenge completed">check_circle</span>
               {% endif %}
-              <span class="text-[10px] font-code px-xs py-[2px] {% if t.level == 'BEGINNER' %}bg-primary text-on-primary{% elif t.level == 'INTERMEDIATE' %}bg-surface-variant text-primary border border-outline-variant{% else %}bg-secondary-container text-on-primary{% endif %}">{{ t.level }}</span>
+              <span
+                class="text-[10px] font-code px-xs py-[2px] {% if t.level == 'BEGINNER' %}bg-primary text-on-primary{% elif t.level == 'INTERMEDIATE' %}bg-surface-variant text-primary border border-outline-variant{% else %}bg-secondary-container text-on-primary{% endif %}">{{
+                t.level }}</span>
             </div>
           </div>
           <h3 class="font-headline-md text-headline-md text-primary mb-xs">{{ t.name }}</h3>
           <p class="font-body-md text-body-md text-on-surface-variant">{{ t.description }}</p>
-          <div class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+          <div
+            class="mt-md flex items-center text-secondary font-label-md text-label-md gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
             OPEN LESSON <span class="material-symbols-outlined text-sm">arrow_forward</span>
           </div>
         </a>
@@ -540,25 +633,31 @@
             </div>
             <span class="font-code text-[11px] px-xs py-[2px] rounded-lg bg-green-100 text-green-800">✓ COMPLETE</span>
           </div>
-<pre class="font-code text-code leading-relaxed text-on-tertiary-container p-md">
+          <pre class="font-code text-code leading-relaxed text-on-tertiary-container p-md">
 <span class="code-syntax-keyword">def</span> <span class="text-[#5cbcf9]">is_even</span>(n):
     <span class="code-syntax-keyword">return</span> n % <span class="code-syntax-number">2</span> == <span class="code-syntax-number">0</span>
 </pre>
           <div class="px-md pb-md flex flex-col gap-xs font-code text-[12px] text-on-tertiary-container">
-            <div class="flex items-center gap-xs"><span class="material-symbols-outlined text-green-400" style="font-size:16px;">check_circle</span><span class="text-green-300">is_even(4) is True</span></div>
-            <div class="flex items-center gap-xs"><span class="material-symbols-outlined text-green-400" style="font-size:16px;">check_circle</span><span class="text-green-300">is_even(7) is False</span></div>
-            <div class="flex items-center gap-xs"><span class="material-symbols-outlined text-green-400" style="font-size:16px;">check_circle</span><span class="text-green-300">is_even(0) is True</span></div>
+            <div class="flex items-center gap-xs"><span class="material-symbols-outlined text-green-400"
+                style="font-size:16px;">check_circle</span><span class="text-green-300">is_even(4) is True</span></div>
+            <div class="flex items-center gap-xs"><span class="material-symbols-outlined text-green-400"
+                style="font-size:16px;">check_circle</span><span class="text-green-300">is_even(7) is False</span></div>
+            <div class="flex items-center gap-xs"><span class="material-symbols-outlined text-green-400"
+                style="font-size:16px;">check_circle</span><span class="text-green-300">is_even(0) is True</span></div>
           </div>
           <div class="border-t border-outline-variant/20 px-md py-sm bg-tertiary-container/50 mt-auto">
             <p class="font-body-md text-body-md text-on-tertiary-container">
-              <strong class="text-white">Hands-on challenges.</strong> Write Python, run real tests in your browser, pass the lesson. Powered by Pyodide — no install, no server, no risk.
+              <strong class="text-white">Hands-on challenges.</strong> Write Python, run real tests in your browser,
+              pass the lesson. Powered by Pyodide — no install, no server, no risk.
             </p>
           </div>
         </div>
 
         <!-- AI search fallback -->
-        <div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant shadow-lg flex flex-col">
-          <div class="flex items-center justify-between px-md py-sm border-b border-outline-variant bg-surface-container-low">
+        <div
+          class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant shadow-lg flex flex-col">
+          <div
+            class="flex items-center justify-between px-md py-sm border-b border-outline-variant bg-surface-container-low">
             <div class="flex items-center gap-xs">
               <span class="material-symbols-outlined text-secondary" style="font-size: 18px;">manage_search</span>
               <span class="font-code text-[12px] text-on-surface-variant">Not in the catalog? Just search.</span>
@@ -566,23 +665,31 @@
           </div>
           <div class="p-md flex flex-col gap-md">
             <div class="relative">
-              <span class="absolute inset-y-0 left-sm flex items-center material-symbols-outlined text-outline" style="font-size: 18px;">search</span>
-              <div class="w-full bg-background border border-outline-variant rounded-lg py-sm pl-xl pr-md font-body-md text-on-surface-variant">
+              <span class="absolute inset-y-0 left-sm flex items-center material-symbols-outlined text-outline"
+                style="font-size: 18px;">search</span>
+              <div
+                class="w-full bg-background border border-outline-variant rounded-lg py-sm pl-xl pr-md font-body-md text-on-surface-variant">
                 How do I read CSV files in Python?
               </div>
             </div>
             <div class="border border-outline-variant rounded-lg p-sm bg-background flex flex-col gap-xs">
               <span class="font-code text-[11px] text-secondary uppercase tracking-wider">Generated lesson</span>
-              <p class="font-body-md text-body-md text-on-surface">Use the built-in <code class="font-code text-[13px] bg-surface-container px-xs rounded">csv</code> module's <code class="font-code text-[13px] bg-surface-container px-xs rounded">DictReader</code> to iterate rows as dictionaries...</p>
+              <p class="font-body-md text-body-md text-on-surface">Use the built-in <code
+                  class="font-code text-[13px] bg-surface-container px-xs rounded">csv</code> module's <code
+                  class="font-code text-[13px] bg-surface-container px-xs rounded">DictReader</code> to iterate rows as
+                dictionaries...</p>
               <div class="flex gap-xs flex-wrap pt-xs">
-                <span class="font-code text-[11px] bg-secondary-container text-white px-xs py-[2px] rounded-lg">→ File I/O</span>
-                <span class="font-code text-[11px] bg-secondary-container text-white px-xs py-[2px] rounded-lg">→ Dictionaries</span>
+                <span class="font-code text-[11px] bg-secondary-container text-white px-xs py-[2px] rounded-lg">→ File
+                  I/O</span>
+                <span class="font-code text-[11px] bg-secondary-container text-white px-xs py-[2px] rounded-lg">→
+                  Dictionaries</span>
               </div>
             </div>
           </div>
           <div class="border-t border-outline-variant px-md py-sm bg-surface-container-low mt-auto">
             <p class="font-body-md text-body-md text-on-surface-variant">
-              <strong class="text-on-surface">Can't find your topic? Just search it.</strong> The AI tutor writes a custom lesson and links you to related canonical topics.
+              <strong class="text-on-surface">Can't find your topic? Just search it.</strong> The AI tutor writes a
+              custom lesson and links you to related canonical topics.
             </p>
           </div>
         </div>
@@ -610,7 +717,8 @@
         <span class="font-headline-md text-headline-md text-on-tertiary">LearnPy</span>
         <p class="font-label-md text-label-md text-outline-variant">© 2026 LearnPy. Built for technical precision.</p>
         <p class="font-label-md text-label-md text-outline-variant">
-          Created by <a class="text-secondary hover:text-white transition-colors underline decoration-secondary/30 underline-offset-4"
+          Created by <a
+            class="text-secondary hover:text-white transition-colors underline decoration-secondary/30 underline-offset-4"
             href="https://github.com/danv27" target="_blank">Daniel Valenzuela</a>
         </p>
       </div>
@@ -643,570 +751,570 @@
       5. Event wiring: search submit, suggestion clicks, copy / export buttons.
   -->
   <script>
-    (function () {
-      // -----------------------------------------------------------------
-      // 1. Sidebar drawer
-      // -----------------------------------------------------------------
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebar-overlay');
-      const openBtn = document.getElementById('open-sidebar');
-      const closeBtn = document.getElementById('close-sidebar');
+      (function () {
+        // -----------------------------------------------------------------
+        // 1. Sidebar drawer
+        // -----------------------------------------------------------------
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const openBtn = document.getElementById('open-sidebar');
+        const closeBtn = document.getElementById('close-sidebar');
 
-      function openSidebar() {
-        sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');   // prevent page scroll behind drawer
-      }
-      function closeSidebar() {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-      }
-      openBtn.addEventListener('click', openSidebar);
-      closeBtn.addEventListener('click', closeSidebar);
-      overlay.addEventListener('click', closeSidebar);
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeSidebar();
-      });
-
-      // -----------------------------------------------------------------
-      // 2. Server-injected state
-      // -----------------------------------------------------------------
-      // On /lesson/<slug>: activeTopic and activeLesson are both populated.
-      // On /:              both are null.
-      let activeTopic = null;
-      let activeLesson = null;
-      try {
-        activeTopic = JSON.parse(document.getElementById('active-topic-data').textContent.trim());
-      } catch (e) { activeTopic = null; }
-      try {
-        activeLesson = JSON.parse(document.getElementById('active-lesson-data').textContent.trim());
-      } catch (e) { activeLesson = null; }
-
-      // -----------------------------------------------------------------
-      // 3. DOM refs + utilities
-      // -----------------------------------------------------------------
-      // Note: `form`, `promptInput`, `generate-btn*` exist exactly once on
-      // any given page. Their location depends on `active_topic`:
-      //   - home page:    inside the hero search
-      //   - lesson page:  inside the "Continue exploring" section at bottom
-      const form = document.getElementById('learn-form');
-      const promptInput = document.getElementById('prompt-input');
-      const generateBtn = document.getElementById('generate-btn');
-      const generateBtnIcon = document.getElementById('generate-btn-icon');
-      const generateBtnLabel = document.getElementById('generate-btn-label');
-
-      const outputSection = document.getElementById('output-section');
-      const topicsSection = document.getElementById('topics-section');
-      const lessonTitleEl = document.getElementById('lesson-title');
-      const lessonSummaryEl = document.getElementById('lesson-summary');
-      const lessonBodyEl = document.getElementById('lesson-body');
-      const statusReady = document.getElementById('status-ready');
-      const relatedSection = document.getElementById('related-section');
-      const relatedList = document.getElementById('related-list');
-      const copyBtn = document.getElementById('copy-btn');
-      const copyBtnLabel = document.getElementById('copy-btn-label');
-      const exportBtn = document.getElementById('export-btn');
-
-      // Lesson-page only: container that holds appended follow-up answers.
-      const answersSection = document.getElementById('answers-section');
-
-      // The most recently rendered lesson's primary code snippet — used by
-      // the Copy and Export buttons.
-      let currentCode = '';
-      let currentFilename = 'lesson.py';
-
-      function escapeHTML(s) {
-        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      }
-
-      // Toggle the "Teach Me" button into / out of its loading state.
-      function setLoading(loading) {
-        generateBtn.disabled = loading;
-        promptInput.disabled = loading;
-        if (loading) {
-          generateBtnIcon.textContent = 'progress_activity';
-          generateBtnIcon.classList.add('animate-spin');
-          generateBtnLabel.textContent = 'Teaching...';
-        } else {
-          generateBtnIcon.textContent = 'school';
-          generateBtnIcon.classList.remove('animate-spin');
-          generateBtnLabel.textContent = 'Teach Me';
+        function openSidebar() {
+          sidebar.classList.remove('-translate-x-full');
+          overlay.classList.remove('hidden');
+          document.body.classList.add('overflow-hidden');   // prevent page scroll behind drawer
         }
-      }
-
-      // Reveal the lesson card and hide the topic-cards grid.
-      function showOutput() {
-        outputSection.classList.remove('hidden');
-        topicsSection.classList.add('hidden');
-        outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
-      // Clear the lesson card back to a "loading…" state before a new fetch.
-      function resetLesson() {
-        lessonBodyEl.innerHTML = '<p class="text-on-surface-variant italic">Preparing your Python lesson...</p>';
-        lessonSummaryEl.classList.add('hidden');
-        lessonSummaryEl.textContent = '';
-        statusReady.classList.add('hidden');
-        relatedSection.classList.add('hidden');
-        relatedList.innerHTML = '';
-        copyBtn.disabled = true;
-        exportBtn.disabled = true;
-        currentCode = '';
-      }
-
-      // Drop a prompt into the search input and fire a generation.
-      // Used by every "clickable thing that should start a lesson":
-      // popular chips, topic cards, inline #topic: links, and AI-generated
-      // related-topic buttons (the ones without their own permanent URL).
-      function startLessonForPrompt(prompt) {
-        promptInput.value = prompt;
-        generate();
-      }
-      window.startLessonForPrompt = startLessonForPrompt;
-
-      // Inline cross-reference links of the form [text](#topic:...) get
-      // restyled into orange chips and rewired to call generate() instead
-      // of navigating.
-      function wireTopicAnchor(a, prompt) {
-        a.classList.add('topic-link');
-        a.setAttribute('href', '#');
-        a.setAttribute('data-prompt', prompt);
-        a.addEventListener('click', (e) => {
-          e.preventDefault();
-          startLessonForPrompt(prompt);
-        });
-      }
-
-      // -----------------------------------------------------------------
-      // 4. Lesson rendering
-      // -----------------------------------------------------------------
-      // Paint a lesson dict (from either the server-side render or a
-      // /generate API response) into the lesson card.
-      function renderLesson(data) {
-        const title = data.title || 'Lesson';
-        const summary = data.summary || '';
-        const md = data.lesson_markdown || '';
-        currentCode = data.code || '';
-
-        lessonTitleEl.textContent = title;
-
-        if (summary) {
-          lessonSummaryEl.textContent = summary;
-          lessonSummaryEl.classList.remove('hidden');
-        } else {
-          lessonSummaryEl.classList.add('hidden');
+        function closeSidebar() {
+          sidebar.classList.add('-translate-x-full');
+          overlay.classList.add('hidden');
+          document.body.classList.remove('overflow-hidden');
         }
-
-        // Render markdown -> HTML (marked.js loaded from CDN)
-        const html = (window.marked && typeof marked.parse === 'function')
-          ? marked.parse(md, { gfm: true, breaks: false })
-          : '<pre>' + escapeHTML(md) + '</pre>';
-        lessonBodyEl.innerHTML = html;
-
-        // Convert any inline anchors whose href starts with `#topic:` into
-        // clickable topic chips that re-trigger generation.
-        lessonBodyEl.querySelectorAll('a[href^="#topic:"]').forEach(a => {
-          const prompt = decodeURIComponent(a.getAttribute('href').slice('#topic:'.length));
-          wireTopicAnchor(a, prompt);
+        openBtn.addEventListener('click', openSidebar);
+        closeBtn.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeSidebar();
         });
 
-        // Render related topics — links to real pages where possible,
-        // search-triggering buttons otherwise.
-        relatedList.innerHTML = '';
-        const related = Array.isArray(data.related_topics) ? data.related_topics : [];
-        if (related.length) {
-          related.forEach(t => {
-            const label = t.name || t.label || '';
-            const url = t.url; // present for canonical topics
-            const chipCls =
-              'inline-flex items-center gap-xs bg-secondary-container text-white font-label-md text-label-md px-md py-xs rounded-lg hover:brightness-110 transition-all shadow-sm';
-            let el;
-            if (url) {
-              el = document.createElement('a');
-              el.href = url;
-              el.className = chipCls + ' no-underline';
-            } else {
-              el = document.createElement('button');
-              el.className = chipCls;
-              el.addEventListener('click', () => startLessonForPrompt(t.prompt || label));
-            }
-            el.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span>' + escapeHTML(label);
-            relatedList.appendChild(el);
-          });
-          relatedSection.classList.remove('hidden');
-        } else {
-          relatedSection.classList.add('hidden');
-        }
-
-        statusReady.classList.remove('hidden');
-
-        if (currentCode) {
-          copyBtn.disabled = false;
-          exportBtn.disabled = false;
-          const match = currentCode.match(/def\s+([A-Za-z_][A-Za-z0-9_]*)/);
-          currentFilename = (match ? match[1] : (title || 'lesson').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'lesson') + '.py';
-        }
-      }
-
-      // Build one appended-answer card. Used on lesson pages when the
-      // user clicks a follow-up button, a sub-topic, or types in the
-      // bottom search. The card stacks below previous answers in
-      // #answers-section so a user can ask many follow-ups in a row.
-      function appendAnswer(question, data) {
-        const card = document.createElement('div');
-        card.className = 'bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-md shadow-sm';
-
-        const label = document.createElement('p');
-        label.className = 'font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm';
-        label.textContent = 'Q: ' + question;
-        card.appendChild(label);
-
-        if (data.summary) {
-          const s = document.createElement('p');
-          s.className = 'font-body-lg text-on-surface-variant italic mb-md';
-          s.textContent = data.summary;
-          card.appendChild(s);
-        }
-
-        const body = document.createElement('div');
-        body.className = 'lesson-body';
-        const md = data.lesson_markdown || '';
-        body.innerHTML = (window.marked && typeof marked.parse === 'function')
-          ? marked.parse(md, { gfm: true, breaks: false })
-          : '<pre>' + escapeHTML(md) + '</pre>';
-
-        // Rewire any inline #topic: anchors so they become clickable chips
-        // that start a new follow-up instead of navigating to a dead anchor.
-        body.querySelectorAll('a[href^="#topic:"]').forEach(a => {
-          const prompt = decodeURIComponent(a.getAttribute('href').slice('#topic:'.length));
-          wireTopicAnchor(a, prompt);
-        });
-        card.appendChild(body);
-
-        answersSection.appendChild(card);
-        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        return card;
-      }
-
-      // Show a "thinking…" placeholder before the AI responds so the user
-      // sees something happen immediately.
-      function appendLoadingAnswer(question) {
-        const card = document.createElement('div');
-        card.className = 'bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-md shadow-sm';
-        card.innerHTML =
-          '<p class="font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm">Q: '
-          + escapeHTML(question)
-          + '</p>'
-          + '<p class="font-body-md text-on-surface-variant italic">Thinking...</p>';
-        answersSection.appendChild(card);
-        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        return card;
-      }
-
-      // Drive a single /generate request.
-      //   - On the home page (no activeTopic): replaces the lesson card.
-      //   - On a lesson page (activeTopic set): appends an answer card.
-      // `customPrompt` lets the follow-up / sub-topic buttons pass their
-      // data-prompt directly without going through the input field.
-      async function generate(customPrompt) {
-        const prompt = (customPrompt || promptInput.value).trim();
-        if (!prompt) {
-          promptInput.focus();
-          return;
-        }
-
-        const lessonPageMode = !!activeTopic;
-        let placeholderCard = null;
-
-        if (lessonPageMode) {
-          placeholderCard = appendLoadingAnswer(prompt);
-          promptInput.value = '';
-        } else {
-          resetLesson();
-          showOutput();
-        }
-        setLoading(true);
-
+        // -----------------------------------------------------------------
+        // 2. Server-injected state
+        // -----------------------------------------------------------------
+        // On /lesson/<slug>: activeTopic and activeLesson are both populated.
+        // On /:              both are null.
+        let activeTopic = null;
+        let activeLesson = null;
         try {
-          const res = await fetch('/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt }),
-          });
-          const data = await res.json();
+          activeTopic = JSON.parse(document.getElementById('active-topic-data').textContent.trim());
+        } catch (e) { activeTopic = null; }
+        try {
+          activeLesson = JSON.parse(document.getElementById('active-lesson-data').textContent.trim());
+        } catch (e) { activeLesson = null; }
 
-          if (!res.ok) {
-            const msg = '<p class="text-red-600"><strong>Error:</strong> '
-              + escapeHTML(data.error || res.statusText) + '</p>';
+        // -----------------------------------------------------------------
+        // 3. DOM refs + utilities
+        // -----------------------------------------------------------------
+        // Note: `form`, `promptInput`, `generate-btn*` exist exactly once on
+        // any given page. Their location depends on `active_topic`:
+        //   - home page:    inside the hero search
+        //   - lesson page:  inside the "Continue exploring" section at bottom
+        const form = document.getElementById('learn-form');
+        const promptInput = document.getElementById('prompt-input');
+        const generateBtn = document.getElementById('generate-btn');
+        const generateBtnIcon = document.getElementById('generate-btn-icon');
+        const generateBtnLabel = document.getElementById('generate-btn-label');
+
+        const outputSection = document.getElementById('output-section');
+        const topicsSection = document.getElementById('topics-section');
+        const lessonTitleEl = document.getElementById('lesson-title');
+        const lessonSummaryEl = document.getElementById('lesson-summary');
+        const lessonBodyEl = document.getElementById('lesson-body');
+        const statusReady = document.getElementById('status-ready');
+        const relatedSection = document.getElementById('related-section');
+        const relatedList = document.getElementById('related-list');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyBtnLabel = document.getElementById('copy-btn-label');
+        const exportBtn = document.getElementById('export-btn');
+
+        // Lesson-page only: container that holds appended follow-up answers.
+        const answersSection = document.getElementById('answers-section');
+
+        // The most recently rendered lesson's primary code snippet — used by
+        // the Copy and Export buttons.
+        let currentCode = '';
+        let currentFilename = 'lesson.py';
+
+        function escapeHTML(s) {
+          return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // Toggle the "Teach Me" button into / out of its loading state.
+        function setLoading(loading) {
+          generateBtn.disabled = loading;
+          promptInput.disabled = loading;
+          if (loading) {
+            generateBtnIcon.textContent = 'progress_activity';
+            generateBtnIcon.classList.add('animate-spin');
+            generateBtnLabel.textContent = 'Teaching...';
+          } else {
+            generateBtnIcon.textContent = 'school';
+            generateBtnIcon.classList.remove('animate-spin');
+            generateBtnLabel.textContent = 'Teach Me';
+          }
+        }
+
+        // Reveal the lesson card and hide the topic-cards grid.
+        function showOutput() {
+          outputSection.classList.remove('hidden');
+          topicsSection.classList.add('hidden');
+          outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Clear the lesson card back to a "loading…" state before a new fetch.
+        function resetLesson() {
+          lessonBodyEl.innerHTML = '<p class="text-on-surface-variant italic">Preparing your Python lesson...</p>';
+          lessonSummaryEl.classList.add('hidden');
+          lessonSummaryEl.textContent = '';
+          statusReady.classList.add('hidden');
+          relatedSection.classList.add('hidden');
+          relatedList.innerHTML = '';
+          copyBtn.disabled = true;
+          exportBtn.disabled = true;
+          currentCode = '';
+        }
+
+        // Drop a prompt into the search input and fire a generation.
+        // Used by every "clickable thing that should start a lesson":
+        // popular chips, topic cards, inline #topic: links, and AI-generated
+        // related-topic buttons (the ones without their own permanent URL).
+        function startLessonForPrompt(prompt) {
+          promptInput.value = prompt;
+          generate();
+        }
+        window.startLessonForPrompt = startLessonForPrompt;
+
+        // Inline cross-reference links of the form [text](#topic:...) get
+        // restyled into orange chips and rewired to call generate() instead
+        // of navigating.
+        function wireTopicAnchor(a, prompt) {
+          a.classList.add('topic-link');
+          a.setAttribute('href', '#');
+          a.setAttribute('data-prompt', prompt);
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            startLessonForPrompt(prompt);
+          });
+        }
+
+        // -----------------------------------------------------------------
+        // 4. Lesson rendering
+        // -----------------------------------------------------------------
+        // Paint a lesson dict (from either the server-side render or a
+        // /generate API response) into the lesson card.
+        function renderLesson(data) {
+          const title = data.title || 'Lesson';
+          const summary = data.summary || '';
+          const md = data.lesson_markdown || '';
+          currentCode = data.code || '';
+
+          lessonTitleEl.textContent = title;
+
+          if (summary) {
+            lessonSummaryEl.textContent = summary;
+            lessonSummaryEl.classList.remove('hidden');
+          } else {
+            lessonSummaryEl.classList.add('hidden');
+          }
+
+          // Render markdown -> HTML (marked.js loaded from CDN)
+          const html = (window.marked && typeof marked.parse === 'function')
+            ? marked.parse(md, { gfm: true, breaks: false })
+            : '<pre>' + escapeHTML(md) + '</pre>';
+          lessonBodyEl.innerHTML = html;
+
+          // Convert any inline anchors whose href starts with `#topic:` into
+          // clickable topic chips that re-trigger generation.
+          lessonBodyEl.querySelectorAll('a[href^="#topic:"]').forEach(a => {
+            const prompt = decodeURIComponent(a.getAttribute('href').slice('#topic:'.length));
+            wireTopicAnchor(a, prompt);
+          });
+
+          // Render related topics — links to real pages where possible,
+          // search-triggering buttons otherwise.
+          relatedList.innerHTML = '';
+          const related = Array.isArray(data.related_topics) ? data.related_topics : [];
+          if (related.length) {
+            related.forEach(t => {
+              const label = t.name || t.label || '';
+              const url = t.url; // present for canonical topics
+              const chipCls =
+                'inline-flex items-center gap-xs bg-secondary-container text-white font-label-md text-label-md px-md py-xs rounded-lg hover:brightness-110 transition-all shadow-sm';
+              let el;
+              if (url) {
+                el = document.createElement('a');
+                el.href = url;
+                el.className = chipCls + ' no-underline';
+              } else {
+                el = document.createElement('button');
+                el.className = chipCls;
+                el.addEventListener('click', () => startLessonForPrompt(t.prompt || label));
+              }
+              el.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span>' + escapeHTML(label);
+              relatedList.appendChild(el);
+            });
+            relatedSection.classList.remove('hidden');
+          } else {
+            relatedSection.classList.add('hidden');
+          }
+
+          statusReady.classList.remove('hidden');
+
+          if (currentCode) {
+            copyBtn.disabled = false;
+            exportBtn.disabled = false;
+            const match = currentCode.match(/def\s+([A-Za-z_][A-Za-z0-9_]*)/);
+            currentFilename = (match ? match[1] : (title || 'lesson').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'lesson') + '.py';
+          }
+        }
+
+        // Build one appended-answer card. Used on lesson pages when the
+        // user clicks a follow-up button, a sub-topic, or types in the
+        // bottom search. The card stacks below previous answers in
+        // #answers-section so a user can ask many follow-ups in a row.
+        function appendAnswer(question, data) {
+          const card = document.createElement('div');
+          card.className = 'bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-md shadow-sm';
+
+          const label = document.createElement('p');
+          label.className = 'font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm';
+          label.textContent = 'Q: ' + question;
+          card.appendChild(label);
+
+          if (data.summary) {
+            const s = document.createElement('p');
+            s.className = 'font-body-lg text-on-surface-variant italic mb-md';
+            s.textContent = data.summary;
+            card.appendChild(s);
+          }
+
+          const body = document.createElement('div');
+          body.className = 'lesson-body';
+          const md = data.lesson_markdown || '';
+          body.innerHTML = (window.marked && typeof marked.parse === 'function')
+            ? marked.parse(md, { gfm: true, breaks: false })
+            : '<pre>' + escapeHTML(md) + '</pre>';
+
+          // Rewire any inline #topic: anchors so they become clickable chips
+          // that start a new follow-up instead of navigating to a dead anchor.
+          body.querySelectorAll('a[href^="#topic:"]').forEach(a => {
+            const prompt = decodeURIComponent(a.getAttribute('href').slice('#topic:'.length));
+            wireTopicAnchor(a, prompt);
+          });
+          card.appendChild(body);
+
+          answersSection.appendChild(card);
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return card;
+        }
+
+        // Show a "thinking…" placeholder before the AI responds so the user
+        // sees something happen immediately.
+        function appendLoadingAnswer(question) {
+          const card = document.createElement('div');
+          card.className = 'bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-md shadow-sm';
+          card.innerHTML =
+            '<p class="font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm">Q: '
+            + escapeHTML(question)
+            + '</p>'
+            + '<p class="font-body-md text-on-surface-variant italic">Thinking...</p>';
+          answersSection.appendChild(card);
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return card;
+        }
+
+        // Drive a single /generate request.
+        //   - On the home page (no activeTopic): replaces the lesson card.
+        //   - On a lesson page (activeTopic set): appends an answer card.
+        // `customPrompt` lets the follow-up / sub-topic buttons pass their
+        // data-prompt directly without going through the input field.
+        async function generate(customPrompt) {
+          const prompt = (customPrompt || promptInput.value).trim();
+          if (!prompt) {
+            promptInput.focus();
+            return;
+          }
+
+          const lessonPageMode = !!activeTopic;
+          let placeholderCard = null;
+
+          if (lessonPageMode) {
+            placeholderCard = appendLoadingAnswer(prompt);
+            promptInput.value = '';
+          } else {
+            resetLesson();
+            showOutput();
+          }
+          setLoading(true);
+
+          try {
+            const res = await fetch('/generate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prompt }),
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+              const msg = '<p class="text-red-600"><strong>Error:</strong> '
+                + escapeHTML(data.error || res.statusText) + '</p>';
+              if (lessonPageMode) {
+                placeholderCard.innerHTML =
+                  '<p class="font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm">Q: '
+                  + escapeHTML(prompt) + '</p>' + msg;
+              } else {
+                lessonBodyEl.innerHTML = msg;
+              }
+              return;
+            }
+
             if (lessonPageMode) {
+              answersSection.removeChild(placeholderCard);
+              appendAnswer(prompt, data);
+            } else {
+              renderLesson(data);
+            }
+          } catch (err) {
+            const msg = '<p class="text-red-600"><strong>Network error:</strong> '
+              + escapeHTML(err.message) + '</p>';
+            if (lessonPageMode && placeholderCard) {
               placeholderCard.innerHTML =
                 '<p class="font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm">Q: '
                 + escapeHTML(prompt) + '</p>' + msg;
             } else {
               lessonBodyEl.innerHTML = msg;
             }
-            return;
-          }
-
-          if (lessonPageMode) {
-            answersSection.removeChild(placeholderCard);
-            appendAnswer(prompt, data);
-          } else {
-            renderLesson(data);
-          }
-        } catch (err) {
-          const msg = '<p class="text-red-600"><strong>Network error:</strong> '
-            + escapeHTML(err.message) + '</p>';
-          if (lessonPageMode && placeholderCard) {
-            placeholderCard.innerHTML =
-              '<p class="font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm">Q: '
-              + escapeHTML(prompt) + '</p>' + msg;
-          } else {
-            lessonBodyEl.innerHTML = msg;
-          }
-        } finally {
-          setLoading(false);
-        }
-      }
-
-      // -----------------------------------------------------------------
-      // 5. Event wiring
-      // -----------------------------------------------------------------
-      // Submit the search form (also fires on Enter inside the input).
-      form.addEventListener('submit', (e) => { e.preventDefault(); generate(); });
-
-      // Power-user shortcut: Cmd/Ctrl + Enter from inside the textarea.
-      promptInput.addEventListener('keydown', (e) => {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-          e.preventDefault();
-          generate();
-        }
-      });
-
-      // "Popular:" chips + topic-grid cards: pre-fill the input and run.
-      document.querySelectorAll('.suggestion, .suggestion-card').forEach(el => {
-        el.addEventListener('click', () => {
-          const text = el.getAttribute('data-prompt') || el.textContent.trim();
-          startLessonForPrompt(text);
-        });
-      });
-
-      // Follow-up question buttons (lesson page only).
-      // Take the button's data-prompt, run generate(), and the answer
-      // gets appended as a new card in #answers-section below.
-      document.querySelectorAll('.followup-btn').forEach(el => {
-        el.addEventListener('click', () => {
-          const prompt = el.getAttribute('data-prompt');
-          if (prompt) generate(prompt);
-        });
-      });
-
-      // On page load: if the server pre-rendered a lesson (i.e. we're on
-      // /lesson/<slug>), paint it immediately. No API calls, no waiting.
-      if (activeLesson) {
-        topicsSection.classList.add('hidden');
-        outputSection.classList.remove('hidden');
-        renderLesson(activeLesson);
-        if (activeTopic && activeTopic.name) {
-          lessonTitleEl.textContent = activeTopic.name;
-        }
-      }
-
-      // Copy the lesson's primary code snippet to the clipboard.
-      copyBtn.addEventListener('click', async () => {
-        if (!currentCode) return;
-        try {
-          await navigator.clipboard.writeText(currentCode);
-          copyBtnLabel.textContent = 'COPIED!';
-          setTimeout(() => (copyBtnLabel.textContent = 'COPY CODE'), 1500);
-        } catch (e) {
-          copyBtnLabel.textContent = 'FAILED';
-          setTimeout(() => (copyBtnLabel.textContent = 'COPY CODE'), 1500);
-        }
-      });
-
-      // -----------------------------------------------------------------
-      // 6. Challenge runner (Pyodide)
-      // -----------------------------------------------------------------
-      // Loads Pyodide lazily on the first "Run Tests" click and caches it.
-      // Each test runs in a fresh Python globals dict so tests don't
-      // contaminate one another.
-      const challengeDataEl = document.getElementById('challenge-data');
-      if (challengeDataEl) {
-        let challenge = null;
-        try { challenge = JSON.parse(challengeDataEl.textContent.trim()); }
-        catch (e) { challenge = null; }
-
-        const editor = document.getElementById('challenge-editor');
-        const runBtn = document.getElementById('challenge-run');
-        const runIcon = document.getElementById('challenge-run-icon');
-        const runLabel = document.getElementById('challenge-run-label');
-        const resetBtn = document.getElementById('challenge-reset');
-        const resultsEl = document.getElementById('challenge-results');
-        const completeBadge = document.getElementById('challenge-status');
-        const pyStatus = document.getElementById('challenge-pyodide-status');
-
-        const STARTER_CODE = challenge ? challenge.starter_code : '';
-
-        // Cache the Pyodide instance across runs.
-        let pyodidePromise = null;
-        async function getPyodide() {
-          if (!pyodidePromise) {
-            pyStatus.textContent = 'Loading Python (~10 MB, one-time)...';
-            pyodidePromise = loadPyodide().then(py => {
-              pyStatus.textContent = '';
-              return py;
-            }).catch(err => {
-              pyStatus.textContent = 'Failed to load Python: ' + err.message;
-              pyodidePromise = null;
-              throw err;
-            });
-          }
-          return pyodidePromise;
-        }
-
-        function setRunning(running) {
-          runBtn.disabled = running;
-          if (running) {
-            runIcon.textContent = 'progress_activity';
-            runIcon.classList.add('animate-spin');
-            runLabel.textContent = 'Running...';
-          } else {
-            runIcon.textContent = 'play_arrow';
-            runIcon.classList.remove('animate-spin');
-            runLabel.textContent = 'Run Tests';
+          } finally {
+            setLoading(false);
           }
         }
 
-        // Render one test row. Pass = green check, fail = red x + error msg.
-        function renderResultRow(test, result) {
-          const li = document.createElement('li');
-          li.className = 'flex items-start gap-sm font-code text-[13px]';
-          const icon = document.createElement('span');
-          icon.className = 'material-symbols-outlined shrink-0';
-          icon.style.fontSize = '18px';
-          if (result.passed) {
-            icon.textContent = 'check_circle';
-            icon.classList.add('text-green-400');
-          } else {
-            icon.textContent = 'cancel';
-            icon.classList.add('text-red-400');
-          }
-          const text = document.createElement('div');
-          text.className = 'flex flex-col gap-base text-on-tertiary-container';
-          const name = document.createElement('div');
-          name.className = result.passed ? 'text-green-300' : 'text-red-300';
-          name.textContent = test.name;
-          text.appendChild(name);
-          if (!result.passed && result.error) {
-            const err = document.createElement('div');
-            err.className = 'text-on-tertiary-container/70 whitespace-pre-wrap';
-            err.textContent = result.error;
-            text.appendChild(err);
-          }
-          li.appendChild(icon);
-          li.appendChild(text);
-          return li;
-        }
+        // -----------------------------------------------------------------
+        // 5. Event wiring
+        // -----------------------------------------------------------------
+        // Submit the search form (also fires on Enter inside the input).
+        form.addEventListener('submit', (e) => { e.preventDefault(); generate(); });
 
-        // Strip Pyodide's long traceback down to the last meaningful line —
-        // usually "AssertionError: ...".
-        function cleanError(msg) {
-          if (!msg) return 'failed';
-          const lines = msg.trim().split('\n').filter(l => l.trim());
-          return lines[lines.length - 1] || 'failed';
-        }
-
-        async function runChallenge() {
-          if (!challenge) return;
-          resultsEl.innerHTML = '';
-          completeBadge.classList.add('hidden');
-          setRunning(true);
-
-          let py;
-          try {
-            py = await getPyodide();
-          } catch (e) {
-            setRunning(false);
-            return;
-          }
-
-          const userCode = editor.value;
-          let allPassed = true;
-
-          for (const test of challenge.tests) {
-            // Fresh globals dict per test, so a previous test can't leak
-            // state into the next one.
-            const globalsDict = py.toPy({});
-            let result;
-            try {
-              await py.runPythonAsync(userCode, { globals: globalsDict });
-              await py.runPythonAsync(test.code, { globals: globalsDict });
-              result = { passed: true };
-            } catch (err) {
-              result = { passed: false, error: cleanError(err.message) };
-              allPassed = false;
-            } finally {
-              globalsDict.destroy();
-            }
-            resultsEl.appendChild(renderResultRow(test, result));
-          }
-
-          if (allPassed) {
-            completeBadge.classList.remove('hidden');
-            // Persist the win so the eyeball + check icons stay lit across
-            // sessions and on every grid that lists this topic.
-            if (activeTopic && activeTopic.slug) {
-              fetch('/api/progress/complete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ slug: activeTopic.slug }),
-              }).catch(() => { /* network errors don't break the UI */ });
-            }
-          }
-          setRunning(false);
-        }
-
-        runBtn.addEventListener('click', runChallenge);
-
-        resetBtn.addEventListener('click', () => {
-          editor.value = STARTER_CODE;
-          resultsEl.innerHTML = '';
-          completeBadge.classList.add('hidden');
-        });
-
-        // Cmd/Ctrl + Enter inside the editor runs the tests.
-        editor.addEventListener('keydown', (e) => {
+        // Power-user shortcut: Cmd/Ctrl + Enter from inside the textarea.
+        promptInput.addEventListener('keydown', (e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
             e.preventDefault();
-            runChallenge();
-          }
-          // Tab inserts spaces instead of leaving the textarea.
-          if (e.key === 'Tab') {
-            e.preventDefault();
-            const s = editor.selectionStart, e2 = editor.selectionEnd;
-            editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(e2);
-            editor.selectionStart = editor.selectionEnd = s + 4;
+            generate();
           }
         });
-      }
 
-      // Download the lesson's primary code snippet as a .py file.
-      // Built entirely in the browser — no server round trip.
-      exportBtn.addEventListener('click', () => {
-        if (!currentCode) return;
-        const blob = new Blob([currentCode], { type: 'text/x-python' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = currentFilename || 'lesson.py';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      });
-    })();
+        // "Popular:" chips + topic-grid cards: pre-fill the input and run.
+        document.querySelectorAll('.suggestion, .suggestion-card').forEach(el => {
+          el.addEventListener('click', () => {
+            const text = el.getAttribute('data-prompt') || el.textContent.trim();
+            startLessonForPrompt(text);
+          });
+        });
+
+        // Follow-up question buttons (lesson page only).
+        // Take the button's data-prompt, run generate(), and the answer
+        // gets appended as a new card in #answers-section below.
+        document.querySelectorAll('.followup-btn').forEach(el => {
+          el.addEventListener('click', () => {
+            const prompt = el.getAttribute('data-prompt');
+            if (prompt) generate(prompt);
+          });
+        });
+
+        // On page load: if the server pre-rendered a lesson (i.e. we're on
+        // /lesson/<slug>), paint it immediately. No API calls, no waiting.
+        if (activeLesson) {
+          topicsSection.classList.add('hidden');
+          outputSection.classList.remove('hidden');
+          renderLesson(activeLesson);
+          if (activeTopic && activeTopic.name) {
+            lessonTitleEl.textContent = activeTopic.name;
+          }
+        }
+
+        // Copy the lesson's primary code snippet to the clipboard.
+        copyBtn.addEventListener('click', async () => {
+          if (!currentCode) return;
+          try {
+            await navigator.clipboard.writeText(currentCode);
+            copyBtnLabel.textContent = 'COPIED!';
+            setTimeout(() => (copyBtnLabel.textContent = 'COPY CODE'), 1500);
+          } catch (e) {
+            copyBtnLabel.textContent = 'FAILED';
+            setTimeout(() => (copyBtnLabel.textContent = 'COPY CODE'), 1500);
+          }
+        });
+
+        // -----------------------------------------------------------------
+        // 6. Challenge runner (Pyodide)
+        // -----------------------------------------------------------------
+        // Loads Pyodide lazily on the first "Run Tests" click and caches it.
+        // Each test runs in a fresh Python globals dict so tests don't
+        // contaminate one another.
+        const challengeDataEl = document.getElementById('challenge-data');
+        if (challengeDataEl) {
+          let challenge = null;
+          try { challenge = JSON.parse(challengeDataEl.textContent.trim()); }
+          catch (e) { challenge = null; }
+
+          const editor = document.getElementById('challenge-editor');
+          const runBtn = document.getElementById('challenge-run');
+          const runIcon = document.getElementById('challenge-run-icon');
+          const runLabel = document.getElementById('challenge-run-label');
+          const resetBtn = document.getElementById('challenge-reset');
+          const resultsEl = document.getElementById('challenge-results');
+          const completeBadge = document.getElementById('challenge-status');
+          const pyStatus = document.getElementById('challenge-pyodide-status');
+
+          const STARTER_CODE = challenge ? challenge.starter_code : '';
+
+          // Cache the Pyodide instance across runs.
+          let pyodidePromise = null;
+          async function getPyodide() {
+            if (!pyodidePromise) {
+              pyStatus.textContent = 'Loading Python (~10 MB, one-time)...';
+              pyodidePromise = loadPyodide().then(py => {
+                pyStatus.textContent = '';
+                return py;
+              }).catch(err => {
+                pyStatus.textContent = 'Failed to load Python: ' + err.message;
+                pyodidePromise = null;
+                throw err;
+              });
+            }
+            return pyodidePromise;
+          }
+
+          function setRunning(running) {
+            runBtn.disabled = running;
+            if (running) {
+              runIcon.textContent = 'progress_activity';
+              runIcon.classList.add('animate-spin');
+              runLabel.textContent = 'Running...';
+            } else {
+              runIcon.textContent = 'play_arrow';
+              runIcon.classList.remove('animate-spin');
+              runLabel.textContent = 'Run Tests';
+            }
+          }
+
+          // Render one test row. Pass = green check, fail = red x + error msg.
+          function renderResultRow(test, result) {
+            const li = document.createElement('li');
+            li.className = 'flex items-start gap-sm font-code text-[13px]';
+            const icon = document.createElement('span');
+            icon.className = 'material-symbols-outlined shrink-0';
+            icon.style.fontSize = '18px';
+            if (result.passed) {
+              icon.textContent = 'check_circle';
+              icon.classList.add('text-green-400');
+            } else {
+              icon.textContent = 'cancel';
+              icon.classList.add('text-red-400');
+            }
+            const text = document.createElement('div');
+            text.className = 'flex flex-col gap-base text-on-tertiary-container';
+            const name = document.createElement('div');
+            name.className = result.passed ? 'text-green-300' : 'text-red-300';
+            name.textContent = test.name;
+            text.appendChild(name);
+            if (!result.passed && result.error) {
+              const err = document.createElement('div');
+              err.className = 'text-on-tertiary-container/70 whitespace-pre-wrap';
+              err.textContent = result.error;
+              text.appendChild(err);
+            }
+            li.appendChild(icon);
+            li.appendChild(text);
+            return li;
+          }
+
+          // Strip Pyodide's long traceback down to the last meaningful line —
+          // usually "AssertionError: ...".
+          function cleanError(msg) {
+            if (!msg) return 'failed';
+            const lines = msg.trim().split('\n').filter(l => l.trim());
+            return lines[lines.length - 1] || 'failed';
+          }
+
+          async function runChallenge() {
+            if (!challenge) return;
+            resultsEl.innerHTML = '';
+            completeBadge.classList.add('hidden');
+            setRunning(true);
+
+            let py;
+            try {
+              py = await getPyodide();
+            } catch (e) {
+              setRunning(false);
+              return;
+            }
+
+            const userCode = editor.value;
+            let allPassed = true;
+
+            for (const test of challenge.tests) {
+              // Fresh globals dict per test, so a previous test can't leak
+              // state into the next one.
+              const globalsDict = py.toPy({});
+              let result;
+              try {
+                await py.runPythonAsync(userCode, { globals: globalsDict });
+                await py.runPythonAsync(test.code, { globals: globalsDict });
+                result = { passed: true };
+              } catch (err) {
+                result = { passed: false, error: cleanError(err.message) };
+                allPassed = false;
+              } finally {
+                globalsDict.destroy();
+              }
+              resultsEl.appendChild(renderResultRow(test, result));
+            }
+
+            if (allPassed) {
+              completeBadge.classList.remove('hidden');
+              // Persist the win so the eyeball + check icons stay lit across
+              // sessions and on every grid that lists this topic.
+              if (activeTopic && activeTopic.slug) {
+                fetch('/api/progress/complete', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ slug: activeTopic.slug }),
+                }).catch(() => { /* network errors don't break the UI */ });
+              }
+            }
+            setRunning(false);
+          }
+
+          runBtn.addEventListener('click', runChallenge);
+
+          resetBtn.addEventListener('click', () => {
+            editor.value = STARTER_CODE;
+            resultsEl.innerHTML = '';
+            completeBadge.classList.add('hidden');
+          });
+
+          // Cmd/Ctrl + Enter inside the editor runs the tests.
+          editor.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+              e.preventDefault();
+              runChallenge();
+            }
+            // Tab inserts spaces instead of leaving the textarea.
+            if (e.key === 'Tab') {
+              e.preventDefault();
+              const s = editor.selectionStart, e2 = editor.selectionEnd;
+              editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(e2);
+              editor.selectionStart = editor.selectionEnd = s + 4;
+            }
+          });
+        }
+
+        // Download the lesson's primary code snippet as a .py file.
+        // Built entirely in the browser — no server round trip.
+        exportBtn.addEventListener('click', () => {
+          if (!currentCode) return;
+          const blob = new Blob([currentCode], { type: 'text/x-python' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = currentFilename || 'lesson.py';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+      })();
   </script>
 </body>
 
