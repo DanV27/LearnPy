@@ -34,6 +34,7 @@ from generator import generate_lesson
 from topics import TOPICS, get_topic, visible_in_sidebar, get_parent
 from lessons import load_lesson
 from challenges import get_challenge
+from profile_data import calculate_heatmap
 
 
 # ---------------------------------------------------------------------------
@@ -186,7 +187,8 @@ def about():
 @login_required
 def profile():
     """Profile page"""
-    return render_template("profile.html")
+    heatmap = calculate_heatmap(current_user.id)
+    return render_template("profile.html", heatmap=heatmap)
 
 @app.route("/lesson/<slug>")
 @login_required

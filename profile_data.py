@@ -1,24 +1,24 @@
 '''
-profile data helpers - compute the heatma and stats for a user
+profile data helpers - compute the heatmap and stats for a user
 
-Only data. The route in flask_app compute_heatmap() hamds the results to
-the template.
+Only data. The route in flask_app calls calculate_heatmap() and hands the
+result to the template.
 '''
 
-
-
-from datetime import datetime
 
 import calendar
 from collections import Counter
 from datetime import date, datetime, timedelta
 
-#which weekday starts each row of heatmap grid Sun=6
-week_start = 6
-
 from models import LessonProgress
 
-def calculate_heatmap(user_id:int, slug: str, weekss=4):
+
+# which weekday starts each row of the heatmap grid. Sun = 6 (Python's
+# date.weekday() is Mon=0..Sun=6). Change to 0 for Monday-first weeks.
+week_start = 6
+
+
+def calculate_heatmap(user_id: int, year: int = None, month: int = None):
     """Build a one-month heatmap of challenge completions for a user.
 
     Every day in the requested calendar month becomes a cell. A cell is
@@ -48,23 +48,21 @@ def calculate_heatmap(user_id:int, slug: str, weekss=4):
         {"date": date, "count": int, "done": bool}     # real day
     """
 
-    #1 reasolve requested month, defaulting to UTC for now
+    # 1. Resolve the requested month, defaulting to today's UTC month.
     today = datetime.utcnow().date()
     if year is None or month is None:
-        year, month = today.year, today.month    
+        year, month = today.year, today.month
 
-
-
-    #2 boundaries of the requested momth
+    # 2. Boundaries of the requested month.
     first_day = date(year, month, 1)
     last_day_num = calendar.monthrange(year, month)[1]  # days in this month
     last_day = date(year, month, last_day_num)
-    
+
     # Half-open [start, end) range used to filter completed_at.
     start_dt = datetime(year, month, 1)
     end_dt = datetime(year + 1, 1, 1) if month == 12 else datetime(year, month + 1, 1)
 
-    #3 pull the users completiojns inside the month
+    # 3. Pull the user's completions inside the month.
     rows = (
         LessonProgress.query
         .filter(LessonProgress.user_id == user_id)
@@ -73,15 +71,17 @@ def calculate_heatmap(user_id:int, slug: str, weekss=4):
         .filter(LessonProgress.completed_at < end_dt)
         .all()
     )
-    #4 bucket completions by the calander date
-    counts = Counter(r.completed_at_date() for r in rows)
+
+    # 4. Bucket completions by calendar date.
+    counts = Counter(r.completed_at.date() for r in rows)
 
     # 5. Leading / trailing placeholder counts so the grid stays rectangular.
     #    leading  = blanks before day 1 (so the 1st lands in the right column)
     #    trailing = blanks after the last day (so the final row has 7 cells)
     leading = (first_day.weekday() - week_start) % 7
     trailing = (week_start - 1 - last_day.weekday()) % 7
-     # 6. Build the flat cell list.
+
+    # 6. Build the flat cell list.
     cells = [{"placeholder": True} for _ in range(leading)]
     for day_num in range(1, last_day_num + 1):
         d = date(year, month, day_num)
@@ -92,7 +92,7 @@ def calculate_heatmap(user_id:int, slug: str, weekss=4):
     # 7. Slice into rows of 7.
     weeks = [cells[i:i + 7] for i in range(0, len(cells), 7)]
 
-    # 8. Stats — walk only the real-day cells (skip placeholders).
+    # 8. Stats - walk only the real-day cells (skip placeholders).
     day_cells = [c for c in cells if "date" in c]
     total_completions = sum(c["count"] for c in day_cells)
     active_days = sum(1 for c in day_cells if c["done"])
@@ -142,8 +142,3 @@ def _current_streak(day_cells: list, today: date) -> int:
         streak += 1
         d -= timedelta(days=1)
     return streak
-
-
-    
-   
-   
