@@ -11,11 +11,34 @@ search(query, limit=5) — takes a partial query string, returns a list of {slug
 
 import sqlite3
 
+import re
+from pathlib import Path
+from lessons import load_lesson
 
-def build_index():
+
+LESSONS_DIR = Path(__file__).parent / "lessons"
+
+def _build_index():
     """called at app startup. Reads every lessons/*.md, parses out title + summary + body, populates the FTS5 table.
     Drops and recreates the table on each startup so edits to lesson files always show up.
     """
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE VIRTUAL TABLE docs USING fts5(slug UNINDEXED, name, body)")
+
+    for lesson in LESSONS_DIR:
+        load_lesson(lesson)
+
+
+        con.execute(
+        "INSERT INTO docs (slug, name, body) VALUES (?, ?, ?)",
+        ('related_slugs', 'title', 'summary')
+        )
+
+
+    con.commit()
+    print(con.execute("SELECT slug FROM docs WHERE docs MATCH 'decorator*'").fetchone())
+
+
 
     return
 
@@ -23,3 +46,5 @@ def build_index():
 
 def search(query, limit=5):
     return
+
+_build_index()
