@@ -13,38 +13,45 @@ import sqlite3
 
 import re
 from pathlib import Path
-from lessons import load_lesson
+import lessons
+import topics
+
 
 
 LESSONS_DIR = Path(__file__).parent / "lessons"
 
-def _build_index():
-    """called at app startup. Reads every lessons/*.md, parses out title + summary + body, populates the FTS5 table.
-    Drops and recreates the table on each startup so edits to lesson files always show up.
+def _load_all_lessons():
+    """Walk lessons/*.md and return a list of dicts ready to insert.
+
+    Each dict is {slug, name, description, body}. Orphan lesson files
+    (no matching entry in topics.py) are skipped — they're not findable
+    in the catalog anyway.
     """
-    con = sqlite3.connect(":memory:")
-    con.execute("CREATE VIRTUAL TABLE docs USING fts5(slug UNINDEXED, name, body)")
+    all_lessons = []
+    
+    for path in lessons.LESSONS_DIR.glob("*.md"):
+        slug = path.stem
 
-    for lesson in LESSONS_DIR:
-        load_lesson(lesson)
+        topic = topics.get_topic(slug)
+        if topic is None:                # orphan .md — no catalog entry
+            continue
 
+        lesson = lessons.load_lesson(slug)
 
-        con.execute(
-        "INSERT INTO docs (slug, name, body) VALUES (?, ?, ?)",
-        ('related_slugs', 'title', 'summary')
-        )
+        all_lessons.append({
+            "slug": slug,
+            "name": topic["name"],
+            "description": topic["description"],
+            "body": lesson["lesson_markdown"],
+        })
 
-
-    con.commit()
-    print(con.execute("SELECT slug FROM docs WHERE docs MATCH 'decorator*'").fetchone())
-
-
-
-    return
+    return all_lessons
 
 
 
 def search(query, limit=5):
     return
 
-_build_index()
+if __name__ == "__main__":
+    _load_all_lessons()
+    print(len(_load_all_lessons()))
