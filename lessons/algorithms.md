@@ -1,11 +1,9 @@
 ---
 title: Algorithms
-summary: Coming soon — sorting, searching, and the algorithmic patterns that power them.
+summary: Pick a topic below — Big O, searching, sorting, and the patterns that show up in every interview.
 related: basics, data-structures
 ---
 
-This section is under construction. Sorting, searching, and the classic algorithmic patterns will live here — each with a hand-authored walkthrough, a working code example, and an in-browser challenge.
+This section covers the algorithms every Python developer should know cold. Start with [Big O Notation](/lesson/big-o-notation) if you've never thought hard about runtime cost — every other lesson here references it. Then walk through searching, sorting, and the two- pointer / sliding-window / memoization patterns that solve a huge fraction of interview problems.
 
-For now, you can dig into [Basics](/lesson/basics) for the language fundamentals or [Data Structures](/lesson/data-structures) for the structures algorithms operate on.
-
-Have a specific algorithm question in mind? Drop it into the search bar on the home page and the AI tutor will write you a custom lesson on the spot.
+Each lesson has a short explanation, a working implementation, and an in-browser coding challenge. Click any topic below to get started.

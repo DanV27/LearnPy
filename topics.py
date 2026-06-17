@@ -108,7 +108,21 @@ TOPICS = [
         "name": "Algorithms",
         "icon": "sort",
         "level": "INTERMEDIATE",
-        "description": "Bubble, merge, and quicksort.",
+        "description": "Big O, searching, sorting, and the patterns that show up in every interview.",
+        "children": [
+            "big-o-notation",
+            "recursion",
+            "linear-search",
+            "binary-search",
+            "bubble-sort",
+            "selection-sort",
+            "insertion-sort",
+            "merge-sort",
+            "quicksort",
+            "two-pointers",
+            "sliding-window",
+            "memoization",
+        ],
     },
 
 
@@ -161,6 +175,23 @@ TOPICS = [
     {"slug": "defaultdict",        "name": "defaultdict",        "icon": "folder_special",   "level": "BEGINNER",     "description": "Auto-default dict — collections.defaultdict.",     "hide_from_sidebar": True},
     {"slug": "namedtuple",         "name": "namedtuple",         "icon": "label_important",  "level": "BEGINNER",     "description": "Tuples with named fields — collections.namedtuple.","hide_from_sidebar": True},
     {"slug": "frozenset",          "name": "frozenset",          "icon": "ac_unit",          "level": "INTERMEDIATE", "description": "Immutable, hashable sets.",                        "hide_from_sidebar": True},
+
+    # =========================================================================
+    # Algorithms sub-topics — hidden from sidebar; reached via
+    # /lesson/algorithms.
+    # =========================================================================
+    {"slug": "big-o-notation",   "name": "Big O Notation",  "icon": "trending_up",     "level": "BEGINNER",     "description": "How to talk about how fast or slow code is.",   "hide_from_sidebar": True},
+    {"slug": "recursion",        "name": "Recursion",       "icon": "autorenew",       "level": "BEGINNER",     "description": "Functions that call themselves.",                "hide_from_sidebar": True},
+    {"slug": "linear-search",    "name": "Linear Search",   "icon": "search",          "level": "BEGINNER",     "description": "Walk the list, return the first match.",         "hide_from_sidebar": True},
+    {"slug": "binary-search",    "name": "Binary Search",   "icon": "manage_search",   "level": "BEGINNER",     "description": "Halve the range each step — O(log n).",          "hide_from_sidebar": True},
+    {"slug": "bubble-sort",      "name": "Bubble Sort",     "icon": "bubble_chart",    "level": "BEGINNER",     "description": "Swap adjacent pairs until sorted.",              "hide_from_sidebar": True},
+    {"slug": "selection-sort",   "name": "Selection Sort",  "icon": "check_box",       "level": "BEGINNER",     "description": "Repeatedly pick the smallest remaining item.",   "hide_from_sidebar": True},
+    {"slug": "insertion-sort",   "name": "Insertion Sort",  "icon": "input",           "level": "BEGINNER",     "description": "Build the sorted list one element at a time.",   "hide_from_sidebar": True},
+    {"slug": "merge-sort",       "name": "Merge Sort",      "icon": "merge",           "level": "INTERMEDIATE", "description": "Split, sort each half, merge — O(n log n).",     "hide_from_sidebar": True},
+    {"slug": "quicksort",        "name": "Quicksort",       "icon": "bolt",            "level": "INTERMEDIATE", "description": "Pick a pivot, partition, recurse.",              "hide_from_sidebar": True},
+    {"slug": "two-pointers",     "name": "Two Pointers",    "icon": "compare_arrows",  "level": "INTERMEDIATE", "description": "Walk a sequence from both ends.",                "hide_from_sidebar": True},
+    {"slug": "sliding-window",   "name": "Sliding Window",  "icon": "swipe_right",     "level": "INTERMEDIATE", "description": "A moving range over a sequence.",                "hide_from_sidebar": True},
+    {"slug": "memoization",      "name": "Memoization",     "icon": "memory",          "level": "INTERMEDIATE", "description": "Cache results to skip repeat work.",             "hide_from_sidebar": True},
 
     # =========================================================================
     # Shared / cross-section sub-topics — referenced from more than one
