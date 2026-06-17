@@ -42,7 +42,7 @@ def _load_all_lessons():
             "slug": slug,
             "name": topic["name"],
             "description": topic["description"],
-            "body": lesson["lesson_markdown"],
+            "body": _strip_markdown(lesson["lesson_markdown"]),
         })
 
     return all_lessons
@@ -53,11 +53,11 @@ def _strip_markdown(text):
     Remove inline code spans backtick-text-backtick (`like this` → like this).
     Collapse runs of whitespace into single spaces.
     """
-
-    
-
-
-    return
+    text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+    text = re.sub(r'\[(.*?)\]\([^)]+\)', r'\1', text)
+    text = re.sub(r'`(.*?)`', r'\1', text)
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
 
 
 
@@ -65,5 +65,8 @@ def search(query, limit=5):
     return
 
 if __name__ == "__main__":
-    _load_all_lessons()
-    print(len(_load_all_lessons()))
+
+
+
+    print()
+    
