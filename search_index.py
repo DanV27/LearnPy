@@ -47,6 +47,18 @@ def _load_all_lessons():
 
     return all_lessons
 
+def _strip_markdown(text):
+    """Remove fenced code blocks: anything between ``` lines. (A regex with re.DOTALL is the easiest way.)
+    Replace inline link syntax [text](url) with just text. (Another regex.)
+    Remove inline code spans backtick-text-backtick (`like this` → like this).
+    Collapse runs of whitespace into single spaces.
+    """
+
+    
+
+
+    return
+
 
 
 def search(query, limit=5):
