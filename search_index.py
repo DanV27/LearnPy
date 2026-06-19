@@ -10,9 +10,12 @@ search(query, limit=5) — takes a partial query string, returns a list of {slug
 """
 
 import sqlite3
+import os
 
 import re
 from pathlib import Path
+
+from flask import app
 import lessons
 import topics
 
@@ -60,13 +63,30 @@ def _strip_markdown(text):
     return text.strip()
 
 
+def build_index():
+    path = os.path.join(app.instance_path, "codegen.db")
+    con =sqlite3.connect(path)
+
+    con.execute("CREATE VIRTUAL TABLE IF NOT EXISTS lessons_fts USING " 
+    "fts5(slug UNINDEXED, name, description, body, tokenize='porter unicode61'")
+
+    con.execute("DELETE FROM lessons_fts")
+
+    all_lessons = _load_all_lessons()
+
+    for lessons in all_lessons:
+        con.execute("INSERT INTO lessons_fts (slug, name, description, body) VALUES (?, ?, ?, ?",
+                    lessons["slug"],lessons["name"], lessons["description"], lessons["body"])
+    
+    con.commit()
+
+
+    return 
+
+
 
 def search(query, limit=5):
     return
 
-if __name__ == "__main__":
-
-
-
-    print()
-    
+if __name__ == "__main__": build_index();
+    print("indexed")
