@@ -64,21 +64,28 @@ def _strip_markdown(text):
 
 
 def build_index():
-    path = os.path.join(app.instance_path, "codegen.db")
-    con =sqlite3.connect(path)
+    """
+    called at app startup. Reads every lessons/*.md, parses out title + summary + body, populates the FTS5 table.
+      Drops and recreates the table on each startup so edits to lesson files always show up.
+    """
+
+
+    DB_PATH = Path(__file__).parent / "instance" / "codegen.db"
+    con =sqlite3.connect(DB_PATH)
 
     con.execute("CREATE VIRTUAL TABLE IF NOT EXISTS lessons_fts USING " 
-    "fts5(slug UNINDEXED, name, description, body, tokenize='porter unicode61'")
+    "fts5(slug UNINDEXED, name, description, body, tokenize='porter unicode61')")
 
     con.execute("DELETE FROM lessons_fts")
 
     all_lessons = _load_all_lessons()
 
-    for lessons in all_lessons:
-        con.execute("INSERT INTO lessons_fts (slug, name, description, body) VALUES (?, ?, ?, ?",
-                    lessons["slug"],lessons["name"], lessons["description"], lessons["body"])
+    for lesson in all_lessons:
+        con.execute("INSERT INTO lessons_fts (slug, name, description, body) VALUES (?, ?, ?, ?)",
+                    (lesson["slug"],lesson["name"], lesson["description"], lesson["body"]))
     
     con.commit()
+    con.close()
 
 
     return 
@@ -88,5 +95,6 @@ def build_index():
 def search(query, limit=5):
     return
 
-if __name__ == "__main__": build_index();
+if __name__ == "__main__":
+    build_index()
     print("indexed")
