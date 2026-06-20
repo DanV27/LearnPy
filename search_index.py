@@ -93,6 +93,15 @@ def build_index():
 
 
 def search(query, limit=5):
+    """search(query, limit=5) — takes a partial query string, 
+    returns a list of {slug, name, icon, description, score} dicts."""
+    query.strip()
+    if not query:
+        return []
+
+
+
+
     return
 
 if __name__ == "__main__":
