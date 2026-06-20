@@ -95,9 +95,25 @@ def build_index():
 def search(query, limit=5):
     """search(query, limit=5) — takes a partial query string, 
     returns a list of {slug, name, icon, description, score} dicts."""
-    query.strip()
+
+    DB_PATH = Path(__file__).parent / "instance" / "codegen.db"
+    con =sqlite3.connect(DB_PATH)
+
+
+    query = query.strip()
     if not query:
         return []
+
+    parts = re.sub(r"[^a-zA-Z0-9 ]", " ", query)
+
+    parts = parts.split()
+
+    parts[-1] += "*"
+
+    con.execute(
+    "SELECT slug FROM lessons_fts WHERE lessons_fts MATCH ? ORDER BY bm25(lessons_fts, 10.0, 5.0, 2.0, 1.0) LIMIT ?",
+    (query_string, limit)
+)
 
 
 
