@@ -93,33 +93,88 @@ def build_index():
 
 
 def search(query, limit=5):
-    """search(query, limit=5) — takes a partial query string, 
-    returns a list of {slug, name, icon, description, score} dicts."""
+    """Run a prefix-matched FTS5 query and return up to `limit` results.
 
-    DB_PATH = Path(__file__).parent / "instance" / "codegen.db"
-    con =sqlite3.connect(DB_PATH)
+    Returns a list of dicts shaped like:
+        {"slug": str, "name": str, "icon": str, "description": str, "url": str}
+    Empty list if the query is empty, all-special-characters, or matches nothing.
+    """
 
+    # ---- Validate + clean the query BEFORE opening a DB connection. ----
+    # If we bail out early, we don't want a dangling open connection.
 
+    # 1. Strip whitespace. Strings are immutable — must reassign.
     query = query.strip()
     if not query:
         return []
 
-    parts = re.sub(r"[^a-zA-Z0-9 ]", " ", query)
+    # 2. Sanitize: keep only letters, digits, spaces. Anything else becomes a
+    #    space. This prevents the user from injecting FTS5 operators ( ", *,
+    #    (, ^, etc.) that could crash the query with a syntax error.
+    cleaned = re.sub(r"[^a-zA-Z0-9 ]", " ", query)
 
-    parts = parts.split()
+    # 3. Split into individual words.
+    parts = cleaned.split()
 
+    # 4. If everything got sanitized away, there's nothing to search for.
+    #    THIS CHECK GOES BEFORE we touch parts[-1] — otherwise IndexError.
+    if not parts:
+        return []
+
+    # 5. Append * to the last word so we get PREFIX matching. The user is
+    #    still typing — "binary se" should still find "binary search".
     parts[-1] += "*"
 
-    con.execute(
-    "SELECT slug FROM lessons_fts WHERE lessons_fts MATCH ? ORDER BY bm25(lessons_fts, 10.0, 5.0, 2.0, 1.0) LIMIT ?",
-    (query_string, limit)
-)
+    # 6. Join back into one string. FTS5's MATCH takes a single string.
+    #    THIS is where the str(parts) bug bit you — use join.
+    fts_query = " ".join(parts)        # e.g. "binary se*"
 
+    # ---- Now we're ready to talk to the database. ----
 
+    DB_PATH = Path(__file__).parent / "instance" / "codegen.db"
+    con = sqlite3.connect(DB_PATH)
 
+    # 7. Run the query. The ? placeholders are filled in by SQLite from
+    #    the tuple in the second argument, in order. Never f-string user
+    #    input into SQL — placeholders are how you avoid injection.
+    #
+    #    BM25 weights map to the table columns in declaration order:
+    #       slug (UNINDEXED, weight ignored), name, description, body
+    #    Higher = more important. Name matches > description > body.
+    cursor = con.execute(
+        "SELECT slug FROM lessons_fts "
+        "WHERE lessons_fts MATCH ? "
+        "ORDER BY bm25(lessons_fts, 0.0, 10.0, 5.0, 1.0) "
+        "LIMIT ?",
+        (fts_query, limit),
+    )
 
-    return
+    # 8. Iterate the cursor. Each row is a tuple — even with one column.
+    #    For each slug, look up the rest of the topic info from the
+    #    catalog and build a result dict.
+    results = []
+    for row in cursor:
+        slug = row[0]                  # SELECT slug → row is a 1-tuple
+        topic = topics.get_topic(slug)
+        if topic is None:
+            continue                   # defensive — should never happen
+        results.append({
+            "slug": slug,
+            "name": topic["name"],
+            "icon": topic["icon"],
+            "description": topic["description"],
+            "url": f"/lesson/{slug}",
+        })
+
+    # 9. Close the connection. Always. Even on the happy path.
+    con.close()
+
+    return results
 
 if __name__ == "__main__":
     build_index()
     print("indexed")
+    print()
+    for q in ["decor", "binary se", "hash", "", "XYZQQQ", '"; DROP TABLE']:
+        results = search(q)
+        print(f"search({q!r}) → {[r['slug'] for r in results]}")
