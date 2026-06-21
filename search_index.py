@@ -171,10 +171,3 @@ def search(query, limit=5):
 
     return results
 
-if __name__ == "__main__":
-    build_index()
-    print("indexed")
-    print()
-    for q in ["decor", "binary se", "hash", "", "XYZQQQ", '"; DROP TABLE']:
-        results = search(q)
-        print(f"search({q!r}) → {[r['slug'] for r in results]}")
