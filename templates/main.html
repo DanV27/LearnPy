@@ -159,6 +159,47 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
     }
+
+    /* -----------------------------------------------------------------
+       Loading animation: 3×3 grid of orange squares that orbit around a
+       center square while the whole thing pulses in and out. Shown
+       while waiting for a lesson to come back from the AI.
+       Color: #fb6d25 (LearnPy secondary-container orange).
+       ----------------------------------------------------------------- */
+    .lesson-loader {
+      --c: no-repeat linear-gradient(#fb6d25 0 0);
+      background:
+        var(--c), var(--c), var(--c),
+        var(--c), var(--c), var(--c),
+        var(--c), var(--c), var(--c);
+      background-size: 16px 16px;
+      animation:
+        loader-pulse 1s infinite,
+        loader-orbit 1s infinite;
+    }
+    @keyframes loader-pulse {
+      0%, 100% { width: 45px;  height: 45px; }
+      35%, 65% { width: 65px;  height: 65px; }
+    }
+    @keyframes loader-orbit {
+      0%, 40%   { background-position: 0 0,   0 50%, 0 100%, 50% 100%, 100% 100%, 100% 50%, 100% 0, 50% 0,  50% 50%; }
+      60%, 100% { background-position: 0 50%, 0 100%, 50% 100%, 100% 100%, 100% 50%, 100% 0, 50% 0,  0 0,    50% 50%; }
+    }
+    .lesson-loader-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 32px 16px;
+    }
+    .lesson-loader-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #4c4546;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
   </style>
   <script id="tailwind-config">
     tailwind.config = {
@@ -875,7 +916,11 @@
 
         // Clear the lesson card back to a "loading…" state before a new fetch.
         function resetLesson() {
-          lessonBodyEl.innerHTML = '<p class="text-on-surface-variant italic">Preparing your Python lesson...</p>';
+          lessonBodyEl.innerHTML =
+            '<div class="lesson-loader-wrap">' +
+              '<div class="lesson-loader"></div>' +
+              '<div class="lesson-loader-label">Preparing your Python lesson...</div>' +
+            '</div>';
           lessonSummaryEl.classList.add('hidden');
           lessonSummaryEl.textContent = '';
           statusReady.classList.add('hidden');
@@ -1029,7 +1074,10 @@
             '<p class="font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm">Q: '
             + escapeHTML(question)
             + '</p>'
-            + '<p class="font-body-md text-on-surface-variant italic">Thinking...</p>';
+            + '<div class="lesson-loader-wrap">'
+            +   '<div class="lesson-loader"></div>'
+            +   '<div class="lesson-loader-label">Thinking...</div>'
+            + '</div>';
           answersSection.appendChild(card);
           card.scrollIntoView({ behavior: 'smooth', block: 'start' });
           return card;
