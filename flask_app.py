@@ -35,6 +35,7 @@ from topics import TOPICS, get_topic, visible_in_sidebar, get_parent
 from lessons import load_lesson
 from challenges import get_challenge
 from profile_data import calculate_heatmap
+from search_index import build_index,search
 
 
 # ---------------------------------------------------------------------------
@@ -72,6 +73,7 @@ def load_user(user_id: str):
 with app.app_context():
     db.create_all()
 
+build_index()
 
 # ---------------------------------------------------------------------------
 # Error handler — keeps JSON clients from receiving an HTML 500 page
@@ -259,6 +261,16 @@ def lesson_page(slug):
         challenge_completed=challenge_completed,
         parent_topic = parent_topic
     )
+
+
+
+@app.route("/api/search/suggest")
+@login_required
+def api_search_suggest():
+    q = request.args.get("q", "")
+    return jsonify(search(q))
+
+
 
 
 def _resolve_children(slugs):

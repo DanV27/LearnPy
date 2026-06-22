@@ -339,19 +339,32 @@
 
       {% if not active_topic %}
 
-      <form id="learn-form" class="relative w-full max-w-2xl group">
-        <div class="absolute inset-y-0 left-md flex items-center pointer-events-none">
-          <span class="material-symbols-outlined text-outline">search</span>
-        </div>
-        <input id="prompt-input" type="text" autocomplete="off"
-          class="w-full bg-surface-container-lowest border border-outline-variant py-md pl-xl pr-[140px] font-body-md focus:border-primary focus:ring-0 transition-all outline-none rounded-lg"
-          placeholder="e.g. Implement a binary search tree" />
-        <button id="generate-btn" type="submit"
-          class="absolute right-sm top-1/2 -translate-y-1/2 bg-secondary-container text-primary font-bold px-md py-base hover:brightness-110 transition-all rounded-lg flex items-center gap-xs disabled:opacity-50 disabled:cursor-not-allowed">
-          <span id="generate-btn-icon" class="material-symbols-outlined" style="font-size: 18px;">school</span>
-          <span id="generate-btn-label">Teach Me</span>
-        </button>
-      </form>
+      <div class="relative w-full max-w-2xl">
+        <form id="learn-form" class="relative w-full group">
+          <div class="absolute inset-y-0 left-md flex items-center pointer-events-none">
+            <span class="material-symbols-outlined text-outline">search</span>
+          </div>
+          <input id="prompt-input" type="text" autocomplete="off"
+            class="w-full bg-surface-container-lowest border border-outline-variant py-md pl-xl pr-[140px] font-body-md focus:border-primary focus:ring-0 transition-all outline-none rounded-lg"
+            placeholder="e.g. Implement a binary search tree" />
+          <button id="generate-btn" type="submit"
+            class="absolute right-sm top-1/2 -translate-y-1/2 bg-secondary-container text-primary font-bold px-md py-base hover:brightness-110 transition-all rounded-lg flex items-center gap-xs disabled:opacity-50 disabled:cursor-not-allowed">
+            <span id="generate-btn-icon" class="material-symbols-outlined" style="font-size: 18px;">school</span>
+            <span id="generate-btn-label">Teach Me</span>
+          </button>
+        </form>
+
+        <!-- ===========================================================
+             Autocomplete dropdown (Mission 9).
+             Populated by JS from /api/search/suggest while the user types.
+             Each item is a real <a href> so right-click / cmd-click works.
+             =========================================================== -->
+        <ul id="search-suggest"
+          class="hidden absolute left-0 right-0 top-[calc(100%+4px)] z-30
+                 bg-surface-container-lowest border border-outline-variant rounded-lg
+                 shadow-xl overflow-hidden text-left max-h-[400px] overflow-y-auto"
+          role="listbox"></ul>
+      </div>
 
       <div class="mt-md flex gap-xs flex-wrap justify-center">
         <span class="text-label-md font-label-md text-on-surface-variant">Popular:</span>
@@ -1324,6 +1337,162 @@
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
         });
+
+        // ---------------------------------------------------------------
+        // 7. Search autocomplete (Mission 9)
+        //    Hits /api/search/suggest as the user types and renders the
+        //    matches as a dropdown under the input. Keyboard navigable.
+        // ---------------------------------------------------------------
+        const suggestEl = document.getElementById('search-suggest');
+        if (suggestEl && promptInput) {
+          let debounceTimer = null;
+          let activeIndex = -1;   // keyboard-selected row, -1 = nothing
+          let currentItems = [];  // last list of {slug, name, ...} from the server
+
+          // Escape a user-supplied string for safe HTML interpolation —
+          // prevents query text or topic names from breaking out of the markup.
+          function escHTML(s) {
+            return String(s ?? '')
+              .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+          }
+
+          // Wrap any case-insensitive substring matches of `query` inside `<strong>`.
+          // Match highlighting — the polish that makes results feel "smart".
+          function highlight(text, query) {
+            if (!query) return escHTML(text);
+            const tokens = query.trim().split(/\s+/).filter(Boolean).map(t =>
+              t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')   // regex-escape user input
+            );
+            if (!tokens.length) return escHTML(text);
+            const safe = escHTML(text);
+            try {
+              const re = new RegExp('(' + tokens.join('|') + ')', 'gi');
+              return safe.replace(re, '<strong class="text-primary">$1</strong>');
+            } catch (e) {
+              return safe;
+            }
+          }
+
+          function hideSuggestions() {
+            suggestEl.classList.add('hidden');
+            activeIndex = -1;
+            currentItems = [];
+          }
+
+          // Build the dropdown HTML from the result list.
+          function renderSuggestions(items, query) {
+            currentItems = items;
+            activeIndex = -1;
+
+            if (!items.length) {
+              // Empty-state row — bridges the gap between catalog search and
+              // the AI tutor (which fires on Enter / Teach Me anyway).
+              suggestEl.innerHTML =
+                '<li class="px-md py-sm font-body-md text-on-surface-variant">' +
+                '<span class="material-symbols-outlined align-middle mr-xs" style="font-size:16px;">manage_search</span>' +
+                'No catalog match — press Enter to ask the AI tutor.' +
+                '</li>';
+              suggestEl.classList.remove('hidden');
+              return;
+            }
+
+            suggestEl.innerHTML = items.map((it, idx) => `
+              <li role="option" data-index="${idx}">
+                <a href="${escHTML(it.url)}"
+                   class="suggest-item flex items-center gap-sm px-md py-sm transition-colors
+                          border-l-4 border-transparent no-underline
+                          hover:bg-surface-container-low text-on-surface">
+                  <span class="material-symbols-outlined text-secondary shrink-0"
+                        style="font-size:22px;">${escHTML(it.icon || 'menu_book')}</span>
+                  <div class="min-w-0 flex-1">
+                    <div class="font-body-md text-body-md text-on-surface font-semibold truncate">
+                      ${highlight(it.name, query)}
+                    </div>
+                    <div class="font-label-md text-label-md text-on-surface-variant truncate">
+                      ${highlight(it.description || '', query)}
+                    </div>
+                  </div>
+                  <span class="material-symbols-outlined text-outline shrink-0"
+                        style="font-size:18px;">arrow_forward</span>
+                </a>
+              </li>
+            `).join('');
+            suggestEl.classList.remove('hidden');
+          }
+
+          // Toggle the visual "highlighted" state on a row.
+          function paintActive() {
+            const rows = suggestEl.querySelectorAll('.suggest-item');
+            rows.forEach((el, i) => {
+              if (i === activeIndex) {
+                el.classList.add('bg-surface-container-low', 'border-secondary');
+              } else {
+                el.classList.remove('bg-surface-container-low', 'border-secondary');
+              }
+            });
+          }
+
+          // Fetch + render. Always passes the current input value so the
+          // most recent keystroke always wins, even if responses arrive
+          // out of order.
+          async function fetchSuggestions(q) {
+            try {
+              const res = await fetch('/api/search/suggest?q=' + encodeURIComponent(q));
+              if (!res.ok) { hideSuggestions(); return; }
+              const data = await res.json();
+              // Stale response guard: if user kept typing, ignore this batch.
+              if (promptInput.value.trim() !== q.trim()) return;
+              renderSuggestions(Array.isArray(data) ? data : [], q);
+            } catch (e) {
+              hideSuggestions();
+            }
+          }
+
+          // Debounced input handler — only fire ~150ms AFTER the user stops typing.
+          promptInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const q = promptInput.value.trim();
+            if (!q) { hideSuggestions(); return; }
+            debounceTimer = setTimeout(() => fetchSuggestions(q), 150);
+          });
+
+          // Keyboard navigation — arrows + Enter + Esc.
+          promptInput.addEventListener('keydown', (e) => {
+            const visible = !suggestEl.classList.contains('hidden');
+            if (!visible || !currentItems.length) return;
+
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              activeIndex = (activeIndex + 1) % currentItems.length;
+              paintActive();
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              activeIndex = (activeIndex - 1 + currentItems.length) % currentItems.length;
+              paintActive();
+            } else if (e.key === 'Enter' && activeIndex >= 0) {
+              e.preventDefault();
+              window.location.href = currentItems[activeIndex].url;
+            } else if (e.key === 'Escape') {
+              hideSuggestions();
+              promptInput.blur();
+            }
+          });
+
+          // Click outside the dropdown / input closes it.
+          document.addEventListener('mousedown', (e) => {
+            if (suggestEl.contains(e.target) || promptInput.contains(e.target)) return;
+            hideSuggestions();
+          });
+
+          // Re-show on focus if there's still a query in the box.
+          promptInput.addEventListener('focus', () => {
+            const q = promptInput.value.trim();
+            if (q && currentItems.length) {
+              suggestEl.classList.remove('hidden');
+            }
+          });
+        }
       })();
   </script>
 </body>
