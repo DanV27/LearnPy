@@ -31,3 +31,11 @@ Falsy values in Python: `False`, `None`, `0`, `0.0`, `""`, `[]`, `{}`, `set()`. 
 - Use `int(x, base)` to parse non-decimal: `int("ff", 16)` returns 255.
 - `str(x)` always succeeds. `int(x)` and `float(x)` can raise — wrap user input in try/except.
 - See [Python Booleans](/lesson/python-booleans) for the truthiness rules in detail.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Casting explicit user input or external data into the type your logic expects.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Casting blindly without try/except — `int('oops')` raises ValueError and can crash your program.</p>
+</div>
+

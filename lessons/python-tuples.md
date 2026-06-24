@@ -49,3 +49,11 @@ quotient, remainder = divmod_(17, 5)
 locations = {(0, 0): "origin", (1, 1): "diagonal"}    # ✓
 locations = {[0, 0]: "origin"}                         # TypeError
 ```
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Fixed groups of values (coordinates, RGB, simple records) and as dict keys or set elements.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When the data will grow or shrink — use a list. Building tuples with `t = t + (item,)` in a loop is O(n²).</p>
+</div>
+

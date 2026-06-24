@@ -44,3 +44,11 @@ def is_balanced(s: str) -> bool:
 
 - For thread-safe stacks, use `queue.LifoQueue`. Plain lists are not thread-safe.
 - A [Deque](/lesson/deque) also works as a stack and is occasionally faster.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Anything LIFO — undo history, parsing brackets, DFS traversal, call stacks.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When you need to access the bottom or middle — that's O(n). Use a deque or list when random access matters.</p>
+</div>
+

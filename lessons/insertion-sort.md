@@ -43,3 +43,11 @@ Of the three `O(n²)` sorts ([bubble](/lesson/bubble-sort), [selection](/lesson/
 - Lists that are already mostly sorted.
 
 Python's Timsort actually *uses* insertion sort as a sub-routine — it switches to insertion sort for small chunks because the constant factors are tiny. This is the only one of the three you'd ever see inside production code.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Small lists (≤ ~50 elements) or nearly-sorted data — Timsort uses it internally for that reason.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Large random data — degrades to O(n²). Reach for merge sort or `sorted()`.</p>
+</div>
+

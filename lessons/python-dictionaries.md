@@ -45,3 +45,11 @@ squares = {n: n*n for n in range(5)}
 - Dicts remember insertion order (Python 3.7+).
 - Use `dict.keys()`, `.values()`, `.items()` for views that stay in sync with the dict.
 - For more on how dicts work under the hood, see [Hash Map](/lesson/hash-map).
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Whenever you need to look up a value by key.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — For two-way lookups or maintained ordering — once your keys point at other keys, consider a richer data structure.</p>
+</div>
+

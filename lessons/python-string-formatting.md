@@ -48,3 +48,11 @@ f"{'hi':^10}"             # '    hi    ' — center
 - f-strings can include the variable name *and* value with `=` (3.8+): `f"{x=}"` → `"x=42"`. Great for debugging.
 - Multi-line f-strings work fine with triple quotes.
 - For complex template generation (emails, HTML), reach for a real template engine like Jinja2.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — f-strings for every new piece of code — they're fastest, clearest, and most flexible.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — `.format()` or `%`-formatting in new code (legacy). Exception: logging libraries that defer formatting expect `%`-style.</p>
+</div>
+

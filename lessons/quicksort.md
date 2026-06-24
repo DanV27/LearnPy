@@ -42,3 +42,11 @@ That's the readable version — uses extra memory. A production quicksort partit
 | Cache-friendly | Yes | Less so |
 
 Use Python's `sorted()` in real code — it's Timsort, which beats both. Knowing quicksort is interview prep, not implementation prep.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — General-purpose sorting where average performance matters more than worst-case.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When worst-case `O(n²)` is unacceptable (real-time systems, untrusted input). Use merge sort or `sorted()` for guaranteed `O(n log n)`.</p>
+</div>
+

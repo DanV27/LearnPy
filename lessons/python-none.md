@@ -43,3 +43,11 @@ prices.get("rice")        # returns None if "rice" isn't there
 - A function with no `return` returns `None`.
 - `None` is falsy: `if x:` treats `None` and `0` and `""` the same. If that distinction matters, use `if x is None:` explicitly.
 - Don't use `None` as a default argument value if you mean "a mutable type" — see [Python Functions](/lesson/python-functions) for the classic mutable-default bug.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — As a sentinel for 'no value yet' or 'not applicable' — and check with `is None`.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — As a default for *mutable* arguments. `def f(items=None): items = items or []` is the safe pattern; `items=[]` is the bug.</p>
+</div>
+

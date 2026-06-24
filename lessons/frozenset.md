@@ -50,3 +50,11 @@ Because a `frozenset` is immutable, it's **hashable**, which means you can:
 - Any "this collection of things won't change" record.
 
 For mutable, growable sets, stick with `set`. Reach for `frozenset` when hashability or "guaranteed not to change" is a feature, not a limitation.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — As a dict key or set element when you need a 'set of things that won't change.'</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — For mutable working data — you can't add or remove. Use a regular set for that.</p>
+</div>
+

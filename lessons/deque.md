@@ -44,3 +44,11 @@ d.rotate(-1)             # → deque([5, 1, 2, 3, 4])
 - Round-robin scheduling.
 
 For thread-safe variants, see `queue.Queue` and `queue.LifoQueue`.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — O(1) appends and pops from both ends — sliding windows, 'last N' buffers (with `maxlen`).</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Random access in the middle — that's O(n). Use a list when `items[i]` needs to be fast.</p>
+</div>
+

@@ -39,3 +39,11 @@ binary_search(nums, 26)    # -1
 Python's `bisect` module gives you battle-tested binary search: `bisect.bisect_left`, `bisect_right`, `insort`. Reach for those before writing your own in real code.
 
 Binary search also appears in unexpected places: "find the smallest x where condition(x) is true" can often be cast as a binary search over the answer space. Once you see the pattern, you'll find it everywhere.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Searching a *sorted* list, or any monotonic decision space ('smallest x where f(x) is true').</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Unsorted data — you'll get nonsense, silently. Always sort first or verify the order.</p>
+</div>
+

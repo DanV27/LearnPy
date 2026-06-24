@@ -53,3 +53,11 @@ for word in "the cat sat on the mat".split():
 For pure counting, prefer [Counter](/lesson/counter) — it does this plus `most_common`, arithmetic, and a friendlier repr.
 
 **Gotcha**: just *accessing* a missing key in a `defaultdict` creates the entry. If you don't want that side effect, use plain `dict.get(key, default)` instead.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Grouping or counting where you'd otherwise write `if key not in d: d[key] = []`.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When *reads* shouldn't auto-create keys. `d.get(key, default)` is sometimes what you actually want — defaultdict mutates on read.</p>
+</div>
+

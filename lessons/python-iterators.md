@@ -52,3 +52,11 @@ for x in CountDown(3):
 - For most cases, a generator function (`yield`) is much cleaner than writing an iterator class by hand.
 - Iterators are single-use: once exhausted, you have to make a new one.
 - `iter()`, `next()`, `StopIteration` are the three pieces of the iterator protocol.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — When you want streaming, one-at-a-time access — works with `for`, `next`, and generator expressions.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When you need random access or multiple passes — iterators are single-use. Once exhausted, you have to remake them.</p>
+</div>
+

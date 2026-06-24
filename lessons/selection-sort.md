@@ -41,3 +41,11 @@ Starting with `[3, 1, 4, 1, 5]`:
 Selection sort makes far fewer swaps than [bubble sort](/lesson/bubble-sort) — one per pass vs. potentially many. That doesn't make it asymptotically faster (both are `O(n²)`), but it's a real win when each swap is costly.
 
 Neither is what you'd actually use. For that, see [Merge Sort](/lesson/merge-sort) or [Quicksort](/lesson/quicksort).
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — When swap operations are expensive — selection sort makes O(n) swaps, the minimum possible.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Pretty much everywhere else. It's O(n²) and `sorted()` is faster for any practical size.</p>
+</div>
+

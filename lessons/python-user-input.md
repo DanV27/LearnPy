@@ -44,3 +44,11 @@ x, y = int(parts[0]), int(parts[1])
 - `input()` always strips the trailing newline.
 - For non-interactive scripts (cron jobs, pipelines), don't use `input()` — read from `sys.argv` or environment variables instead.
 - For passwords, use `getpass.getpass()` from the standard library — it hides the input.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — `input()` for quick CLI scripts, prototypes, and class exercises.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — In production services or anything non-interactive — read from CLI args, files, or environment variables. `input()` hangs cron jobs forever.</p>
+</div>
+

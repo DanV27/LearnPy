@@ -60,3 +60,11 @@ def dfs(g, start, visited=None):
 - Connected components, A* pathfinding.
 
 For serious graph algorithms in Python, the **networkx** library has everything from PageRank to graph isomorphism.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Modeling relationships — social networks, dependencies, road maps, friend-of-friend queries.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When a tree or flat list would suffice. Graphs bring real complexity (cycles, traversal choice, weighted edges).</p>
+</div>
+

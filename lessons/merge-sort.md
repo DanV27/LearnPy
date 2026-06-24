@@ -44,3 +44,11 @@ Python's `sorted()` uses Timsort, which is essentially a hybrid of merge sort + 
 - You're sorting linked lists (no random access → quicksort's pivot logic is awkward, merge sort is natural).
 - You need a stable sort and your language doesn't give you one.
 - You're sorting data that doesn't fit in memory — merge sort generalizes to external sorting on disk.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — When you need *stable*, guaranteed `O(n log n)` sorting, or are sorting linked lists / external data on disk.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — In-memory random-access arrays — Python's Timsort (`sorted()`) is merge-sort-derived and already optimal.</p>
+</div>
+

@@ -39,3 +39,11 @@ len(s)       # 6
 - Use **f-strings** for interpolation: `f"Hello, {name}!"`. See [String Formatting](/lesson/python-string-formatting).
 - `+` concatenates strings: `"foo" + "bar"`. For many concatenations in a loop, use `"".join(parts)` — it's much faster.
 - For pattern matching beyond simple `in`, use [Regular Expressions](/lesson/regex).
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — For any text you'll display, log, search, or transmit.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — For binary data — use `bytes` instead. Storing image data in a `str` will silently corrupt non-ASCII bytes.</p>
+</div>
+

@@ -40,3 +40,11 @@ delta.total_seconds()            # 604800.0
 - Always store timestamps in UTC. Convert to local time only at display.
 - For timezone-aware datetimes use `datetime.now(timezone.utc)` and the `zoneinfo` module (3.9+).
 - For ISO 8601 strings, `datetime.fromisoformat("2026-06-07T14:32")` is the easiest parser.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — `datetime` for any timestamp; `datetime.now(timezone.utc)` to record events.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Naive datetimes for anything that crosses servers, timezones, or daylight-saving boundaries. The bugs only appear in production.</p>
+</div>
+

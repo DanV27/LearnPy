@@ -43,3 +43,11 @@ make_user(name="Alice", age=30)   # {"name": "Alice", "age": 30}
 - Functions without an explicit `return` return `None`.
 - If a default argument is a mutable type (`list`, `dict`), don't use the literal `[]` — Python evaluates it once. Use `None` and create inside the function instead.
 - For one-liners, `lambda` exists: `square = lambda x: x*x`. But prefer `def` for readability.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — To name and isolate any chunk of logic you'll reuse OR that needs a meaningful label.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Mutable default arguments — `def f(items=[])` shares the same list across calls. Use `items=None` and create inside.</p>
+</div>
+

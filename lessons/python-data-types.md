@@ -37,3 +37,11 @@ x.upper()          # returns "HELLO" — x is unchanged
 
 - `isinstance(value, type)` is the right way to check types in conditional code.
 - Numbers and strings are immutable: this is what makes them safe to use as dict keys.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — `isinstance(value, type)` whenever your function's behavior depends on the type.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — `type(value) == SomeType` — it fails on subclasses and is usually a sign of over-specific code.</p>
+</div>
+

@@ -40,3 +40,11 @@ sorted([3, 1, 4, 1, 5, 9, 2, 6])    # [1, 1, 2, 3, 4, 5, 6, 9] — the real answ
 ```
 
 For other simple `O(n²)` alternatives that are slightly smarter, see [Selection Sort](/lesson/selection-sort) and [Insertion Sort](/lesson/insertion-sort). All three are educational; none are what you'd actually ship.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Teaching, interview practice, sorting truly tiny lists.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Production code — Python's built-in `sorted()` (Timsort) is 100x+ faster on real data.</p>
+</div>
+

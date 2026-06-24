@@ -59,3 +59,11 @@ class Point(NamedTuple):
     x: int
     y: int = 0
 ```
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Lightweight, immutable records with named fields (Point, RGB, simple results).</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Anything needing methods or mutation — use `dataclass` (mutable) or `typing.NamedTuple` (with type hints + methods).</p>
+</div>
+

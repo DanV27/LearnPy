@@ -40,3 +40,11 @@ else:
 - Avoid `while True:` without a clear `break` — it's how infinite loops sneak in.
 - When you're iterating over a known collection, prefer a [for loop](/lesson/python-for-loops) — it's harder to mess up.
 - Watch out for off-by-one bugs: `while i < n` vs. `while i <= n` are commonly confused.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — When you don't know up front how many iterations you'll need (waiting for input, retrying, polling).</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When iterating over a known sequence — a `for` loop is shorter and less prone to off-by-one bugs.</p>
+</div>
+

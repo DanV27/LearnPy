@@ -45,3 +45,11 @@ def has_duplicate(items):
 - Loops over the input → at least `O(n)`. Nested loops → at least `O(n²)`. Halving the search → `O(log n)`.
 
 Big O tells you when an algorithm will get unusable as data grows. A bubble sort on 10 items is fine. On a million items it will time out forever. Knowing the difference up front is half the skill.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — As a sanity check before optimizing — 'is this in the wrong complexity class for my data size?'</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — As a substitute for benchmarking. Constants matter in practice; `O(n log n)` can lose to `O(n²)` for n < 100.</p>
+</div>
+

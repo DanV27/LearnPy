@@ -46,3 +46,11 @@ evens   = [n for n in range(20) if n % 2 == 0]
 
 - Lists can hold mixed types: `[1, "hi", None, [3, 4]]` is valid.
 - For fixed-size data that won't change, use a [tuple](/lesson/python-tuples) instead — it's immutable and slightly faster.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Ordered, mutable data where you'll add or remove items frequently.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Fast membership checks — `x in list` is O(n). Use a `set` or `dict` for O(1) lookups.</p>
+</div>
+

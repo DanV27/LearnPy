@@ -58,3 +58,11 @@ ll.remove(b)             # constant time — no traversal
 **Cost vs. a singly linked list**: 2× the per-node memory, slightly more bookkeeping on every insert/delete. The win is the O(1) middle deletion.
 
 If you find yourself building one of these in Python, double-check that a deque or `OrderedDict` wouldn't do the job with less code.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — When you need O(1) middle deletion AND already hold a reference to the node — LRU caches, browser history.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When a `collections.deque` will do — deques internally use doubly-linked structures and save you 50+ lines of code.</p>
+</div>
+

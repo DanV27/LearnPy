@@ -46,3 +46,11 @@ nums.update([5, 6])
 - Sets are unordered: don't rely on iteration order.
 - Set elements must be **hashable** — strings, numbers, and tuples are fine; lists and dicts are not.
 - For immutable sets (usable as dict keys), use `frozenset`.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Unique items and fast O(1) membership tests.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When order or duplicates matter — sets are unordered and discard repeats. Don't use `set(items)` to 'tidy' a list.</p>
+</div>
+

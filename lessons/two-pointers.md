@@ -49,3 +49,11 @@ def reverse_chars(s: list[str]) -> None:
 Look for: a **sorted** sequence, a problem asking about pairs / sums / endpoints, or a need to compress / dedup in place. If you reach for a nested loop, ask first whether two pointers could collapse it to one pass.
 
 For windows of varying size moving across a sequence, the sibling pattern is [Sliding Window](/lesson/sliding-window).
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Sorted-array problems involving pairs, palindromes, or in-place compaction.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Unsorted data — most two-pointer tricks assume order. Sort first or pick a different pattern.</p>
+</div>
+

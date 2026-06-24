@@ -55,3 +55,11 @@ deep_sum([1, [2, [3, 4]], 5])    # 15
 ```
 
 When the same sub-problems repeat, pair recursion with [Memoization](/lesson/memoization) to avoid recomputing them.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Problems with naturally recursive structure — trees, graphs, divide-and-conquer.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When recursion depth might exceed ~1000 — Python's default stack limit hits and you get `RecursionError`. Rewrite as iterative.</p>
+</div>
+

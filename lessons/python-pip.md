@@ -44,3 +44,11 @@ pip install -r requirements.txt
 ```bash
 python -m pip install --upgrade pip   # upgrade pip itself
 ```
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — `pip install -r requirements.txt` for reproducible installs inside a venv.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — System-wide installs (`sudo pip install`) — you'll break system tools. Always install into a virtual environment.</p>
+</div>
+

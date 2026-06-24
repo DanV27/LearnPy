@@ -38,3 +38,11 @@ if name and name[0] == "A":     # safe — name[0] never evaluated if name is em
 - You don't need parentheses around the condition: `if score >= 90:` not `if (score >= 90):`.
 - For dispatching on a value's structure (especially Python 3.10+), [Python Match](/lesson/python-match) is cleaner than a long chain of `elif`s.
 - Combine conditions with `and`, `or`, `not`. Use parens for clarity in mixed expressions.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Decision trees with two to four branches.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Ten-plus branches over a single value — that's a code smell. Use a dict dispatch or a `match` statement instead.</p>
+</div>
+

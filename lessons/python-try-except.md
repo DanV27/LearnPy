@@ -51,3 +51,11 @@ def withdraw(amount):
 - Catch the most specific exception class you can. `except Exception` swallows bugs.
 - The `as e` binds the exception to a name so you can read `e.args`, the message, etc.
 - For automatic cleanup (files, locks, db connections), `with` blocks (context managers) are cleaner than `try/finally`.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — When an operation might legitimately fail AND you have a meaningful recovery plan.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Blanket `except:` or `except Exception:` — you'll swallow real bugs. Catch the most specific exception you can.</p>
+</div>
+

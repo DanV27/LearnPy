@@ -25,3 +25,11 @@ def add(a: int, b: int) -> int:
 - Write comments to explain **why**, not **what**. Clean code makes the *what* obvious; the *why* is what's worth recording.
 - Don't comment out dead code — delete it. Version control remembers it for you.
 - Docstrings are accessible at runtime via `help(add)` or `add.__doc__`.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — To explain WHY non-obvious code does what it does, and for module/function docstrings.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — To narrate WHAT the code does — clean code makes that obvious. Don't comment every line.</p>
+</div>
+

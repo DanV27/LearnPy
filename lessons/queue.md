@@ -46,3 +46,11 @@ def bfs(graph, start):
 
 - For thread-safe queues (e.g. producer/consumer between threads), use `queue.Queue` from the standard library — it has built-in locking.
 - For priority-based ordering, see [Priority Queue](/lesson/priority-queue).
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Anything FIFO — BFS, job processing, fair scheduling. Use `collections.deque`, not a list.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Thread-safe inter-thread communication — use `queue.Queue` from the stdlib for that (it has built-in locking).</p>
+</div>
+

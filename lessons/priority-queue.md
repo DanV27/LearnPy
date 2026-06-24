@@ -53,3 +53,11 @@ heapq.heappush(maxheap, (-priority, item))
 - The k smallest / k largest items in a stream: `heapq.nsmallest(k, iterable)`.
 
 For thread-safe priority queues, use `queue.PriorityQueue`.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Dijkstra, A*, scheduling, top-k streaming. `heapq` is the standard tool.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When all priorities are equal — use a regular FIFO queue. And remember `heapq` is a min-heap; negate values for max-heap behavior.</p>
+</div>
+

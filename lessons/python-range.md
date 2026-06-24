@@ -39,3 +39,11 @@ sys.getsizeof(list(range(10**9))) # would crash your machine
 - `step` must be non-zero. `range(5, 0)` (no step) gives an empty range — Python won't count down for you implicitly.
 - Use [`enumerate`](/lesson/python-for-loops) instead of `range(len(items))` when you need an index AND the item.
 - For non-integer counting (e.g., `0.0, 0.1, 0.2, ...`), use numpy or a comprehension.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Generating integer sequences for `for` loops without building a list in memory.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — For float steps — `range(0, 1, 0.1)` raises TypeError. Use `numpy.arange` or a comprehension.</p>
+</div>
+

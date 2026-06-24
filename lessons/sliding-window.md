@@ -55,3 +55,11 @@ The window grows on the right, shrinks on the left when a duplicate forces it to
 - "Number of substrings that satisfy ..."
 
 If you find yourself looping over every starting position and then every ending position, you probably want sliding window instead. It's the sibling pattern of [Two Pointers](/lesson/two-pointers) — same mindset, different shape.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — 'Longest/shortest/best subarray with property X' problems — replaces O(n²) nested loops with O(n).</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — When the window isn't *contiguous* — subset/subsequence problems need different tools (DP, two-pointers on indices).</p>
+</div>
+

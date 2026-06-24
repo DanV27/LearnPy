@@ -38,3 +38,11 @@ if items:                # cleaner than `if len(items) > 0:`
 - `bool` is technically a subclass of `int`: `True == 1`, `False == 0`, and `sum([True, True, False])` is `2`. That's occasionally useful for counting matches.
 - `and` / `or` are short-circuiting. `0 or "default"` returns `"default"`.
 - `not` flips a boolean. `not items` is True when the list is empty.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — For yes/no flags and conditional checks.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Multiple booleans to encode three-plus states — use an enum or a string. `is_admin=True, is_guest=True` is a bug waiting to happen.</p>
+</div>
+

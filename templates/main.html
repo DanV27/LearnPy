@@ -161,6 +161,31 @@
     }
 
     /* -----------------------------------------------------------------
+       "When to use / NOT to use" callout — appears at the bottom of
+       every canonical lesson. Two rows: green check + use case, red x
+       + pitfall. Designed to be skimmable and visually distinct from
+       the lesson body without inflating the read.
+       ----------------------------------------------------------------- */
+    .lesson-body .callout {
+      border-left: 4px solid #fb6d25;
+      background: #fff7f0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin: 32px 0 16px 0;
+    }
+    .lesson-body .callout p {
+      margin: 8px 0;
+      line-height: 1.55;
+      color: #1b1b1b;
+    }
+    .lesson-body .callout strong {
+      color: #1b1b1b;
+      font-weight: 600;
+    }
+    .lesson-body .callout .callout-yes strong { color: #15803d; }
+    .lesson-body .callout .callout-no strong  { color: #b91c1c; }
+
+    /* -----------------------------------------------------------------
        Loading animation: 3×3 grid of orange squares that orbit around a
        center square while the whole thing pulses in and out. Shown
        while waiting for a lesson to come back from the AI.

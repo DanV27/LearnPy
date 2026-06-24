@@ -40,3 +40,11 @@ a is None        # idiomatic — don't use `==` for None
 8. `or`
 
 When unsure, add parentheses — readability beats cleverness.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Standard operators for arithmetic, comparison, and logic — they're battle-tested.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Operator-overloading on custom classes unless the semantics are utterly obvious. Cute `obj << logger` patterns confuse readers.</p>
+</div>
+

@@ -58,3 +58,11 @@ t.starts_with("ban")     # True
 - IP routing (a binary trie over bits).
 
 **Trade-offs**: tries use more memory than a plain set of strings because each node holds a dict. For a fixed dictionary with no prefix queries, a [hash map](/lesson/hash-map) or set is simpler.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Autocomplete, spell-check, longest-prefix matching (IP routing, dictionary lookups).</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Exact-match lookup or general key/value storage — a `dict` is simpler, faster, and uses less memory.</p>
+</div>
+

@@ -51,3 +51,11 @@ match user:
 - Match is best when you're branching based on the **shape** of data, not just its value.
 - For simple value checks, plain [if/elif/else](/lesson/python-if-else) is often clearer.
 - Patterns can include guards: `case x if x > 0: ...`.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Branching on the *shape* of structured data — destructuring while matching is its superpower.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Simple equality checks where `if/elif/else` reads cleaner. Don't reach for `match` just because it's new.</p>
+</div>
+

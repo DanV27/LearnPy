@@ -61,3 +61,11 @@ A real hash map (like Python's `dict`) also:
 - Computes hashes once and stores them inside each entry to skip recomputing on resize.
 
 For a deeper look at how built-in containers compare, see [Data Structures](/lesson/data-structures).
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Whenever you need O(1) lookup by key. Python's built-in `dict` already IS a great hash map.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Building your own from scratch for production — the stdlib `dict` is faster, more memory-efficient, and handles edge cases you'd miss.</p>
+</div>
+

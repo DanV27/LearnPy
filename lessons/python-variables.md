@@ -30,3 +30,11 @@ UserCount = 5        # works but reads as a class name
 - Use descriptive names. `n` is fine for a small loop counter; `num_retries` is better elsewhere.
 - Constants are written in `UPPER_SNAKE_CASE` (`MAX_RETRIES = 3`) — a convention, not enforced.
 - Variables defined inside a function are local to that function. See [Functions](/lesson/python-functions) for scope details.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — For any value you'll reuse or want to give a meaningful name to.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — For one-shot expressions — extracting `total = a + b; return total` instead of `return a + b` just adds noise.</p>
+</div>
+

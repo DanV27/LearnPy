@@ -48,3 +48,11 @@ pip install -r requirements.txt
 
 - Tools like Poetry, pipenv, and `uv` build on top of venvs with extra features. Plain `venv` is enough to get started.
 - If you ever see `pip install` errors about "permission denied" or "externally-managed-environment", that's a strong hint you forgot to activate your venv.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Every Python project, from day one. No exceptions.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Skipping it because 'this is just a quick script.' That script becomes production faster than you think.</p>
+</div>
+

@@ -48,3 +48,11 @@ def is_anagram(a: str, b: str) -> bool:
 ```
 
 For a `dict` that auto-fills missing keys with something *other* than zero (like an empty list), see [defaultdict](/lesson/defaultdict).
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Counting occurrences in any iterable — word frequencies, vote tallies, anagram checks.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Storing things other than counts — `Counter` has quirks (negative values, subtraction semantics) that don't fit general use.</p>
+</div>
+

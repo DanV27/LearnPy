@@ -32,3 +32,11 @@ linear_search([5, 2, 9, 1, 7], 4)    # -1
 For sorted lists with many lookups, [Binary Search](/lesson/binary-search) is dramatically faster. For repeated lookups by key, a [hash map](/lesson/hash-map) or `dict` is O(1).
 
 Python's `in` operator on a list is exactly linear search under the hood. So is `list.index()`. Knowing that tells you why `5 in big_list` can be slow — and why `5 in big_set` isn't.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Small lists (< 50 items), unsorted data, or when you only search once.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Repeated searches on large data — sort once and binary-search, or build a dict/set for O(1) lookups.</p>
+</div>
+

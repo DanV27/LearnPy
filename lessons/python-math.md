@@ -47,3 +47,11 @@ math.inf                     # ∞   — float
 - Numbers larger than a float can hold? Use `decimal` for exact decimal arithmetic.
 - For statistics (mean, median, stdev), the `statistics` module is built-in.
 - For vectorized math on arrays, jump to numpy.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — The `math` module for trig, logs, floor/ceil, and constants like `pi`.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — For exact decimal math (money) — use `decimal.Decimal`. Or for arrays — use `numpy`. `math` is scalar-only.</p>
+</div>
+

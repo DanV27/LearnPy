@@ -54,3 +54,11 @@ if __name__ == "__main__":
 
 - Python's standard library is huge: `os`, `sys`, `pathlib`, `json`, `re`, `datetime`, `collections`, `itertools`, `functools` — explore it before reaching for third-party packages.
 - For external packages, use [pip](/lesson/python-pip) to install and a [virtual env](/lesson/python-virtualenv) to keep projects isolated.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Split code across files once `main.py` outgrows ~200 lines.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — `from module import *` — it silently shadows names and breaks linters. Import specific names instead.</p>
+</div>
+

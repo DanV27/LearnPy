@@ -66,3 +66,11 @@ Memoization is only useful if:
 If those three conditions hold and the function is slow, memoization is almost always a free speedup.
 
 The next step up from memoization is bottom-up dynamic programming — same idea, but building the cache iteratively from the smallest sub-problem up. Reach for that when [recursion](/lesson/recursion) depth becomes a problem.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Pure functions with repeated calls on the same inputs — recursive DP, expensive computations, repeated API calls.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Functions with side effects, large unique input spaces (cache balloons), or time-dependent logic (`now()` will be wrong).</p>
+</div>
+

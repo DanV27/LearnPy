@@ -81,3 +81,11 @@ if m:
 ```
 
 When you're done here, revisit [Python Strings](/lesson/python-strings) if string slicing would have been enough, or read [JSON](/lesson/json) for another common parsing pattern.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Pattern matching over text with structure that can't be captured by `str.contains` or `str.startswith`.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Parsing HTML, code, or any nested grammar. You'll get something that works on Monday and breaks on Tuesday. Use a real parser.</p>
+</div>
+

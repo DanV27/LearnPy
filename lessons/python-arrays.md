@@ -40,3 +40,11 @@ arr.shape        # (4,)
 - **list**: 95% of code. Mixed types, small to medium sizes, mutable.
 - **array module**: tens of thousands of homogeneous numbers, no extra deps.
 - **numpy**: scientific computing, large datasets, vectorized math.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — `list` for almost everything; `array.array` for compact numeric storage; `numpy` for serious math.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Reaching for `array.array` 'for performance' without measuring — its win over lists isn't always real.</p>
+</div>
+

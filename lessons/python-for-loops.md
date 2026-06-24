@@ -46,3 +46,11 @@ for name, age in zip(names, ages):
 - Use [`break`](/lesson/python-while-loops) to exit early, `continue` to skip an iteration.
 - Modifying a list while you iterate it is a classic bug — make a copy with `list(items)` first, or use a [list comprehension](/lesson/python-lists).
 - See [Python Range](/lesson/python-range) for the full range() signature.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — To iterate over any sequence — lists, strings, dicts, files, ranges.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — To mutate the sequence you're iterating over. `for x in items: items.remove(x)` will silently skip elements. Iterate a copy.</p>
+</div>
+

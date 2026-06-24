@@ -34,3 +34,11 @@ round(3.7)         # 4
 - Mixing `int` and `float` produces a `float`.
 - The `math` module ([Python Math](/lesson/python-math)) has `sqrt`, `floor`, `ceil`, `pi`, and friends.
 - Bit operators (`&`, `|`, `^`, `<<`, `>>`) work on ints for low-level tasks.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — `int` for counts and indices, `float` for measurements and ratios.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — `float` for money — use `decimal.Decimal` instead. Floating-point rounding will eventually bite you.</p>
+</div>
+

@@ -56,3 +56,11 @@ print(ll.find(2))        # True
 For real code in Python, a [deque](/lesson/deque) gives you O(1) at both ends without the boilerplate. Reach for a hand-written linked list when you need pointer fiddling — circular lists, custom traversal — or to learn the algorithm.
 
 Next: see [Doubly Linked List](/lesson/doubly-linked-list) for the version with `prev` pointers, which makes deletion in the middle O(1) when you already hold the node.
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Interview prep, learning pointer mechanics, or building custom list structures.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — Everyday storage — Python lists are nearly always faster, simpler, and use less memory.</p>
+</div>
+

@@ -74,3 +74,11 @@ except json.JSONDecodeError as e:
 ```
 
 For more strict parsing patterns, see [Regular Expressions](/lesson/regex).
+
+---
+
+<div class="callout">
+<p class="callout-yes"><strong>✓ Use it when</strong> — Web APIs, config files, and simple persistence — `json.dumps`/`loads` is the standard answer.</p>
+<p class="callout-no"><strong>✗ Skip it when</strong> — For binary data, dates, or custom classes — JSON can't represent any of those natively. Use a `default=` serializer or a different format.</p>
+</div>
+
