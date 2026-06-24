@@ -8,6 +8,11 @@
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Prism.js: Python syntax highlighting for code blocks in lesson bodies.
+       Custom token colors live in the <style> block below to match the
+       LearnPy palette. -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
   <!-- Pyodide: Python in the browser (WebAssembly). Loaded only when the
        user first clicks "Run Tests" on a lesson with a challenge. -->
   <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
@@ -122,6 +127,41 @@
       color: inherit;
       font-size: 14px;
     }
+
+    /* -----------------------------------------------------------------
+       Prism.js token colors for Python code blocks in lesson bodies.
+       Palette matches the inline "Live Code Preview" mock so the AI
+       output and the marketing demo look like they came from the same
+       editor.
+       ----------------------------------------------------------------- */
+    .lesson-body .token.keyword,
+    .lesson-body .token.boolean,
+    .lesson-body .token.decorator,
+    .lesson-body .token.decorator .token.punctuation { color: #FF7028; }     /* orange */
+
+    .lesson-body .token.function,
+    .lesson-body .token.builtin,
+    .lesson-body .token.class-name { color: #5cbcf9; }                       /* light blue */
+
+    .lesson-body .token.string,
+    .lesson-body .token.triple-quoted-string,
+    .lesson-body .token.string-interpolation { color: #9aa0a6; }              /* grey */
+
+    .lesson-body .token.number { color: #c6c6c6; font-weight: 500; }          /* light grey */
+
+    .lesson-body .token.comment {
+      color: #6b6361;
+      font-style: italic;
+    }
+
+    .lesson-body .token.operator,
+    .lesson-body .token.punctuation { color: #d4d0cd; }                       /* near-white */
+
+    .lesson-body .token.interpolation .token.punctuation,
+    .lesson-body .token.interpolation { color: #FF7028; }                     /* f-string braces */
+
+    .lesson-body .token.parameter,
+    .lesson-body .token.variable { color: #f1f1f1; }
 
     .lesson-body a {
       color: #a43d00;
@@ -1005,6 +1045,11 @@
             : '<pre>' + escapeHTML(md) + '</pre>';
           lessonBodyEl.innerHTML = html;
 
+          // Syntax-highlight any Python code blocks via Prism.js.
+          if (window.Prism && Prism.highlightAllUnder) {
+            Prism.highlightAllUnder(lessonBodyEl);
+          }
+
           // Convert any inline anchors whose href starts with `#topic:` into
           // clickable topic chips that re-trigger generation.
           lessonBodyEl.querySelectorAll('a[href^="#topic:"]').forEach(a => {
@@ -1076,6 +1121,11 @@
           body.innerHTML = (window.marked && typeof marked.parse === 'function')
             ? marked.parse(md, { gfm: true, breaks: false })
             : '<pre>' + escapeHTML(md) + '</pre>';
+
+          // Syntax-highlight any Python code blocks in the follow-up answer.
+          if (window.Prism && Prism.highlightAllUnder) {
+            Prism.highlightAllUnder(body);
+          }
 
           // Rewire any inline #topic: anchors so they become clickable chips
           // that start a new follow-up instead of navigating to a dead anchor.
