@@ -1,0 +1,95 @@
+{
+  "title": "Python Lists",
+  "summary": "Slicing, methods, and comprehensions for Python's most-used container.",
+  "icon": "list",
+  "related_lesson": "python-lists",
+  "sections": [
+    {
+      "name": "Create",
+      "rows": [
+        {"sig": "[]",                  "example": "[]",                      "result": "empty list"},
+        {"sig": "[a, b, c]",           "example": "[1, 2, 3]",               "result": "[1, 2, 3]"},
+        {"sig": "list(iter)",          "example": "list('abc')",             "result": "['a', 'b', 'c']"},
+        {"sig": "list(range(n))",      "example": "list(range(4))",          "result": "[0, 1, 2, 3]"},
+        {"sig": "[v] * n",             "example": "[0] * 4",                 "result": "[0, 0, 0, 0]"}
+      ]
+    },
+    {
+      "name": "Inspect",
+      "rows": [
+        {"sig": "len(lst)",            "example": "len([1, 2, 3])",          "result": "3"},
+        {"sig": "x in lst",            "example": "2 in [1, 2, 3]",          "result": "True"},
+        {"sig": "lst.count(x)",        "example": "[1, 2, 2].count(2)",      "result": "2"},
+        {"sig": "lst.index(x)",        "example": "['a', 'b'].index('b')",   "result": "1"},
+        {"sig": "min(lst)",            "example": "min([3, 1, 2])",          "result": "1"},
+        {"sig": "max(lst)",            "example": "max([3, 1, 2])",          "result": "3"},
+        {"sig": "sum(lst)",            "example": "sum([1, 2, 3])",          "result": "6"},
+        {"sig": "any(lst)",            "example": "any([0, 1])",             "result": "True"},
+        {"sig": "all(lst)",            "example": "all([1, 1, 0])",          "result": "False"}
+      ]
+    },
+    {
+      "name": "Index & Slice",
+      "rows": [
+        {"sig": "lst[i]",              "example": "[1, 2, 3][0]",            "result": "1"},
+        {"sig": "lst[-1]",             "example": "[1, 2, 3][-1]",           "result": "3 (last item)"},
+        {"sig": "lst[a:b]",            "example": "[1, 2, 3, 4][1:3]",       "result": "[2, 3]"},
+        {"sig": "lst[:b]",             "example": "[1, 2, 3, 4][:2]",        "result": "[1, 2]"},
+        {"sig": "lst[a:]",             "example": "[1, 2, 3, 4][2:]",        "result": "[3, 4]"},
+        {"sig": "lst[::n]",            "example": "[1, 2, 3, 4][::2]",       "result": "[1, 3]  (every nth)"},
+        {"sig": "lst[::-1]",           "example": "[1, 2, 3][::-1]",         "result": "[3, 2, 1]  (reversed)"},
+        {"sig": "lst[:]",              "example": "[1, 2, 3][:]",            "result": "shallow copy"}
+      ]
+    },
+    {
+      "name": "Add",
+      "rows": [
+        {"sig": "lst.append(x)",       "example": "lst = [1, 2]; lst.append(3)", "result": "lst is [1, 2, 3]"},
+        {"sig": "lst.extend(iter)",    "example": "lst = [1]; lst.extend([2, 3])", "result": "lst is [1, 2, 3]"},
+        {"sig": "lst.insert(i, x)",    "example": "lst = [1, 3]; lst.insert(1, 2)", "result": "lst is [1, 2, 3]"},
+        {"sig": "lst + other",         "example": "[1] + [2, 3]",            "result": "[1, 2, 3]  (new list)"},
+        {"sig": "lst += other",        "example": "lst = [1]; lst += [2]",   "result": "lst is [1, 2]"}
+      ]
+    },
+    {
+      "name": "Remove",
+      "rows": [
+        {"sig": "lst.pop()",           "example": "[1, 2, 3].pop()",         "result": "3  (last item, removed)"},
+        {"sig": "lst.pop(i)",          "example": "['a', 'b'].pop(0)",       "result": "'a'  (and removed)"},
+        {"sig": "lst.remove(x)",       "example": "[1, 2, 1].remove(1)",     "result": "[2, 1]  (first match)"},
+        {"sig": "lst.clear()",         "example": "lst = [1, 2]; lst.clear()", "result": "lst is []"},
+        {"sig": "del lst[i]",          "example": "lst = [1, 2, 3]; del lst[1]", "result": "lst is [1, 3]"},
+        {"sig": "del lst[a:b]",        "example": "lst = [1, 2, 3, 4]; del lst[1:3]", "result": "lst is [1, 4]"}
+      ]
+    },
+    {
+      "name": "Sort & Reverse",
+      "rows": [
+        {"sig": "lst.sort()",          "example": "lst = [3, 1, 2]; lst.sort()", "result": "lst is [1, 2, 3]"},
+        {"sig": "lst.sort(reverse=True)", "example": "lst.sort(reverse=True)", "result": "descending order"},
+        {"sig": "lst.sort(key=fn)",    "example": "words.sort(key=len)",     "result": "by length"},
+        {"sig": "sorted(lst)",         "example": "sorted([3, 1, 2])",       "result": "[1, 2, 3]  (new list)"},
+        {"sig": "lst.reverse()",       "example": "lst = [1, 2]; lst.reverse()", "result": "lst is [2, 1]"},
+        {"sig": "reversed(lst)",       "example": "list(reversed([1, 2]))",  "result": "[2, 1]"}
+      ]
+    },
+    {
+      "name": "Iterate",
+      "rows": [
+        {"sig": "for x in lst:",        "example": "for x in [1, 2, 3]:",     "result": "loops over items"},
+        {"sig": "for i, x in enumerate(lst):", "example": "enumerate(['a', 'b'])", "result": "(0, 'a'), (1, 'b')"},
+        {"sig": "for a, b in zip(l1, l2):", "example": "zip([1, 2], ['a', 'b'])", "result": "(1, 'a'), (2, 'b')"},
+        {"sig": "for x in reversed(lst):", "example": "reversed([1, 2, 3])", "result": "3, 2, 1"}
+      ]
+    },
+    {
+      "name": "Comprehensions",
+      "rows": [
+        {"sig": "[f(x) for x in iter]", "example": "[n*2 for n in [1, 2, 3]]", "result": "[2, 4, 6]"},
+        {"sig": "[x for x in iter if c]", "example": "[n for n in range(5) if n % 2]", "result": "[1, 3]"},
+        {"sig": "[f(x) if c else g(x) for x in iter]", "example": "['+' if n > 0 else '-' for n in [1, -1]]", "result": "['+', '-']"},
+        {"sig": "[a for sub in nested for a in sub]", "example": "flatten [[1, 2], [3]]", "result": "[1, 2, 3]"}
+      ]
+    }
+  ]
+}

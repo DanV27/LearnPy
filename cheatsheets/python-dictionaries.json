@@ -1,0 +1,90 @@
+{
+  "title": "Python Dictionaries",
+  "summary": "Key-value lookups, merges, and the comprehension patterns you'll actually use.",
+  "icon": "menu_book",
+  "related_lesson": "python-dictionaries",
+  "sections": [
+    {
+      "name": "Create",
+      "rows": [
+        {"sig": "{}",                    "example": "{}",                          "result": "empty dict"},
+        {"sig": "{k: v}",                "example": "{'a': 1, 'b': 2}",            "result": "{'a': 1, 'b': 2}"},
+        {"sig": "dict(k=v)",             "example": "dict(a=1, b=2)",              "result": "{'a': 1, 'b': 2}"},
+        {"sig": "dict(pairs)",           "example": "dict([('a', 1), ('b', 2)])",  "result": "{'a': 1, 'b': 2}"},
+        {"sig": "dict.fromkeys(keys, v)", "example": "dict.fromkeys('abc', 0)",    "result": "{'a': 0, 'b': 0, 'c': 0}"}
+      ]
+    },
+    {
+      "name": "Access",
+      "rows": [
+        {"sig": "d[k]",                  "example": "{'a': 1}['a']",               "result": "1  (KeyError if missing)"},
+        {"sig": "d.get(k)",              "example": "{'a': 1}.get('b')",           "result": "None  (no error)"},
+        {"sig": "d.get(k, default)",     "example": "{'a': 1}.get('b', 0)",        "result": "0"},
+        {"sig": "d.setdefault(k, v)",    "example": "d.setdefault('new', [])",     "result": "existing value OR sets v"},
+        {"sig": "k in d",                "example": "'a' in {'a': 1}",             "result": "True"},
+        {"sig": "k not in d",            "example": "'b' not in {'a': 1}",         "result": "True"}
+      ]
+    },
+    {
+      "name": "Modify",
+      "rows": [
+        {"sig": "d[k] = v",              "example": "d['a'] = 1",                  "result": "sets or overrides"},
+        {"sig": "d.update(other)",       "example": "d.update({'a': 1, 'b': 2})",  "result": "bulk add/update"},
+        {"sig": "d.update(k=v, ...)",    "example": "d.update(a=1, b=2)",          "result": "same, kwargs form"},
+        {"sig": "d.pop(k)",              "example": "d.pop('a')",                  "result": "removes and returns value"},
+        {"sig": "d.pop(k, default)",     "example": "d.pop('missing', 0)",         "result": "0  (no error)"},
+        {"sig": "d.popitem()",           "example": "d.popitem()",                 "result": "removes & returns last (k, v)"},
+        {"sig": "del d[k]",              "example": "del d['a']",                  "result": "KeyError if missing"},
+        {"sig": "d.clear()",             "example": "d.clear()",                   "result": "d is {}"}
+      ]
+    },
+    {
+      "name": "Inspect",
+      "rows": [
+        {"sig": "len(d)",                "example": "len({'a': 1, 'b': 2})",       "result": "2"},
+        {"sig": "d.keys()",              "example": "{'a': 1, 'b': 2}.keys()",     "result": "dict_keys(['a', 'b'])"},
+        {"sig": "d.values()",            "example": "{'a': 1, 'b': 2}.values()",   "result": "dict_values([1, 2])"},
+        {"sig": "d.items()",             "example": "{'a': 1}.items()",            "result": "dict_items([('a', 1)])"}
+      ]
+    },
+    {
+      "name": "Iterate",
+      "rows": [
+        {"sig": "for k in d:",           "example": "for k in {'a': 1}:",          "result": "loops over keys"},
+        {"sig": "for k, v in d.items():", "example": "for k, v in d.items():",     "result": "loops over pairs"},
+        {"sig": "for v in d.values():",  "example": "for v in d.values():",        "result": "loops over values"},
+        {"sig": "sorted(d)",             "example": "sorted({'b': 1, 'a': 2})",    "result": "['a', 'b']  (sorted keys)"},
+        {"sig": "sorted(d.items())",     "example": "sorted({'b': 1, 'a': 2}.items())", "result": "sorted by key"}
+      ]
+    },
+    {
+      "name": "Merge",
+      "rows": [
+        {"sig": "{**a, **b}",            "example": "{**{'a': 1}, **{'b': 2}}",    "result": "{'a': 1, 'b': 2}"},
+        {"sig": "a | b  (3.9+)",         "example": "{'a': 1} | {'b': 2}",         "result": "{'a': 1, 'b': 2}"},
+        {"sig": "a |= b  (3.9+)",        "example": "d |= {'c': 3}",               "result": "merges in place"},
+        {"sig": "d.update(other)",       "example": "d.update({'c': 3})",          "result": "merges in place (legacy)"}
+      ]
+    },
+    {
+      "name": "Comprehensions",
+      "rows": [
+        {"sig": "{k: f(k) for k in iter}",  "example": "{n: n*n for n in range(3)}", "result": "{0: 0, 1: 1, 2: 4}"},
+        {"sig": "{k: v for k, v in pairs}", "example": "{k: v for k, v in [('a', 1)]}", "result": "{'a': 1}"},
+        {"sig": "{k: v for k, v in d.items() if c}", "example": "filter pairs", "result": "filtered dict"},
+        {"sig": "{v: k for k, v in d.items()}", "example": "invert {'a': 1, 'b': 2}", "result": "{1: 'a', 2: 'b'}"}
+      ]
+    },
+    {
+      "name": "Common Patterns",
+      "rows": [
+        {"sig": "d.get(k, []).append(v)", "example": "BUG — doesn't mutate the dict", "result": "use setdefault instead"},
+        {"sig": "d.setdefault(k, []).append(v)", "example": "group into lists by key", "result": "creates list on first miss"},
+        {"sig": "Counter(iter)",         "example": "Counter('mississippi')",      "result": "Counter({'i': 4, 's': 4, ...})"},
+        {"sig": "defaultdict(list)",     "example": "d[k].append(v)  (no KeyError)", "result": "auto-creates empty list"},
+        {"sig": "max(d, key=d.get)",     "example": "key with the highest value",  "result": "the winning key"},
+        {"sig": "min(d, key=d.get)",     "example": "key with the lowest value",   "result": "the losing key"}
+      ]
+    }
+  ]
+}
