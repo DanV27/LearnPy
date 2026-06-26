@@ -1,0 +1,23 @@
+{
+  "title": "Python Strings",
+  "summary": "Quick reference for the methods you actually use.",
+  "icon": "text_fields",
+  "related_lesson": "python-strings",
+  "sections": [
+    {
+      "name": "Case",
+      "rows": [
+        {"sig": "s.upper()",   "example": "'hi'.upper()",   "result": "'HI'"},
+        {"sig": "s.lower()",   "example": "'HI'.lower()",   "result": "'hi'"},
+        {"sig": "s.title()",   "example": "'hi there'.title()", "result": "'Hi There'"}
+      ]
+    },
+    {
+      "name": "Whitespace",
+      "rows": [
+        {"sig": "s.strip()",   "example": "'  hi  '.strip()", "result": "'hi'"},
+        {"sig": "s.lstrip()",  "example": "'  hi'.lstrip()",  "result": "'hi'"}
+      ]
+    }
+  ]
+}
