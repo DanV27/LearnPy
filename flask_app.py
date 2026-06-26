@@ -36,6 +36,7 @@ from lessons import load_lesson
 from challenges import get_challenge
 from profile_data import calculate_heatmap
 from search_index import build_index,search
+from cheatsheets import load_cheatsheet, list_cheatsheets, lesson_to_cheatsheet
 
 
 # ---------------------------------------------------------------------------
@@ -270,6 +271,17 @@ def api_search_suggest():
     q = request.args.get("q", "")
     return jsonify(search(q))
 
+
+
+@app.route("/cheatsheet/<slug>")
+@login_required
+def cheatsheet_page(slug):
+    sheet = load_cheatsheet(slug)
+    if not sheet:
+        return redirect(url_for("index"))
+    return render_template("cheatsheet.html",
+                           active_cheatsheet=sheet,
+                           slug=slug)
 
 
 
