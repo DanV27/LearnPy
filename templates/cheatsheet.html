@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>{{ active_cheatsheet.title }} — Cheat Sheet · LearnPy</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "secondary-container": "#fb6d25",
+            "primary": "#000000",
+            "surface-container-high": "#e8e8e8",
+            "on-surface": "#1b1b1b",
+            "background": "#f9f9f9",
+            "outline": "#7e7576",
+            "outline-variant": "#cfc4c5",
+            "on-background": "#1b1b1b",
+            "surface": "#f9f9f9",
+            "on-surface-variant": "#4c4546",
+            "surface-container-low": "#f3f3f3",
+            "surface-container": "#eeeeee",
+            "surface-container-lowest": "#ffffff",
+            "secondary": "#a43d00",
+            "on-primary": "#ffffff",
+            "tertiary": "#000000",
+            "on-tertiary": "#ffffff"
+          },
+          borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+          spacing: { margin: "32px", md: "24px", lg: "48px", gutter: "24px", xs: "8px", sm: "16px", base: "4px", xl: "80px" },
+          fontFamily: {
+            "body-md":      ["Space Grotesk"],
+            "body-lg":      ["Space Grotesk"],
+            "label-md":     ["Space Grotesk"],
+            "display-xl":   ["Space Grotesk"],
+            "headline-md":  ["Space Grotesk"],
+            "headline-lg":  ["Space Grotesk"],
+            "code":         ["JetBrains Mono"]
+          },
+          fontSize: {
+            "body-md":      ["16px", { lineHeight: "1.5", fontWeight: "400" }],
+            "body-lg":      ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+            "label-md":     ["14px", { lineHeight: "1.4", letterSpacing: "0.02em", fontWeight: "500" }],
+            "display-xl":   ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "headline-md":  ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+            "headline-lg":  ["32px", { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "600" }]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 20px;
+    }
+    body { font-family: 'Space Grotesk', sans-serif; }
+    .grid-overlay {
+      background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* ---------- Cheat-row grid ----------
+       Three monospace columns: signature | example | result.
+       Using CSS grid (not <table>) for cleaner hover and copy-button states. */
+    .cheat-row {
+      display: grid;
+      grid-template-columns: minmax(140px, 1fr) minmax(160px, 1.4fr) minmax(120px, 1fr) 32px;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 6px;
+      transition: background 0.1s;
+    }
+    .cheat-row + .cheat-row { border-top: 1px solid #eeeeee; }
+    .cheat-row:hover { background: #f8f4f0; }
+    .cheat-row code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #1b1b1b;
+      background: transparent;
+      padding: 0;
+      overflow-wrap: anywhere;
+    }
+    .cheat-row .cheat-arrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #fb6d25;
+      text-align: center;
+    }
+    .cheat-row .cheat-sig {
+      color: #fb6d25;
+      font-weight: 500;
+    }
+    .cheat-row .cheat-result {
+      color: #4c4546;
+    }
+    .cheat-copy {
+      visibility: hidden;
+      background: transparent;
+      border: 1px solid #cfc4c5;
+      border-radius: 4px;
+      padding: 4px;
+      cursor: pointer;
+      color: #7e7576;
+      transition: all 0.1s;
+    }
+    .cheat-copy:hover { background: #fb6d25; color: white; border-color: #fb6d25; }
+    .cheat-row:hover .cheat-copy { visibility: visible; }
+
+    /* Collapse to two lines on narrow screens — arrow column disappears */
+    @media (max-width: 640px) {
+      .cheat-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      .cheat-arrow { display: none; }
+    }
+
+    /* Print: drop chrome, scale to fit, force black text */
+    @media print {
+      header, aside, #sidebar-overlay, .no-print, .cheat-copy { display: none !important; }
+      body { background: white; }
+      .cheat-row:hover { background: transparent; }
+      .cheat-row code, .cheat-row .cheat-sig, .cheat-row .cheat-result { color: black; }
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-background min-h-screen flex flex-col grid-overlay">
+
+  <!-- TopAppBar — same pattern as Learn / About / Profile -->
+  <header class="w-full top-0 bg-surface border-b border-outline-variant z-40 sticky no-print">
+    <div class="flex justify-between items-center px-margin py-sm max-w-7xl mx-auto">
+      <div class="flex items-center gap-md">
+        <button id="open-sidebar" aria-label="Open topics"
+          class="p-xs rounded-lg hover:bg-surface-container transition-colors flex items-center gap-xs text-primary">
+          <span class="material-symbols-outlined" style="font-size: 24px;">menu</span>
+          <span class="hidden sm:inline font-label-md text-label-md">Topics</span>
+        </button>
+        <a href="/" class="flex items-center gap-xs">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo"
+            class="h-28 w-28 rounded-lg" style="image-rendering: pixelated;" />
+          <span class="font-headline-md text-headline-md font-bold text-primary">LearnPy</span>
+        </a>
+        <nav class="hidden md:flex gap-md font-body-md text-body-md ml-md">
+          <a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="/">Learn</a>
+          <a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="/about">About</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-sm">
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('profile') }}"
+          class="text-on-surface-variant hover:text-secondary font-label-md text-label-md hidden sm:inline">{{ current_user.username }}</a>
+        <a href="{{ url_for('logout') }}"
+          class="bg-primary text-on-primary px-md py-xs font-label-md text-label-md rounded-lg active:opacity-80">Logout</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar overlay -->
+  <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/40 z-40 transition-opacity"></div>
+
+  <!-- Sidebar drawer (Topics) -->
+  <aside id="sidebar"
+    class="fixed top-0 left-0 h-full w-72 bg-surface-container-lowest border-r border-outline-variant shadow-2xl z-50 transform -translate-x-full transition-transform duration-200 ease-out flex flex-col">
+    <div class="flex items-center justify-between px-md py-md border-b border-outline-variant">
+      <div class="flex items-center gap-xs">
+        <span class="material-symbols-outlined text-primary">menu_book</span>
+        <span class="font-headline-md text-headline-md text-primary">Topics</span>
+      </div>
+      <button id="close-sidebar" aria-label="Close topics"
+        class="p-xs rounded-lg hover:bg-surface-container transition-colors text-on-surface-variant">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-xs">
+      {% for t in all_topics %}
+      <a href="{{ url_for('lesson_page', slug=t.slug) }}"
+        class="flex items-center gap-sm px-md py-sm transition-colors text-on-surface-variant hover:bg-surface-container-low border-l-4 border-transparent">
+        <span class="material-symbols-outlined shrink-0" style="font-size: 22px;">{{ t.icon }}</span>
+        <span class="font-body-md text-body-md truncate">{{ t.name }}</span>
+      </a>
+      {% endfor %}
+    </nav>
+    <div class="border-t border-outline-variant px-md py-sm">
+      <p class="font-label-md text-label-md text-on-surface-variant">
+        Can't find your topic? Use the search to ask anything.
+      </p>
+    </div>
+  </aside>
+
+  <!-- ===========================================================
+       Main content — Cheat Sheet
+       =========================================================== -->
+  <main class="flex-grow flex justify-center px-md py-lg pb-xl">
+    <div class="w-full max-w-4xl flex flex-col gap-md">
+
+      <!-- Header -->
+      <section class="flex flex-col gap-xs">
+        <span class="font-code text-label-md text-secondary tracking-widest uppercase">// Cheat Sheet</span>
+        <h1 class="font-display-xl text-display-xl text-primary">{{ active_cheatsheet.title }}</h1>
+        <p class="font-body-md text-on-surface-variant">{{ active_cheatsheet.summary }}</p>
+
+        {% if active_cheatsheet.related_lesson %}
+        <a href="{{ url_for('lesson_page', slug=active_cheatsheet.related_lesson) }}"
+           class="inline-flex items-center gap-xs text-secondary hover:brightness-110 font-label-md text-label-md no-underline mt-xs w-fit">
+          <span class="material-symbols-outlined" style="font-size: 16px;">school</span>
+          View the related lesson
+          <span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span>
+        </a>
+        {% endif %}
+      </section>
+
+      <!-- Filter bar -->
+      <section class="sticky top-[88px] z-10 bg-background pt-xs pb-sm no-print">
+        <div class="relative">
+          <span class="absolute inset-y-0 left-sm flex items-center material-symbols-outlined text-outline"
+                style="font-size: 18px;">filter_alt</span>
+          <input id="cheat-filter" type="text" autocomplete="off"
+            class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-sm pl-xl pr-md font-body-md focus:border-primary focus:outline-none transition-all"
+            placeholder="Filter — type 'split' or 'upper' to find a method..." />
+        </div>
+        <p id="cheat-no-match" class="hidden font-body-md text-on-surface-variant italic mt-sm pl-sm">
+          No rows match. Clear the filter to see everything.
+        </p>
+      </section>
+
+      <!-- Sections -->
+      <section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+        {% for section in active_cheatsheet.sections %}
+        <div class="cheat-section">
+          <div class="flex items-center gap-xs px-md py-sm bg-surface-container-low border-b border-outline-variant">
+            <span class="material-symbols-outlined text-secondary" style="font-size: 18px;">label</span>
+            <h2 class="font-headline-md text-headline-md text-primary">{{ section.name }}</h2>
+            <span class="font-code text-[11px] text-on-surface-variant ml-auto">{{ section.rows | length }} row{{ '' if section.rows | length == 1 else 's' }}</span>
+          </div>
+          <div class="flex flex-col px-xs py-xs">
+            {% for row in section.rows %}
+            <div class="cheat-row" data-text="{{ row.sig|lower }} {{ row.example|lower }} {{ row.result|lower }}">
+              <code class="cheat-sig">{{ row.sig }}</code>
+              <code class="cheat-example">{{ row.example }}</code>
+              <code class="cheat-result">→ {{ row.result }}</code>
+              <button class="cheat-copy" data-copy="{{ row.example }}" aria-label="Copy example">
+                <span class="material-symbols-outlined" style="font-size: 14px;">content_copy</span>
+              </button>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </section>
+
+      <!-- Footer hint -->
+      <p class="font-code text-label-md text-on-surface-variant text-center pt-sm no-print">
+        Tip: <kbd class="bg-surface-container border border-outline-variant px-xs py-base rounded">Cmd/Ctrl + P</kbd>
+        prints a clean copy of this sheet.
+      </p>
+
+    </div>
+  </main>
+
+  <script>
+    // -------------------------------------------------------------
+    // Sidebar drawer wiring — same as other pages.
+    // -------------------------------------------------------------
+    (function () {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      const openBtn = document.getElementById('open-sidebar');
+      const closeBtn = document.getElementById('close-sidebar');
+      const open = () => {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      };
+      const close = () => {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      };
+      openBtn.addEventListener('click', open);
+      closeBtn.addEventListener('click', close);
+      overlay.addEventListener('click', close);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    })();
+
+    // -------------------------------------------------------------
+    // Live filter — matches against the row's data-text attribute.
+    // Hides section headers when none of their rows are visible.
+    // -------------------------------------------------------------
+    (function () {
+      const input = document.getElementById('cheat-filter');
+      const noMatch = document.getElementById('cheat-no-match');
+      input.addEventListener('input', () => {
+        const q = input.value.toLowerCase().trim();
+        let anyVisible = false;
+
+        document.querySelectorAll('.cheat-section').forEach(section => {
+          let sectionVisible = 0;
+          section.querySelectorAll('.cheat-row').forEach(row => {
+            const match = !q || (row.dataset.text || '').includes(q);
+            row.style.display = match ? '' : 'none';
+            if (match) sectionVisible++;
+          });
+          section.style.display = sectionVisible ? '' : 'none';
+          if (sectionVisible) anyVisible = true;
+        });
+
+        noMatch.classList.toggle('hidden', anyVisible || !q);
+      });
+    })();
+
+    // -------------------------------------------------------------
+    // Copy-to-clipboard on row buttons. Flashes a brief check.
+    // -------------------------------------------------------------
+    (function () {
+      document.querySelectorAll('.cheat-copy').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const text = btn.getAttribute('data-copy') || '';
+          try {
+            await navigator.clipboard.writeText(text);
+            const icon = btn.querySelector('.material-symbols-outlined');
+            const before = icon.textContent;
+            icon.textContent = 'check';
+            setTimeout(() => { icon.textContent = before; }, 1000);
+          } catch (e) { /* ignore */ }
+        });
+      });
+    })();
+  </script>
+</body>
+
+</html>
