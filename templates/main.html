@@ -396,6 +396,22 @@
         <span class="font-body-md text-body-md truncate">{{ t.name }}</span>
       </a>
       {% endfor %}
+
+      {% if all_cheatsheets %}
+      <!-- Cheat Sheets section -->
+      <div class="px-md pt-md pb-xs mt-xs border-t border-outline-variant">
+        <span class="font-code text-[11px] text-on-surface-variant tracking-wider uppercase">
+          Cheat Sheets
+        </span>
+      </div>
+      {% for c in all_cheatsheets %}
+      <a href="{{ url_for('cheatsheet_page', slug=c.slug) }}"
+        class="flex items-center gap-sm px-md py-sm transition-colors text-on-surface-variant hover:bg-surface-container-low border-l-4 border-transparent">
+        <span class="material-symbols-outlined shrink-0 text-secondary" style="font-size: 22px;">{{ c.icon }}</span>
+        <span class="font-body-md text-body-md truncate">{{ c.title }}</span>
+      </a>
+      {% endfor %}
+      {% endif %}
     </nav>
     <div class="border-t border-outline-variant px-md py-sm">
       <p class="font-label-md text-label-md text-on-surface-variant">

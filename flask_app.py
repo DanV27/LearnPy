@@ -113,6 +113,13 @@ def inject_topics():
 
 
 @app.context_processor
+def inject_cheatsheets():
+    """Make the cheat-sheet catalog available to every template, so the
+    sidebar drawer can render the "Cheat Sheets" section on every page."""
+    return {"all_cheatsheets": list_cheatsheets()}
+
+
+@app.context_processor
 def inject_user_progress():
     """Inject `user_progress` into every template: a {slug: {viewed, completed}}
     dict. Empty for anonymous users so templates can call it unconditionally."""
