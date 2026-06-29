@@ -1,0 +1,87 @@
+{# -----------------------------------------------------------------
+   Animated snake logo for the navbar.
+
+   Three layers stacked over the PNG:
+     1. base PNG (static/logo-animated.png)
+     2. two animated eye-blink ellipses, MASKED to the snake silhouette
+        so they don't bleed outside the head
+     3. a tongue path with two nested animations:
+        - snake-flick: tongue darts out then snaps back every ~5s
+        - snake-flutter: tiny rapid jitter while it's out
+
+   The whole component fills its parent — set width/height via Tailwind
+   on the calling site (currently h-28 w-28 = 112px).
+
+   Keyframes are scoped with `snake-` prefix to avoid colliding with
+   any other animation in the page.
+   ----------------------------------------------------------------- #}
+<style>
+  @keyframes snake-flick {
+    0%, 2%, 24%, 100% { transform: scaleX(0); }
+    6%   { transform: scaleX(1); }
+    9%   { transform: scaleX(0.82); }
+    12%  { transform: scaleX(1.06); }
+    16%  { transform: scaleX(0.9); }
+    19%  { transform: scaleX(1); }
+  }
+  @keyframes snake-flutter {
+    0%, 100% { transform: rotate(0deg); }
+    25%      { transform: rotate(-2.4deg); }
+    50%      { transform: rotate(0.5deg); }
+    75%      { transform: rotate(-1.6deg); }
+  }
+  @keyframes snake-blink {
+    0%, 13%, 18%, 100% { transform: scaleY(0); }
+    15.5%              { transform: scaleY(1); }
+  }
+</style>
+
+<a href="/" class="flex items-center gap-xs" aria-label="LearnPy home">
+  <div class="h-28 w-28 relative shrink-0">
+    {# Base PNG #}
+    <img src="{{ url_for('static', filename='logo-animated.png') }}" alt=""
+         class="absolute inset-0 w-full h-full object-contain block" />
+
+    {# Eye-blink overlay — masked to the snake silhouette so the ellipses
+       only appear inside the snake's outline. #}
+    <div class="absolute inset-0"
+         style="-webkit-mask-image:url('{{ url_for('static', filename='logo-animated.png') }}');
+                mask-image:url('{{ url_for('static', filename='logo-animated.png') }}');
+                -webkit-mask-size:100% 100%; mask-size:100% 100%;
+                -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;">
+      <svg viewBox="0 0 1024 1024" class="absolute inset-0 w-full h-full"
+           preserveAspectRatio="xMidYMid meet">
+        <g transform="rotate(-18 430 269)">
+          <ellipse cx="430" cy="269" rx="64" ry="34" fill="#ff8c1b"
+                   style="transform-box:fill-box; transform-origin:50% 0%;
+                          animation:snake-blink 4.3s ease-in-out infinite;" />
+        </g>
+        <g transform="rotate(-12 592 640)">
+          <ellipse cx="592" cy="640" rx="68" ry="34" fill="#f95807"
+                   style="transform-box:fill-box; transform-origin:50% 0%;
+                          animation:snake-blink 4.3s ease-in-out infinite;" />
+        </g>
+      </svg>
+    </div>
+
+    {# Tongue flick — NOT masked because the tongue intentionally
+       extends past the snake's head when it darts out. #}
+    <svg viewBox="0 0 1024 1024"
+         class="absolute inset-0 w-full h-full"
+         style="overflow:visible"
+         preserveAspectRatio="xMidYMid meet">
+      <g style="transform-box:fill-box; transform-origin:100% 50%;
+                animation:snake-flick 5s cubic-bezier(.5,0,.5,1) infinite;">
+        <g style="transform-box:fill-box; transform-origin:100% 50%;
+                  animation:snake-flutter .22s ease-in-out infinite;">
+          <path d="M306,324 C285,326 262,326 244,326 C222,320 208,316 197,314
+                   C214,322 230,329 242,333 C238,336 237,339 240,341
+                   C244,355 248,366 251,376 C249,362 248,350 250,344
+                   C268,341 288,338 306,336 Z"
+                fill="#e0420a" />
+        </g>
+      </g>
+    </svg>
+  </div>
+  <span class="font-headline-md text-headline-md font-bold text-primary">LearnPy</span>
+</a>

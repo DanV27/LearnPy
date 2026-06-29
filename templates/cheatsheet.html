@@ -147,11 +147,7 @@
           <span class="material-symbols-outlined" style="font-size: 24px;">menu</span>
           <span class="hidden sm:inline font-label-md text-label-md">Topics</span>
         </button>
-        <a href="/" class="flex items-center gap-xs">
-          <img src="{{ url_for('static', filename='logo.png') }}" alt="LearnPy logo"
-            class="h-28 w-28 rounded-lg" style="image-rendering: pixelated;" />
-          <span class="font-headline-md text-headline-md font-bold text-primary">LearnPy</span>
-        </a>
+        {% include 'partials/_animated_logo.html' %}
         <nav class="hidden md:flex gap-md font-body-md text-body-md ml-md">
           <a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="/">Learn</a>
           <a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="/about">About</a>
