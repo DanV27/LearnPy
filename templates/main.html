@@ -529,23 +529,23 @@
           <div class="flex items-center gap-xs min-w-0">
             <span class="material-symbols-outlined text-secondary shrink-0" style="font-size: 18px;">school</span>
             <span id="lesson-title" class="font-headline-md text-headline-md text-primary truncate">Lesson</span>
-            {% if not active_lesson %}<span id="status-ready"
+            <span id="status-ready"
               class="hidden font-code text-[11px] px-xs py-[2px] rounded-lg bg-green-100 text-green-800 ml-sm shrink-0">✓
-              LESSON READY</span>{% endif %}
+              LESSON READY</span>
           </div>
           <div class="flex items-center gap-md shrink-0">
-            {% if not active_lesson %}<button id="copy-btn"
+            <button id="copy-btn"
               class="flex items-center gap-xs text-on-surface-variant hover:text-primary transition-colors disabled:opacity-30"
               disabled>
               <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
               <span id="copy-btn-label" class="font-code text-[12px]">COPY CODE</span>
-            </button>{% endif %}
-            {% if not active_lesson %}<button id="export-btn"
+            </button>
+            <button id="export-btn"
               class="flex items-center gap-xs text-on-surface-variant hover:text-primary transition-colors disabled:opacity-30"
               disabled>
               <span class="material-symbols-outlined" style="font-size: 16px;">download</span>
               <span class="font-code text-[12px]">EXPORT</span>
-            </button>{% endif %}
+            </button>
           </div>
         </div>
         <!-- Lesson body -->
