@@ -418,15 +418,30 @@
 
   <main class="flex-grow">
 
-    <!-- Breadcrumb strip — only on sub-topic pages, sits flush left above   -->
-    <!-- the centered hero. Mirrors the page's max-w-7xl content container. -->
+    <!-- Breadcrumb strip — shown on all lesson pages above the hero -->
     {% if parent_topic %}
     <div class="bg-surface-container-low border-b border-outline-variant">
-      <div class="max-w-7xl mx-auto px-margin py-xs">
+      <div class="max-w-7xl mx-auto px-margin py-xs flex items-center gap-md">
+        <a href="/"
+          class="inline-flex items-center gap-xs font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors no-underline">
+          <span class="material-symbols-outlined" style="font-size: 18px;">home</span>
+          Home
+        </a>
+        <span class="text-outline-variant font-label-md text-label-md">/</span>
         <a href="{{ url_for('lesson_page', slug=parent_topic.slug) }}"
           class="inline-flex items-center gap-xs font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors no-underline">
           <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
           Back to {{ parent_topic.name }}
+        </a>
+      </div>
+    </div>
+    {% elif active_topic %}
+    <div class="bg-surface-container-low border-b border-outline-variant">
+      <div class="max-w-7xl mx-auto px-margin py-xs">
+        <a href="/"
+          class="inline-flex items-center gap-xs font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors no-underline">
+          <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+          Back to Home
         </a>
       </div>
     </div>
