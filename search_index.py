@@ -22,6 +22,7 @@ import topics
 
 
 LESSONS_DIR = Path(__file__).parent / "lessons"
+DB_PATH = Path(__file__).parent / "instance" / "codegen.db"
 
 def _load_all_lessons():
     """Walk lessons/*.md and return a list of dicts ready to insert.
@@ -70,8 +71,7 @@ def build_index():
     """
 
 
-    DB_PATH = Path(__file__).parent / "instance" / "codegen.db"
-    con =sqlite3.connect(DB_PATH)
+    con = sqlite3.connect(DB_PATH)
 
     con.execute("CREATE VIRTUAL TABLE IF NOT EXISTS lessons_fts USING " 
     "fts5(slug UNINDEXED, name, description, body, tokenize='porter unicode61')")
@@ -131,7 +131,6 @@ def search(query, limit=5):
 
     # ---- Now we're ready to talk to the database. ----
 
-    DB_PATH = Path(__file__).parent / "instance" / "codegen.db"
     con = sqlite3.connect(DB_PATH)
 
     # 7. Run the query. The ? placeholders are filled in by SQLite from
