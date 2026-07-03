@@ -15,23 +15,23 @@ DIAGRAM_SEQUENCES = {
     "hash-map": [
         {
             "src": "diagrams/hashmap/step-1.png",
-            "caption": "Empty hash table with 6 buckets, indexed 0–5.",
+            "caption": "Empty hash table with 6 buckets, indexed 0-5.",
         },
         {
             "src": "diagrams/hashmap/step-2.png",
-            "caption": "Insert ‘cat’: hash(‘cat’) % 6 = 2, goes into bucket 2.",
+            "caption": "Insert ‘cat’: 1 — hash(‘cat’) % 6 = 2,",
         },
         {
             "src": "diagrams/hashmap/step-3.png",
-            "caption": "Insert ‘dog’: hash(‘dog’) % 6 = 2 as well. Collision.",
+            "caption": "goes into bucket 2.",
         },
         {
             "src": "diagrams/hashmap/step-4.png",
-            "caption": "Both key-value pairs chained together in bucket 2.",
+            "caption": "Insert ‘dog’: 2 — hash(‘dog’) % 6 = 2 as well.",
         },
         {
             "src": "diagrams/hashmap/step-5.png",
-            "caption": "Looking up ‘dog’: jump to bucket 2, walk the chain past ‘cat’ to find it.",
+            "caption": "Collision — both key-value pairs chained together in bucket 2.",
         },
     ],
 }
