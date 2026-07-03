@@ -16,6 +16,9 @@
   <!-- Pyodide: Python in the browser (WebAssembly). Loaded only when the
        user first clicks "Run Tests" on a lesson with a challenge. -->
   <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+  {% if diagram_sequence %}
+  <script src="{{ url_for('static', filename='js/diagram-player.js') }}" defer></script>
+  {% endif %}
   <link
     href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
     rel="stylesheet" />
@@ -565,6 +568,35 @@
     </section>
 
     {% if active_topic %}
+
+    <!-- ===========================================================
+         Diagram Player (lesson page only, when a diagram sequence exists)
+         The mount div holds a noscript fallback (step 1 as a static image)
+         so the diagram is always visible. diagram-player.js replaces the
+         contents with the interactive player when JS is available.
+         =========================================================== -->
+    {% if diagram_sequence %}
+    <section class="max-w-4xl mx-auto px-margin pb-lg">
+      <div id="diagram-player-mount">
+        <noscript>
+          <div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-lg">
+            <div class="flex justify-center items-center bg-surface-container p-md">
+              <img src="{{ url_for('static', filename=diagram_sequence[0].src) }}"
+                   alt="{{ diagram_sequence[0].caption }}"
+                   class="max-w-full max-h-[480px] object-contain rounded-lg" />
+            </div>
+            <p class="px-lg py-sm font-body-md text-body-md text-on-surface-variant text-center">
+              {{ diagram_sequence[0].caption }}
+            </p>
+          </div>
+        </noscript>
+      </div>
+    </section>
+    <script id="diagram-sequence-data" type="application/json">
+      {{ diagram_sequence | tojson }}
+    </script>
+    {% endif %}
+
     <!-- ===========================================================
          Challenge (lesson page only, if a challenge exists)
          The user types Python into a textarea editor. Clicking
