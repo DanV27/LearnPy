@@ -34,6 +34,24 @@ DIAGRAM_SEQUENCES = {
             "caption": "Collision — both key-value pairs chained together in bucket 2.",
         },
     ],
+    "linked-list": [
+        {
+            "src": "diagrams/linked-list/step-1.png",
+            "caption": "Original list: A → B → C → null.",
+        },
+        {
+            "src": "diagrams/linked-list/step-2.png",
+            "caption": "New node X is created, but not yet connected to the list.",
+        },
+        {
+            "src": "diagrams/linked-list/step-3.png",
+            "caption": "X's pointer is set to point at C — link the new node forward first.",
+        },
+        {
+            "src": "diagrams/linked-list/step-4.png",
+            "caption": "B's pointer is redirected from C to X. Final: A → B → X → C → null.",
+        },
+    ],
 }
 
 
