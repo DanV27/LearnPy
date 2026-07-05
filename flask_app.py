@@ -37,6 +37,7 @@ from challenges import get_challenge
 from profile_data import calculate_heatmap
 from search_index import build_index,search
 from cheatsheets import load_cheatsheet, list_cheatsheets, lesson_to_cheatsheet
+from diagram_sequences import get_diagram_sequence
 
 
 # ---------------------------------------------------------------------------
@@ -267,7 +268,8 @@ def lesson_page(slug):
         followups=followups,
         challenge=challenge,
         challenge_completed=challenge_completed,
-        parent_topic = parent_topic
+        parent_topic=parent_topic,
+        diagram_sequence=get_diagram_sequence(slug),
     )
 
 
