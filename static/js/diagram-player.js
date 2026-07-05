@@ -51,9 +51,9 @@
 
   // Image
   const imgWrap = document.createElement('div');
-  imgWrap.className = 'flex justify-center items-center bg-surface-container p-md min-h-[200px]';
+  imgWrap.className = 'flex justify-center items-center bg-surface-container p-md h-[400px]';
   const img = document.createElement('img');
-  img.className = 'max-w-full max-h-[480px] object-contain rounded-lg';
+  img.className = 'w-full h-full object-contain rounded-lg';
   img.alt = '';
   imgWrap.appendChild(img);
   card.appendChild(imgWrap);
