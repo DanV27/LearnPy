@@ -17,6 +17,9 @@ types something into the search and submits it.
 import os
 import traceback
 
+from dotenv import load_dotenv
+load_dotenv()  # loads .env into os.environ before any config reads
+
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_login import (
     LoginManager,
@@ -25,6 +28,7 @@ from flask_login import (
     login_required,
     current_user,
 )
+from flask_migrate import Migrate
 from werkzeug.exceptions import HTTPException
 
 from datetime import datetime
@@ -46,16 +50,18 @@ from diagram_sequences import get_diagram_sequence
 
 app = Flask(__name__)
 
-# SQLite file lives in Flask's instance folder (`instance/codegen.db`).
-# Delete that file if you change the schema in `models.py` — Flask-SQLAlchemy
-# won't migrate existing tables for you.
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///codegen.db"
+# DATABASE_URL is set in .env (Postgres on Neon in production) or as an
+# environment variable on the deploy host. Falls back to local SQLite so
+# local dev and CI work with no Postgres running.
+_default_db = "sqlite:///codegen.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", _default_db)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.environ.get(
     "SECRET_KEY", "dev-secret-key-change-in-production"
 )
 
 db.init_app(app)
+migrate = Migrate(app, db)  # enables `flask db init/migrate/upgrade`
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -70,10 +76,11 @@ def load_user(user_id: str):
     return User.query.get(int(user_id))
 
 
-# Create any missing tables on startup. Safe to run repeatedly — it does
-# nothing if the tables already exist.
-with app.app_context():
-    db.create_all()
+# Auto-create tables for local SQLite only. On Postgres the schema is
+# managed by Flask-Migrate — run `flask db upgrade` instead.
+if app.config["SQLALCHEMY_DATABASE_URI"].startswith("sqlite"):
+    with app.app_context():
+        db.create_all()
 
 build_index()
 
