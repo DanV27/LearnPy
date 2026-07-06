@@ -36,6 +36,13 @@ def test_app():
         LOGIN_DISABLED=True,
     )
 
+    # Flask-SQLAlchemy 3.x caches the engine URI at db.init_app() time.
+    # load_dotenv() in flask_app.py may have already wired in the Postgres
+    # DATABASE_URL before we updated the config above.  Evict the cached
+    # engine state and re-init so the test session uses in-memory SQLite.
+    flask_app.extensions.pop("sqlalchemy", None)
+    db.init_app(flask_app)
+
     with flask_app.app_context():
         db.create_all()
         yield flask_app

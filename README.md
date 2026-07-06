@@ -109,7 +109,7 @@ Two places Claude gets called, both gated behind login:
 
 ## Tech Stack
 
-- **Backend:** Python 3.9+, Flask, Flask-Login, Flask-SQLAlchemy. SQLite by default; the same DB file holds both the auth/progress tables and the FTS5 search index.
+- **Backend:** Python 3.9+, Flask, Flask-Login, Flask-SQLAlchemy, Flask-Migrate (Alembic). Postgres (Neon) in production; SQLite locally and in CI.
 - **AI:** Anthropic Claude API via the official `anthropic` Python SDK. Single entry point in `generator.py`.
 - **Retrieval:** SQLite FTS5 with `porter unicode61` tokenization and BM25 ranking. Indexes ~58 lesson bodies in under 100ms at startup.
 - **In-browser code execution:** [Pyodide](https://pyodide.org/) (CPython compiled to WebAssembly), loaded lazily from jsDelivr on the first Run Tests click.
@@ -150,8 +150,12 @@ aiCodeGenerator/
 ├── static/
 │   └── logo.png           # Pixel-art snake mascot
 │
+├── migrations/            # Alembic migration files (flask db upgrade)
+│   └── versions/
+│       └── 0001_initial_schema.py
+│
 ├── instance/
-│   └── codegen.db         # SQLite: auth + progress + FTS5 index
+│   └── codegen.db         # SQLite: FTS5 search index (local dev also holds auth/progress)
 │
 └── README.md
 ```
@@ -189,17 +193,38 @@ source .venv/bin/activate     # macOS / Linux
 # .venv\Scripts\activate       # Windows
 
 # 2. Install dependencies
-pip install flask flask-sqlalchemy flask-login anthropic werkzeug
+pip install -r requirements.txt
 
-# 3. Set your Anthropic API key (only needed for the AI tutor)
-export ANTHROPIC_API_KEY=sk-ant-...
+# 3. Configure environment variables
+#    Copy the example below into a file named .env at the project root.
+#    .env is gitignored — never commit it.
+cat > .env <<'EOF'
+ANTHROPIC_API_KEY=sk-ant-...        # required for the AI tutor
+SECRET_KEY=change-me-in-production  # Flask session signing key
 
-# 4. Run the app
+# Optional — omit to use local SQLite (instance/codegen.db).
+# Set to your Neon (or any Postgres) connection string for a hosted DB:
+# DATABASE_URL=postgresql://user:pass@host/dbname
+EOF
+
+# 4. Run database migrations
+#    First run only — or after any schema change in models.py:
+flask db upgrade
+
+# 5. Run the app
 python flask_app.py
 # Open http://localhost:5000
 ```
 
-The first time you run it, `instance/codegen.db` is created automatically and the FTS index is built from `lessons/*.md`. If you ever change the schema in `models.py`, delete that file and Flask-SQLAlchemy will rebuild it.
+**Database notes:**
+- Without `DATABASE_URL` set, the app creates `instance/codegen.db` (SQLite) automatically on startup. No setup required for local dev.
+- With `DATABASE_URL` pointing to Postgres, the app skips the SQLite auto-create. Run `flask db upgrade` to apply the schema via Flask-Migrate before the first start.
+- The FTS5 search index is always stored in a separate SQLite file (`instance/codegen.db`) even in production, rebuilt at startup from `lessons/*.md`.
+- Schema migrations live in `migrations/versions/`. To generate a new migration after changing `models.py`:
+  ```bash
+  flask db migrate -m "describe your change"
+  flask db upgrade
+  ```
 
 ---
 
