@@ -20,7 +20,9 @@ import traceback
 from dotenv import load_dotenv
 load_dotenv()  # loads .env into os.environ before any config reads
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+import json
+
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Response, stream_with_context
 from flask_login import (
     LoginManager,
     login_user,
@@ -34,7 +36,7 @@ from werkzeug.exceptions import HTTPException
 from datetime import datetime
 
 from models import db, User, Generation, LessonProgress
-from generator import generate_lesson
+from generator import generate_lesson, stream_lesson_chunks, _extract_first_python_block
 from topics import TOPICS, get_topic, visible_in_sidebar, get_parent
 from lessons import load_lesson
 from challenges import get_challenge
@@ -493,6 +495,69 @@ def generate():
             jsonify({"error": str(e), "trace": traceback.format_exc()}),
             500,
         )
+
+
+# ---------------------------------------------------------------------------
+# Streaming AI endpoint — SSE version of /generate
+# ---------------------------------------------------------------------------
+
+@app.route("/generate/stream")
+@login_required
+def generate_stream():
+    """Stream a lesson token-by-token via Server-Sent Events.
+
+    GET /generate/stream?prompt=<query>
+
+    Events emitted:
+      data: {"text": "..."}    — one markdown body chunk
+      data: {"meta": {...}}    — title, summary, related_topics (sent once at end)
+      data: {"error": "..."}  — on exception
+      data: [DONE]             — stream is complete
+    """
+    spec = request.args.get("prompt", "").strip()
+    if not spec:
+        return jsonify({"error": "Prompt is empty."}), 400
+
+    # Capture user id before entering the generator (current_user is request-local).
+    user_id = current_user.id
+
+    def event_stream():
+        full_text = ""
+        meta = None
+        try:
+            for event in stream_lesson_chunks(spec):
+                if event["type"] == "text":
+                    full_text += event["text"]
+                    yield f'data: {json.dumps({"text": event["text"]})}\n\n'
+                elif event["type"] == "meta":
+                    meta = event
+                    yield f'data: {json.dumps({"meta": event})}\n\n'
+                elif event["type"] == "error":
+                    yield f'data: {json.dumps({"error": event["error"]})}\n\n'
+        except Exception as exc:
+            yield f'data: {json.dumps({"error": str(exc)})}\n\n'
+        finally:
+            yield "data: [DONE]\n\n"
+            # Persist to Generation history after the stream completes.
+            try:
+                title = ((meta or {}).get("title") or spec)[:200]
+                gen = Generation(
+                    user_id=user_id,
+                    spec=spec[:500],
+                    title=title,
+                    lesson_markdown=full_text,
+                    code=_extract_first_python_block(full_text),
+                )
+                db.session.add(gen)
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                app.logger.exception("Failed to persist streaming generation: user=%s", user_id)
+
+    resp = Response(stream_with_context(event_stream()), mimetype="text/event-stream")
+    resp.headers["Cache-Control"] = "no-cache"
+    resp.headers["X-Accel-Buffering"] = "no"
+    return resp
 
 
 # ---------------------------------------------------------------------------

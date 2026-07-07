@@ -20,6 +20,7 @@ import re
 import anthropic
 
 from search_index import search as _search_catalog
+from stream_utils import DelimiterSplitter
 
 
 # Claude model used for lesson generation. Bump this when a newer model
@@ -147,6 +148,112 @@ Rules:
         "code": data.get("code") or _extract_first_python_block(data.get("lesson_markdown") or ""),
         "related_topics": merged_related[:6],
     }
+
+
+def stream_lesson_chunks(spec: str):
+    """Generator that yields streaming events for a lesson on ``spec``.
+
+    Each yielded item is a dict with a ``"type"`` key:
+
+    * ``{"type": "text", "text": "..."}``   — markdown body token
+    * ``{"type": "meta", "title": "...", "summary": "...", "related_topics": [...]}``
+    * ``{"type": "error", "error": "..."}`` — on exception mid-stream
+
+    The output format sent to Claude is different from ``generate_lesson``:
+    Claude writes the full markdown lesson body first (with a ```python block
+    embedded), then emits the ``<<<META>>>`` delimiter, then a compact JSON
+    object with title / summary / related_topics.  This lets us stream the
+    lesson body live without waiting for a complete JSON object.
+    """
+    client = anthropic.Anthropic()
+
+    try:
+        retrieval_q = _retrieval_query(spec)
+        canonical_matches = _search_catalog(retrieval_q, limit=RAG_TOP_K) or []
+    except Exception:
+        canonical_matches = []
+
+    context_block = _build_context_block(canonical_matches)
+
+    prompt = f"""You are a friendly Python tutor writing a SHORT lesson on a single topic.
+
+Topic: {spec}
+{context_block}
+
+Output format — follow EXACTLY in this order, nothing else:
+
+PART 1 — Lesson body in GitHub-flavored Markdown:
+  - Start with a level-1 heading: # Topic Name
+  - One- or two-sentence introduction
+  - A working Python code example in a ```python fenced block
+  - A few bullet points explaining how it works
+  - Keep the whole lesson under ~400 words
+  - Where relevant, link to existing LearnPy lessons using their URLs as inline
+    markdown links, e.g. [Binary Search](/lesson/binary-search)
+
+PART 2 — Output this exact delimiter on its own line (nothing before or after it on that line):
+<<<META>>>
+
+PART 3 — Immediately after the delimiter, a single JSON object (no fencing, no prose):
+{{
+  "title": "Short topic title, max ~60 chars",
+  "summary": "One or two plain-text sentences introducing the topic.",
+  "related_topics": [
+    {{"label": "Short topic name", "prompt": "Full search prompt for that topic"}},
+    {{"label": "Short topic name", "prompt": "Full search prompt for that topic"}},
+    {{"label": "Short topic name", "prompt": "Full search prompt for that topic"}}
+  ]
+}}
+
+Nothing may appear after the JSON. No closing remarks, no extra text.
+"""
+
+    splitter = DelimiterSplitter()
+
+    try:
+        with client.messages.stream(
+            model=MODEL,
+            max_tokens=MAX_TOKENS,
+            messages=[{"role": "user", "content": prompt}],
+        ) as stream:
+            for chunk in stream.text_stream:
+                text_out, _ = splitter.feed(chunk)
+                if text_out:
+                    yield {"type": "text", "text": text_out}
+
+        remaining_text, meta_str = splitter.finish()
+        if remaining_text:
+            yield {"type": "text", "text": remaining_text}
+
+        meta_data = {}
+        if meta_str:
+            # Strip accidental markdown fencing Claude occasionally adds
+            clean = re.sub(r"^```[a-zA-Z]*\s*", "", meta_str.strip())
+            clean = re.sub(r"\s*```$", "", clean)
+            try:
+                meta_data = json.loads(clean)
+            except json.JSONDecodeError:
+                pass
+
+        ai_related = [
+            {
+                "label": str(t.get("label", ""))[:80],
+                "prompt": str(t.get("prompt", ""))[:300],
+            }
+            for t in (meta_data.get("related_topics") or [])
+            if isinstance(t, dict) and t.get("label")
+        ]
+        merged_related = _merge_related(_canonical_as_related(canonical_matches), ai_related)
+
+        yield {
+            "type": "meta",
+            "title": (meta_data.get("title") or spec)[:120],
+            "summary": meta_data.get("summary") or "",
+            "related_topics": merged_related[:6],
+        }
+
+    except Exception as exc:
+        yield {"type": "error", "error": str(exc)}
 
 
 # ---------------------------------------------------------------------------
