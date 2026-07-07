@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "LearnPy",
+      "runtimeExecutable": "/Users/daniel/Desktop/aiCodeGenerator/.venv/bin/python3",
+      "runtimeArgs": ["flask_app.py"],
+      "port": 5000
+    }
+  ]
+}
