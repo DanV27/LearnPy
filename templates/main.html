@@ -278,6 +278,48 @@
       0%, 100% { opacity: 1; }
       50%       { opacity: 0; }
     }
+
+    /* ------------------------------------------------------------------
+       Border beam — a bright comet that races around the search input.
+       Uses @property to animate the conic-gradient angle directly in CSS
+       (no JS, no repaints beyond GPU compositing).
+       ------------------------------------------------------------------ */
+    @property --beam-angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    .beam-ring {
+      position: absolute;
+      inset: -1px;
+      border-radius: 10px;       /* 2px more than the input's rounded-lg */
+      padding: 1.5px;
+      background: conic-gradient(
+        from var(--beam-angle),
+        transparent 0%,
+        transparent 70%,
+        #ff4500 80%,
+        #ff6a00 86%,
+        #ffb347 91%,
+        rgba(255, 220, 160, 0.5) 94%,
+        transparent 97%
+      );
+      /* Mask: keep only the padding ring — cuts out the interior so
+         the input background shows through untouched. */
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
+      pointer-events: none;
+      z-index: 10;
+      animation: beam-spin 2.5s linear infinite;
+    }
+
+    @keyframes beam-spin {
+      to { --beam-angle: 360deg; }
+    }
   </style>
   <script id="tailwind-config">
     tailwind.config = {
@@ -486,6 +528,7 @@
       {% if not active_topic %}
 
       <div class="relative w-full max-w-2xl">
+        <div class="beam-ring" aria-hidden="true"></div>
         <form id="learn-form" class="relative w-full group">
           <div class="absolute inset-y-0 left-md flex items-center pointer-events-none">
             <span class="material-symbols-outlined text-outline">search</span>
@@ -796,6 +839,27 @@
           </div>
         </a>
         {% endfor %}
+
+        <!-- Cheat Sheets card — same size as the topic cards above -->
+        <div class="bg-surface-container-low border border-outline-variant p-md hover-lift flex flex-col">
+          <div class="flex justify-between items-start mb-sm">
+            <span class="material-symbols-outlined text-primary" style="font-size: 32px;">quick_reference_all</span>
+            <span class="text-[10px] font-code px-xs py-[2px] bg-primary text-on-primary">REFERENCE</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-primary mb-xs">Cheat Sheets</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant mb-md">Quick-reference cards for Python's most-used built-ins.</p>
+          <div class="flex flex-col gap-xs mt-auto">
+            {% for sheet in all_cheatsheets %}
+            <a href="{{ url_for('cheatsheet_page', slug=sheet.slug) }}"
+               class="flex items-center gap-sm px-sm py-sm border border-outline-variant rounded-lg hover:border-primary hover:bg-surface-container-lowest transition-colors no-underline group">
+              <span class="material-symbols-outlined text-secondary" style="font-size: 18px;">{{ sheet.icon }}</span>
+              <span class="font-body-md text-body-md text-on-surface flex-1">{{ sheet.title }}</span>
+              <span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity" style="font-size: 16px;">arrow_forward</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+
       </div>
     </section>
 
