@@ -268,6 +268,16 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
+    .stream-cursor {
+      display: inline-block;
+      animation: blink-cursor 0.8s step-end infinite;
+      color: #ff6a00;
+      line-height: 1;
+    }
+    @keyframes blink-cursor {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
   </style>
   <script id="tailwind-config">
     tailwind.config = {
@@ -1006,6 +1016,9 @@
         let currentCode = '';
         let currentFilename = 'lesson.py';
 
+        // AbortController for the in-flight SSE stream. A new search aborts the old one.
+        let activeStreamController = null;
+
         function escapeHTML(s) {
           return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
@@ -1112,27 +1125,9 @@
 
           // Render related topics — links to real pages where possible,
           // search-triggering buttons otherwise.
-          relatedList.innerHTML = '';
           const related = Array.isArray(data.related_topics) ? data.related_topics : [];
+          renderRelatedChips(relatedList, related);
           if (related.length) {
-            related.forEach(t => {
-              const label = t.name || t.label || '';
-              const url = t.url; // present for canonical topics
-              const chipCls =
-                'inline-flex items-center gap-xs bg-secondary-container text-white font-label-md text-label-md px-md py-xs rounded-lg hover:brightness-110 transition-all shadow-sm';
-              let el;
-              if (url) {
-                el = document.createElement('a');
-                el.href = url;
-                el.className = chipCls + ' no-underline';
-              } else {
-                el = document.createElement('button');
-                el.className = chipCls;
-                el.addEventListener('click', () => startLessonForPrompt(t.prompt || label));
-              }
-              el.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span>' + escapeHTML(label);
-              relatedList.appendChild(el);
-            });
             relatedSection.classList.remove('hidden');
           } else {
             relatedSection.classList.add('hidden');
@@ -1148,10 +1143,32 @@
           }
         }
 
-        // Build one appended-answer card. Used on lesson pages when the
-        // user clicks a follow-up button, a sub-topic, or types in the
-        // bottom search. The card stacks below previous answers in
-        // #answers-section so a user can ask many follow-ups in a row.
+        // Render related-topic chips into `container` from a related_topics array.
+        // Shared by both renderLesson (home page) and streaming answer cards.
+        function renderRelatedChips(container, related) {
+          container.innerHTML = '';
+          if (!Array.isArray(related) || !related.length) return;
+          const chipCls =
+            'inline-flex items-center gap-xs bg-secondary-container text-white font-label-md text-label-md px-md py-xs rounded-lg hover:brightness-110 transition-all shadow-sm';
+          related.forEach(t => {
+            const label = t.name || t.label || '';
+            const url = t.url;
+            let el;
+            if (url) {
+              el = document.createElement('a');
+              el.href = url;
+              el.className = chipCls + ' no-underline';
+            } else {
+              el = document.createElement('button');
+              el.className = chipCls;
+              el.addEventListener('click', () => startLessonForPrompt(t.prompt || label));
+            }
+            el.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span>' + escapeHTML(label);
+            container.appendChild(el);
+          });
+        }
+
+        // Build one appended-answer card (non-streaming path, kept for static lessons).
         function appendAnswer(question, data) {
           const card = document.createElement('div');
           card.className = 'bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-md shadow-sm';
@@ -1175,22 +1192,46 @@
             ? marked.parse(md, { gfm: true, breaks: false })
             : '<pre>' + escapeHTML(md) + '</pre>';
 
-          // Syntax-highlight any Python code blocks in the follow-up answer.
-          if (window.Prism && Prism.highlightAllUnder) {
-            Prism.highlightAllUnder(body);
-          }
-
-          // Rewire any inline #topic: anchors so they become clickable chips
-          // that start a new follow-up instead of navigating to a dead anchor.
+          if (window.Prism && Prism.highlightAllUnder) Prism.highlightAllUnder(body);
           body.querySelectorAll('a[href^="#topic:"]').forEach(a => {
-            const prompt = decodeURIComponent(a.getAttribute('href').slice('#topic:'.length));
-            wireTopicAnchor(a, prompt);
+            wireTopicAnchor(a, decodeURIComponent(a.getAttribute('href').slice('#topic:'.length)));
           });
           card.appendChild(body);
+
+          if (Array.isArray(data.related_topics) && data.related_topics.length) {
+            const chips = document.createElement('div');
+            chips.className = 'flex flex-wrap gap-sm mt-md';
+            renderRelatedChips(chips, data.related_topics);
+            card.appendChild(chips);
+          }
 
           answersSection.appendChild(card);
           card.scrollIntoView({ behavior: 'smooth', block: 'start' });
           return card;
+        }
+
+        // Build an empty streaming card. Returns { card, bodyEl, chipsEl }
+        // so the caller can stream text into bodyEl and fill chipsEl on meta.
+        function appendStreamingCard(question) {
+          const card = document.createElement('div');
+          card.className = 'bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-md shadow-sm';
+
+          const label = document.createElement('p');
+          label.className = 'font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm';
+          label.textContent = 'Q: ' + question;
+          card.appendChild(label);
+
+          const body = document.createElement('div');
+          body.className = 'lesson-body';
+          card.appendChild(body);
+
+          const chipsWrap = document.createElement('div');
+          chipsWrap.className = 'flex flex-wrap gap-sm mt-md hidden';
+          card.appendChild(chipsWrap);
+
+          answersSection.appendChild(card);
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return { card, bodyEl: body, chipsEl: chipsWrap };
         }
 
         // Show a "thinking…" placeholder before the AI responds so the user
@@ -1211,70 +1252,160 @@
           return card;
         }
 
-        // Drive a single /generate request.
-        //   - On the home page (no activeTopic): replaces the lesson card.
-        //   - On a lesson page (activeTopic set): appends an answer card.
-        // `customPrompt` lets the follow-up / sub-topic buttons pass their
-        // data-prompt directly without going through the input field.
+        // Drive a single /generate/stream request via SSE.
+        //   - Home page (no activeTopic): streams text live into the lesson card.
+        //   - Lesson page (activeTopic set): appends a new card and streams into it.
+        // `customPrompt` lets follow-up / sub-topic buttons pass their data-prompt
+        // directly without touching the input field.
         async function generate(customPrompt) {
           const prompt = (customPrompt || promptInput.value).trim();
-          if (!prompt) {
-            promptInput.focus();
-            return;
+          if (!prompt) { promptInput.focus(); return; }
+
+          // Cancel any in-flight stream before starting a new one.
+          if (activeStreamController) {
+            activeStreamController.abort();
+            activeStreamController = null;
           }
+          const controller = new AbortController();
+          activeStreamController = controller;
 
           const lessonPageMode = !!activeTopic;
-          let placeholderCard = null;
+
+          // Target elements: where streamed text lands and where chips go.
+          let targetBodyEl, targetChipsEl, streamingCard = null;
 
           if (lessonPageMode) {
-            placeholderCard = appendLoadingAnswer(prompt);
             promptInput.value = '';
+            const refs = appendStreamingCard(prompt);
+            streamingCard = refs.card;
+            targetBodyEl = refs.bodyEl;
+            targetChipsEl = refs.chipsEl;
           } else {
             resetLesson();
             showOutput();
+            targetBodyEl = lessonBodyEl;
+            targetChipsEl = relatedList;
           }
+
+          // Show blinking cursor immediately.
+          targetBodyEl.innerHTML = '<span class="stream-cursor">&#x258C;</span>';
           setLoading(true);
 
-          try {
-            const res = await fetch('/generate', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ prompt }),
-            });
-            const data = await res.json();
+          let fullText = '';
+          let lastRenderMs = 0;
 
-            if (!res.ok) {
-              const msg = '<p class="text-red-600"><strong>Error:</strong> '
-                + escapeHTML(data.error || res.statusText) + '</p>';
-              if (lessonPageMode) {
-                placeholderCard.innerHTML =
-                  '<p class="font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm">Q: '
-                  + escapeHTML(prompt) + '</p>' + msg;
-              } else {
-                lessonBodyEl.innerHTML = msg;
-              }
+          function flushText(final) {
+            const now = Date.now();
+            if (!final && now - lastRenderMs < 50) return;
+            lastRenderMs = now;
+            const html = (window.marked && typeof marked.parse === 'function')
+              ? marked.parse(fullText, { gfm: true, breaks: false })
+              : '<pre>' + escapeHTML(fullText) + '</pre>';
+            targetBodyEl.innerHTML = html + (final ? '' : '<span class="stream-cursor">&#x258C;</span>');
+            if (window.Prism && Prism.highlightAllUnder) Prism.highlightAllUnder(targetBodyEl);
+            const cursor = targetBodyEl.querySelector('.stream-cursor');
+            if (cursor) cursor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+
+          try {
+            const url = '/generate/stream?prompt=' + encodeURIComponent(prompt);
+            const resp = await fetch(url, { signal: controller.signal });
+            if (!resp.ok) {
+              const err = await resp.text();
+              targetBodyEl.innerHTML = '<p class="text-red-600"><strong>Error ' + resp.status + ':</strong> ' + escapeHTML(err) + '</p>';
               return;
             }
 
-            if (lessonPageMode) {
-              answersSection.removeChild(placeholderCard);
-              appendAnswer(prompt, data);
-            } else {
-              renderLesson(data);
+            const reader = resp.body.getReader();
+            const decoder = new TextDecoder();
+            let sseBuffer = '';
+
+            outer: while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              sseBuffer += decoder.decode(value, { stream: true });
+
+              // Split on double-newline (SSE event boundary).
+              const events = sseBuffer.split('\n\n');
+              sseBuffer = events.pop(); // hold back the incomplete tail
+
+              for (const raw of events) {
+                const line = raw.trim();
+                if (!line.startsWith('data:')) continue;
+                const payload = line.slice('data:'.length).trim();
+
+                if (payload === '[DONE]') break outer;
+
+                let parsed;
+                try { parsed = JSON.parse(payload); } catch { continue; }
+
+                if (parsed.text) {
+                  fullText += parsed.text;
+                  flushText(false);
+                } else if (parsed.meta) {
+                  const meta = parsed.meta;
+                  // Final render — remove cursor, wire #topic: anchors.
+                  flushText(true);
+                  targetBodyEl.querySelectorAll('a[href^="#topic:"]').forEach(a => {
+                    wireTopicAnchor(a, decodeURIComponent(a.getAttribute('href').slice('#topic:'.length)));
+                  });
+
+                  // Update title / summary for home page mode.
+                  if (!lessonPageMode) {
+                    if (meta.title) lessonTitleEl.textContent = meta.title;
+                    if (meta.summary) {
+                      lessonSummaryEl.textContent = meta.summary;
+                      lessonSummaryEl.classList.remove('hidden');
+                    }
+                    // Enable copy/export once we have text.
+                    currentCode = _extractFirstPythonBlock(fullText);
+                    if (currentCode) {
+                      copyBtn.disabled = false;
+                      exportBtn.disabled = false;
+                      const m = currentCode.match(/def\s+([A-Za-z_][A-Za-z0-9_]*)/);
+                      currentFilename = (m ? m[1] : (meta.title || 'lesson').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'lesson') + '.py';
+                    }
+                    statusReady.classList.remove('hidden');
+                  }
+
+                  // Render related chips.
+                  const related = Array.isArray(meta.related_topics) ? meta.related_topics : [];
+                  renderRelatedChips(targetChipsEl, related);
+                  if (related.length) {
+                    if (lessonPageMode) {
+                      targetChipsEl.classList.remove('hidden');
+                    } else {
+                      relatedSection.classList.remove('hidden');
+                    }
+                  }
+                } else if (parsed.redirect) {
+                  window.location.href = parsed.redirect;
+                  return;
+                } else if (parsed.error) {
+                  targetBodyEl.innerHTML = '<p class="text-red-600"><strong>Error:</strong> ' + escapeHTML(parsed.error) + '</p>';
+                  break outer;
+                }
+              }
             }
+
+            // Final flush in case [DONE] arrived before the last meta event.
+            if (fullText && targetBodyEl.querySelector('.stream-cursor')) {
+              flushText(true);
+            }
+
           } catch (err) {
-            const msg = '<p class="text-red-600"><strong>Network error:</strong> '
-              + escapeHTML(err.message) + '</p>';
-            if (lessonPageMode && placeholderCard) {
-              placeholderCard.innerHTML =
-                '<p class="font-label-md text-label-md text-secondary tracking-wider uppercase mb-sm">Q: '
-                + escapeHTML(prompt) + '</p>' + msg;
-            } else {
-              lessonBodyEl.innerHTML = msg;
-            }
+            if (err.name === 'AbortError') return; // intentional abort — no UI update needed
+            targetBodyEl.innerHTML = '<p class="text-red-600"><strong>Network error:</strong> ' + escapeHTML(err.message) + '</p>';
           } finally {
             setLoading(false);
+            if (activeStreamController === controller) activeStreamController = null;
           }
+        }
+
+        // Extract the first ```python block from markdown (mirrors server helper).
+        function _extractFirstPythonBlock(md) {
+          const m = md.match(/```python\s*\n([\s\S]*?)\n```/);
+          return m ? m[1].trim() : '';
         }
 
         // -----------------------------------------------------------------

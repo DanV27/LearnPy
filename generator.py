@@ -20,6 +20,8 @@ import re
 import anthropic
 
 from search_index import search as _search_catalog
+from stream_utils import DelimiterSplitter
+from topic_resolver import resolve_topic, get_canonical_name
 
 
 # Claude model used for lesson generation. Bump this when a newer model
@@ -30,6 +32,20 @@ MAX_TOKENS = 2048
 # How many canonical matches to pull from the FTS index and feed into
 # Claude's context. Three is enough to ground without overwhelming.
 RAG_TOP_K = 3
+
+
+def _build_catalog_listing() -> str:
+    """One-time compact listing of all catalog lessons for the Claude prompt."""
+    from topics import TOPICS
+    lines = ["", "## Full LearnPy catalog (use these slugs in related_topics):"]
+    for t in TOPICS:
+        lines.append(f"- {t['name']} (slug: {t['slug']})")
+    lines.append("")
+    return "\n".join(lines)
+
+
+# Built once at import — referenced in both prompt builders below.
+_CATALOG_LISTING = _build_catalog_listing()
 
 
 def generate_lesson(spec: str) -> dict:
@@ -71,28 +87,29 @@ def generate_lesson(spec: str) -> dict:
     prompt = f"""You are a friendly Python tutor writing a SHORT lesson on a single topic.
 
 Topic: {spec}
-{context_block}
-
+{context_block}{_CATALOG_LISTING}
 Write a focused, beginner-friendly Python lesson. Your output MUST be a single
 valid JSON object — no prose before or after — with EXACTLY these fields:
 
 {{
   "title": "Short topic title, max ~60 chars",
   "summary": "One or two plain-text sentences introducing the topic.",
-  "lesson_markdown": "Full lesson body in GitHub-flavored markdown. Should include: a short explanation, a working Python code example in a ```python fenced block, and a few bullet points about how it works. Keep the whole lesson under ~400 words. When relevant, reference the existing LearnPy lessons listed above by name AND use their URLs as inline markdown links — like [Binary Search](/lesson/binary-search). This makes the lesson feel coherent with the rest of the site.",
-  "code": "The primary Python code example as PLAIN Python (no markdown fencing). Must be the same code shown in the lesson_markdown.",
+  "lesson_markdown": "Full lesson body in GitHub-flavored markdown. Include: a short explanation, a working Python code example in a ```python fenced block, and bullet points about how it works. Keep under ~400 words. Link to relevant catalog lessons using their URLs: [Binary Search](/lesson/binary-search).",
+  "code": "The primary Python code example as PLAIN Python (no markdown fencing). Same code as in lesson_markdown.",
   "related_topics": [
-    {{"label": "Short topic name", "prompt": "Full search prompt for that topic"}},
-    {{"label": "Short topic name", "prompt": "Full search prompt for that topic"}},
-    {{"label": "Short topic name", "prompt": "Full search prompt for that topic"}}
+    {{"title": "Exact catalog lesson name OR invented title", "slug": "exact-catalog-slug-or-null"}},
+    {{"title": "Exact catalog lesson name OR invented title", "slug": "exact-catalog-slug-or-null"}},
+    {{"title": "Exact catalog lesson name OR invented title", "slug": "exact-catalog-slug-or-null"}}
   ]
 }}
 
-Rules:
-- Output ONLY the JSON object. No prose, no markdown fencing around the JSON itself.
-- Include 3 to 4 related_topics that flow naturally from this lesson.
-- Code must be valid Python 3.9+ with type hints where useful.
-- If any of the LearnPy lessons listed above are directly relevant, prefer linking to them in the body over inventing your own concepts.
+Rules for related_topics:
+- PREFER existing catalog lessons. Look up the full catalog listing above.
+- For catalog lessons, set slug to the EXACT slug from the catalog (e.g. "binary-search").
+- For topics NOT in the catalog, set slug to null.
+- Include 3–4 entries. No duplicates.
+- Output ONLY the JSON. No prose, no markdown fencing around the JSON itself.
+- Code must be valid Python 3.9+.
 """
 
     message = client.messages.create(
@@ -102,8 +119,6 @@ Rules:
     )
     raw = message.content[0].text.strip()
 
-    # Claude sometimes wraps its JSON in a markdown code fence even when
-    # asked not to. Strip those off so json.loads doesn't choke.
     if raw.startswith("```"):
         raw = re.sub(r"^```[a-zA-Z]*\s*", "", raw)
         raw = re.sub(r"\s*```$", "", raw)
@@ -111,33 +126,16 @@ Rules:
     try:
         data = json.loads(raw)
     except json.JSONDecodeError:
-        # Fallback: the model didn't return valid JSON. Surface whatever
-        # it sent as markdown so the user still sees something useful.
         return {
             "title": spec[:60],
             "summary": "",
             "lesson_markdown": raw,
             "code": _extract_first_python_block(raw),
-            # Even on JSON failure we still expose the canonical matches
-            # so the user has somewhere useful to click.
             "related_topics": _canonical_as_related(canonical_matches),
         }
 
-    # Defensive normalization — guarantee the shape regardless of model drift.
-    # Each field is coerced to the right type and clamped to a reasonable size.
-    ai_related = [
-        {
-            "label": str(t.get("label", ""))[:80],
-            "prompt": str(t.get("prompt", ""))[:300],
-        }
-        for t in (data.get("related_topics") or [])
-        if isinstance(t, dict) and t.get("label")
-    ]
+    ai_related = _resolve_related_topics(data.get("related_topics") or [])
 
-    # Merge canonical matches (with real URLs) FIRST, then dedupe by lowercased
-    # label so we don't show "Binary Search" twice. Canonical matches always
-    # win because they have direct URLs — the AI's invented topics fall in
-    # behind them as "ask AI" buttons.
     merged_related = _merge_related(_canonical_as_related(canonical_matches), ai_related)
 
     return {
@@ -147,6 +145,107 @@ Rules:
         "code": data.get("code") or _extract_first_python_block(data.get("lesson_markdown") or ""),
         "related_topics": merged_related[:6],
     }
+
+
+def stream_lesson_chunks(spec: str):
+    """Generator that yields streaming events for a lesson on ``spec``.
+
+    Each yielded item is a dict with a ``"type"`` key:
+
+    * ``{"type": "text", "text": "..."}``   — markdown body token
+    * ``{"type": "meta", "title": "...", "summary": "...", "related_topics": [...]}``
+    * ``{"type": "error", "error": "..."}`` — on exception mid-stream
+
+    The output format sent to Claude is different from ``generate_lesson``:
+    Claude writes the full markdown lesson body first (with a ```python block
+    embedded), then emits the ``<<<META>>>`` delimiter, then a compact JSON
+    object with title / summary / related_topics.  This lets us stream the
+    lesson body live without waiting for a complete JSON object.
+    """
+    client = anthropic.Anthropic()
+
+    try:
+        retrieval_q = _retrieval_query(spec)
+        canonical_matches = _search_catalog(retrieval_q, limit=RAG_TOP_K) or []
+    except Exception:
+        canonical_matches = []
+
+    context_block = _build_context_block(canonical_matches)
+
+    prompt = f"""You are a friendly Python tutor writing a SHORT lesson on a single topic.
+
+Topic: {spec}
+{context_block}{_CATALOG_LISTING}
+Output format — follow EXACTLY in this order, nothing else:
+
+PART 1 — Lesson body in GitHub-flavored Markdown:
+  - Start with a level-1 heading: # Topic Name
+  - One- or two-sentence introduction
+  - A working Python code example in a ```python fenced block
+  - A few bullet points explaining how it works
+  - Keep the whole lesson under ~400 words
+  - Link to relevant catalog lessons using their URLs, e.g. [Binary Search](/lesson/binary-search)
+
+PART 2 — This exact delimiter on its own line:
+<<<META>>>
+
+PART 3 — Immediately after the delimiter, a single JSON object (no fencing, no prose):
+{{
+  "title": "Short topic title, max ~60 chars",
+  "summary": "One or two plain-text sentences introducing the topic.",
+  "related_topics": [
+    {{"title": "Exact catalog lesson name OR invented title", "slug": "exact-catalog-slug-or-null"}},
+    {{"title": "Exact catalog lesson name OR invented title", "slug": "exact-catalog-slug-or-null"}},
+    {{"title": "Exact catalog lesson name OR invented title", "slug": "exact-catalog-slug-or-null"}}
+  ]
+}}
+
+Rules for related_topics:
+- PREFER existing catalog lessons from the listing above.
+- For catalog lessons, set slug to the EXACT slug (e.g. "binary-search").
+- For topics not in the catalog, set slug to null.
+- Include 3–4 entries. No duplicates. Nothing may appear after the JSON.
+"""
+
+    splitter = DelimiterSplitter()
+
+    try:
+        with client.messages.stream(
+            model=MODEL,
+            max_tokens=MAX_TOKENS,
+            messages=[{"role": "user", "content": prompt}],
+        ) as stream:
+            for chunk in stream.text_stream:
+                text_out, _ = splitter.feed(chunk)
+                if text_out:
+                    yield {"type": "text", "text": text_out}
+
+        remaining_text, meta_str = splitter.finish()
+        if remaining_text:
+            yield {"type": "text", "text": remaining_text}
+
+        meta_data = {}
+        if meta_str:
+            # Strip accidental markdown fencing Claude occasionally adds
+            clean = re.sub(r"^```[a-zA-Z]*\s*", "", meta_str.strip())
+            clean = re.sub(r"\s*```$", "", clean)
+            try:
+                meta_data = json.loads(clean)
+            except json.JSONDecodeError:
+                pass
+
+        ai_related = _resolve_related_topics(meta_data.get("related_topics") or [])
+        merged_related = _merge_related(_canonical_as_related(canonical_matches), ai_related)
+
+        yield {
+            "type": "meta",
+            "title": (meta_data.get("title") or spec)[:120],
+            "summary": meta_data.get("summary") or "",
+            "related_topics": merged_related[:6],
+        }
+
+    except Exception as exc:
+        yield {"type": "error", "error": str(exc)}
 
 
 # ---------------------------------------------------------------------------
@@ -220,6 +319,50 @@ def _merge_related(canonical: list, ai_generated: list) -> list:
         seen.add(label)
         merged.append(t)
     return merged
+
+
+def _resolve_related_topics(raw_list: list) -> list:
+    """Convert the new {title, slug} schema from Claude into frontend-ready dicts.
+
+    For each entry:
+    - If Claude gave a valid catalog slug → chip with url.
+    - Else run title through resolve_topic() → chip with url when found.
+    - Otherwise → chip with prompt (AI-ask button).
+
+    Dedupes by resolved slug so two entries pointing to the same lesson collapse.
+    """
+    seen_slugs: set = set()
+    result = []
+
+    for t in raw_list:
+        if not isinstance(t, dict):
+            continue
+        title = str(t.get("title") or "").strip()[:80]
+        if not title:
+            continue
+
+        claude_slug = (t.get("slug") or "").strip().lower() or None
+
+        # Prefer the slug Claude explicitly provided if it's valid.
+        from topics import TOPICS as _TOPICS
+        valid_slugs = {_t["slug"] for _t in _TOPICS}
+
+        resolved_slug = None
+        if claude_slug and claude_slug in valid_slugs:
+            resolved_slug = claude_slug
+        else:
+            resolved_slug = resolve_topic(title)
+
+        if resolved_slug:
+            if resolved_slug in seen_slugs:
+                continue
+            seen_slugs.add(resolved_slug)
+            canonical = get_canonical_name(resolved_slug)
+            result.append({"label": canonical, "url": f"/lesson/{resolved_slug}"})
+        else:
+            result.append({"label": title, "prompt": title[:300]})
+
+    return result
 
 
 def _extract_first_python_block(markdown: str) -> str:
