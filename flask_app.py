@@ -37,6 +37,7 @@ from datetime import datetime
 
 from models import db, User, Generation, LessonProgress
 from generator import generate_lesson, stream_lesson_chunks, _extract_first_python_block
+from topic_resolver import resolve_topic_strict
 from topics import TOPICS, get_topic, visible_in_sidebar, get_parent
 from lessons import load_lesson
 from challenges import get_challenge
@@ -517,6 +518,21 @@ def generate_stream():
     spec = request.args.get("prompt", "").strip()
     if not spec:
         return jsonify({"error": "Prompt is empty."}), 400
+
+    # Front-door check: if the query maps exactly to a catalog lesson, skip
+    # Claude entirely and redirect the client to the hand-authored page.
+    catalog_slug = resolve_topic_strict(spec)
+    if catalog_slug:
+        app.logger.info("Front-door redirect: %r → /lesson/%s", spec, catalog_slug)
+
+        def _redirect_stream():
+            yield f'data: {json.dumps({"redirect": f"/lesson/{catalog_slug}"})}\n\n'
+            yield "data: [DONE]\n\n"
+
+        resp = Response(stream_with_context(_redirect_stream()), mimetype="text/event-stream")
+        resp.headers["Cache-Control"] = "no-cache"
+        resp.headers["X-Accel-Buffering"] = "no"
+        return resp
 
     # Capture user id before entering the generator (current_user is request-local).
     user_id = current_user.id

@@ -271,7 +271,7 @@
     .stream-cursor {
       display: inline-block;
       animation: blink-cursor 0.8s step-end infinite;
-      color: var(--md-sys-color-primary, #c17d3c);
+      color: #ff6a00;
       line-height: 1;
     }
     @keyframes blink-cursor {
@@ -1303,6 +1303,8 @@
               : '<pre>' + escapeHTML(fullText) + '</pre>';
             targetBodyEl.innerHTML = html + (final ? '' : '<span class="stream-cursor">&#x258C;</span>');
             if (window.Prism && Prism.highlightAllUnder) Prism.highlightAllUnder(targetBodyEl);
+            const cursor = targetBodyEl.querySelector('.stream-cursor');
+            if (cursor) cursor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }
 
           try {
@@ -1376,6 +1378,9 @@
                       relatedSection.classList.remove('hidden');
                     }
                   }
+                } else if (parsed.redirect) {
+                  window.location.href = parsed.redirect;
+                  return;
                 } else if (parsed.error) {
                   targetBodyEl.innerHTML = '<p class="text-red-600"><strong>Error:</strong> ' + escapeHTML(parsed.error) + '</p>';
                   break outer;

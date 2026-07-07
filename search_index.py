@@ -170,3 +170,33 @@ def search(query, limit=5):
 
     return results
 
+
+def search_scored(query: str, limit: int = 1):
+    """Like search() but returns [(slug, bm25_score)] so callers can apply
+    their own confidence threshold.  BM25 scores are negative — more negative
+    means a stronger match.  Returns an empty list on no-match or bad input.
+    """
+    query = query.strip()
+    if not query:
+        return []
+
+    cleaned = re.sub(r"[^a-zA-Z0-9 ]", " ", query)
+    parts = cleaned.split()
+    if not parts:
+        return []
+    parts[-1] += "*"
+    fts_query = " ".join(parts)
+
+    con = sqlite3.connect(DB_PATH)
+    cursor = con.execute(
+        "SELECT slug, bm25(lessons_fts, 0.0, 10.0, 5.0, 1.0) AS score "
+        "FROM lessons_fts "
+        "WHERE lessons_fts MATCH ? "
+        "ORDER BY score "
+        "LIMIT ?",
+        (fts_query, limit),
+    )
+    rows = cursor.fetchall()
+    con.close()
+    return [(row[0], row[1]) for row in rows]
+
