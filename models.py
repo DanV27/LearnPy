@@ -35,9 +35,28 @@ class User(UserMixin, db.Model):
     # to fit any algorithm werkzeug might use in the future.
     password = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Bumped every time this user's password changes via the forgot-password
+    # flow. Embedded in issued reset tokens and in the session id (see
+    # get_id() below) so both outstanding reset links and logged-in
+    # sessions become invalid the moment a reset happens.
+    password_reset_at = db.Column(db.DateTime, nullable=True)
 
     # One-to-many: a user has many generations.
     generations = db.relationship("Generation", backref="user", lazy=True)
+
+    def get_id(self) -> str:
+        """Flask-Login session identifier, fingerprinted with the current
+        password-reset marker.
+
+        Flask-Login only stores whatever this returns in the session
+        cookie. Baking `password_reset_at` into it means a session minted
+        before a password reset no longer matches the fingerprint
+        `load_user()` recomputes from the database afterwards — so
+        resetting a password invalidates every other logged-in session
+        for that account, without needing a server-side session store.
+        """
+        marker = self.password_reset_at.isoformat() if self.password_reset_at else "never"
+        return f"{self.id}|{marker}"
 
     def set_password(self, raw_password: str) -> None:
         """Hash and store a plaintext password.
