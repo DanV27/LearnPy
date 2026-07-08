@@ -45,6 +45,8 @@ from profile_data import calculate_heatmap
 from search_index import build_index,search
 from cheatsheets import load_cheatsheet, list_cheatsheets, lesson_to_cheatsheet
 from diagram_sequences import get_diagram_sequence
+from mailer import send_email
+from reset_tokens import issue_reset_token, verify_reset_token
 
 
 # ---------------------------------------------------------------------------
@@ -79,8 +81,29 @@ login_manager.login_view = "login"
 @login_manager.user_loader
 def load_user(user_id: str):
     """Flask-Login calls this on every request to rehydrate the user from
-    whatever it stored in the session cookie (the integer user id)."""
-    return User.query.get(int(user_id))
+    whatever it stored in the session cookie.
+
+    The cookie holds User.get_id()'s composite "<id>|<password_reset_at>"
+    fingerprint, not a bare id. If the stored fingerprint doesn't match the
+    user's *current* password_reset_at, the session predates a password
+    reset (elsewhere) and is treated as invalid — Flask-Login then sees an
+    anonymous user, which is how resetting a password logs out every other
+    active session for that account.
+    """
+    raw_id, _, marker = user_id.partition("|")
+    try:
+        uid = int(raw_id)
+    except ValueError:
+        return None
+
+    user = User.query.get(uid)
+    if user is None:
+        return None
+
+    current_marker = user.password_reset_at.isoformat() if user.password_reset_at else "never"
+    if marker != current_marker:
+        return None
+    return user
 
 
 # Auto-create tables for local SQLite only. On Postgres the schema is
@@ -377,6 +400,62 @@ def _default_followups(topic_name: str):
 # Auth routes
 # ---------------------------------------------------------------------------
 
+MIN_PASSWORD_LENGTH = 8  # length only — no composition rules, per NIST 800-63B
+
+
+def _normalize_email(raw: str) -> str:
+    """Lowercase + strip, the canonical form we store and look up by."""
+    return (raw or "").strip().lower()
+
+
+def _is_valid_email(email: str) -> bool:
+    """Sane-check an email address without pulling in a validation dependency.
+
+    Deliberately loose: just "has an @, and a dot somewhere in the domain
+    part that isn't leading/trailing". Real deliverability is out of scope —
+    that's what the confirmation/reset emails themselves prove.
+    """
+    local, sep, domain = email.partition("@")
+    if not sep or not local or not domain:
+        return False
+    return "." in domain.strip(".")
+
+
+def _find_user_by_identifier(identifier: str):
+    """Look up a user by username OR email for the login form.
+
+    An "@" in the identifier means "probably an email" — try that lookup
+    first, then fall back to treating it as a username (and vice versa),
+    so an unusual username containing "@" still works.
+    """
+    if not identifier:
+        return None
+    if "@" in identifier:
+        return (
+            User.query.filter_by(email=_normalize_email(identifier)).first()
+            or User.query.filter_by(username=identifier).first()
+        )
+    return (
+        User.query.filter_by(username=identifier).first()
+        or User.query.filter_by(email=_normalize_email(identifier)).first()
+    )
+
+
+def _reset_url(token: str) -> str:
+    """Build an absolute reset-password URL for the email body.
+
+    Prefers APP_BASE_URL (needed for background/non-request contexts and
+    to pin the host in production); falls back to the current request's
+    host, then to localhost for the rare case neither is available.
+    """
+    base = (
+        os.environ.get("APP_BASE_URL")
+        or (request.host_url.rstrip("/") if request else "")
+        or "http://localhost:5000"
+    )
+    return f"{base}{url_for('reset_password_page')}?token={token}"
+
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     """Sign-up page. GET renders the form; POST receives JSON, creates the
@@ -385,17 +464,24 @@ def signup():
         try:
             data = request.get_json(silent=True) or {}
             username = (data.get("username") or "").strip()
-            email = (data.get("email") or "").strip()
+            email = _normalize_email(data.get("email") or "")
             password = data.get("password") or ""
+            confirm_password = data.get("confirm_password") or ""
 
             # Field-level validation
-            if not username or not email or not password:
+            if not username or not email or not password or not confirm_password:
                 return jsonify({"error": "All fields required"}), 400
-            if len(password) < 6:
-                return jsonify({"error": "Password must be at least 6 characters"}), 400
+            if not _is_valid_email(email):
+                return jsonify({"error": "Enter a valid email address"}), 400
+            if password != confirm_password:
+                return jsonify({"error": "Passwords do not match"}), 400
+            if len(password) < MIN_PASSWORD_LENGTH:
+                return jsonify({"error": f"Password must be at least {MIN_PASSWORD_LENGTH} characters"}), 400
 
             # Uniqueness checks (also enforced by DB constraints, but failing
-            # here gives a friendlier error message)
+            # here gives a friendlier error message). Specific "which field"
+            # errors are fine here — signup existence checks aren't the
+            # enumeration-sensitive surface (forgot-password is; see below).
             if User.query.filter_by(username=username).first():
                 return jsonify({"error": "Username already exists"}), 400
             if User.query.filter_by(email=email).first():
@@ -420,14 +506,15 @@ def signup():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Login page. GET renders the form; POST authenticates and sets the
-    session cookie."""
+    session cookie. The identifier field accepts either a username or an
+    email address."""
     if request.method == "POST":
         try:
             data = request.get_json(silent=True) or {}
-            username = (data.get("username") or "").strip()
+            identifier = (data.get("identifier") or "").strip()
             password = data.get("password") or ""
 
-            user = User.query.filter_by(username=username).first()
+            user = _find_user_by_identifier(identifier)
             if not user or not user.check_password(password):
                 return jsonify({"error": "Invalid username or password"}), 401
 
@@ -447,6 +534,86 @@ def logout():
     """Clear the session cookie and bounce back to the login page."""
     logout_user()
     return redirect(url_for("login"))
+
+
+@app.route("/forgot-password", methods=["GET"])
+def forgot_password_page():
+    """Public page (no login required) with a single email input."""
+    return render_template("forgot_password.html")
+
+
+@app.route("/api/forgot-password", methods=["POST"])
+def api_forgot_password():
+    """Always responds identically whether or not the email is on file —
+    the response body and status code must never leak account existence."""
+    generic_response = jsonify({
+        "message": "If an account exists for that email, a reset link has been sent."
+    })
+
+    data = request.get_json(silent=True) or {}
+    email = _normalize_email(data.get("email") or "")
+    if not email:
+        return generic_response, 200
+
+    user = User.query.filter_by(email=email).first()
+
+    # Do the token-issuance work regardless of whether the account exists,
+    # so a nonexistent-email request costs roughly the same as a real one.
+    # A transient, unsaved User stands in for the "no such account" case —
+    # it's never added to the session, just used to shape a same-cost token.
+    token = issue_reset_token(app.config["SECRET_KEY"], user or User(id=-1, password_reset_at=None))
+
+    if user is not None:
+        send_email(
+            to=user.email,
+            subject="Reset your LearnPy password",
+            body=(
+                "We received a request to reset your LearnPy password. "
+                "This link expires in 30 minutes and can only be used once:\n\n"
+                f"{_reset_url(token)}\n\n"
+                "If you didn't request this, you can safely ignore this email."
+            ),
+        )
+
+    return generic_response, 200
+
+
+@app.route("/reset-password", methods=["GET"])
+def reset_password_page():
+    """Renders the new-password form, or an invalid/expired message.
+
+    The token is validated here (page load), not just on the eventual
+    POST, so a stale or already-used link tells the user immediately
+    instead of after they've typed a new password.
+    """
+    token = request.args.get("token", "")
+    user = verify_reset_token(app.config["SECRET_KEY"], token) if token else None
+    return render_template("reset_password.html", token=token, token_valid=user is not None)
+
+
+@app.route("/api/reset-password", methods=["POST"])
+def api_reset_password():
+    """Validates the token again, sets the new password, and invalidates
+    the token (and every other active session) by bumping password_reset_at."""
+    data = request.get_json(silent=True) or {}
+    token = data.get("token") or ""
+    password = data.get("password") or ""
+    confirm_password = data.get("confirm_password") or ""
+
+    user = verify_reset_token(app.config["SECRET_KEY"], token) if token else None
+    if user is None:
+        return jsonify({"error": "This reset link is invalid or has expired."}), 400
+
+    if password != confirm_password:
+        return jsonify({"error": "Passwords do not match"}), 400
+    if len(password) < MIN_PASSWORD_LENGTH:
+        return jsonify({"error": f"Password must be at least {MIN_PASSWORD_LENGTH} characters"}), 400
+
+    user.set_password(password)
+    user.password_reset_at = datetime.utcnow()
+    db.session.commit()
+
+    return jsonify({"success": True, "redirect": url_for("login")})
 
 
 # ---------------------------------------------------------------------------
