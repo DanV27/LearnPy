@@ -3,7 +3,7 @@
 
 A focused Python learning site — a curated catalog of short, hand-authored lessons, an in-browser coding challenge on every page, and an AI tutor for anything off-catalog. No ad walls, no SEO sludge, just the lesson, the code, and the challenge.
 
-![Project Demo](./assets/LearnPyGIF.gif)
+![Project Demo](./assets/LearnPy_newGIF.gif)
 
 ## TRY NOW
 https://ai-code-generator--danv27.replit.app/
