@@ -15,14 +15,17 @@ types something into the search and submits it.
 """
 
 import os
+import time
 import traceback
+from collections import defaultdict, deque
+from functools import wraps
 
 from dotenv import load_dotenv
 load_dotenv()  # loads .env into os.environ before any config reads
 
 import json
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for, Response, stream_with_context
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Response, stream_with_context, session
 from flask_login import (
     LoginManager,
     login_user,
@@ -104,6 +107,42 @@ def load_user(user_id: str):
     if marker != current_marker:
         return None
     return user
+
+
+def login_or_guest_required(view):
+    """Like @login_required, but also admits guest sessions (session['guest']).
+
+    Guests never get a User row — this just widens the gate for content
+    routes (lessons, cheatsheets, the AI tutor) while leaving DB-backed
+    routes (profile, progress) behind the stricter @login_required.
+    """
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if current_user.is_authenticated or session.get("guest"):
+            return view(*args, **kwargs)
+        return login_manager.unauthorized()
+    return wrapped
+
+
+def account_required(view):
+    """Like @login_required, but guests are bounced to signup (not login)
+    with a save-progress notice — for DB-backed routes guests can never
+    use (profile, progress). JSON requests get a 401 JSON body instead of
+    a redirect, since the client can't follow a redirect on a fetch() call.
+    """
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if current_user.is_authenticated:
+            return view(*args, **kwargs)
+        if session.get("guest"):
+            if request.is_json:
+                return jsonify({
+                    "error": "Create a free account to save your progress.",
+                    "redirect": url_for("signup", notice="save_progress"),
+                }), 401
+            return redirect(url_for("signup", notice="save_progress"))
+        return login_manager.unauthorized()
+    return wrapped
 
 
 # Auto-create tables for local SQLite only. On Postgres the schema is
@@ -220,7 +259,7 @@ def _mark_completed(user_id: int, slug: str) -> None:
 
 
 @app.route("/")
-@login_required
+@login_or_guest_required
 def index():
     """Home page — the free-form search hero + topic-cards grid."""
     return render_template("main.html", active_topic=None)
@@ -231,15 +270,26 @@ def about():
     """Public About page. No login required."""
     return render_template("about.html")
 
+
+@app.route("/guest", methods=["POST"])
+def start_guest_session():
+    """Start a guest session: no account, no DB row — just a session flag.
+
+    Guests get lesson/editor/AI-tutor access via login_or_guest_required,
+    but stay locked out of profile/progress routes (still @login_required).
+    """
+    session["guest"] = True
+    return redirect(url_for("index"))
+
 @app.route("/profile")
-@login_required
+@account_required
 def profile():
     """Profile page"""
     heatmap = calculate_heatmap(current_user.id)
     return render_template("profile.html", heatmap=heatmap)
 
 @app.route("/lesson/<slug>")
-@login_required
+@login_or_guest_required
 def lesson_page(slug):
     """Render a hand-authored lesson for a canonical topic.
 
@@ -285,15 +335,18 @@ def lesson_page(slug):
     challenge = get_challenge(slug)
 
     # Record that the current user has viewed this lesson. Adds an eyeball
-    # icon to the topic on every grid where it appears.
-    _mark_viewed(current_user.id, slug)
+    # icon to the topic on every grid where it appears. Guests have no
+    # User row, so there's nothing to record and nothing to pre-light.
+    challenge_completed = False
+    if current_user.is_authenticated:
+        _mark_viewed(current_user.id, slug)
 
-    # Pre-light the CHALLENGE COMPLETE badge on lesson pages the user has
-    # already beaten in a previous session.
-    progress = LessonProgress.query.filter_by(
-        user_id=current_user.id, slug=slug
-    ).first()
-    challenge_completed = progress is not None and progress.completed_at is not None
+        # Pre-light the CHALLENGE COMPLETE badge on lesson pages the user has
+        # already beaten in a previous session.
+        progress = LessonProgress.query.filter_by(
+            user_id=current_user.id, slug=slug
+        ).first()
+        challenge_completed = progress is not None and progress.completed_at is not None
 
 
 
@@ -312,7 +365,7 @@ def lesson_page(slug):
 
 
 @app.route("/api/search/suggest")
-@login_required
+@login_or_guest_required
 def api_search_suggest():
     q = request.args.get("q", "")
     return jsonify(search(q))
@@ -320,7 +373,7 @@ def api_search_suggest():
 
 
 @app.route("/cheatsheet/<slug>")
-@login_required
+@login_or_guest_required
 def cheatsheet_page(slug):
     sheet = load_cheatsheet(slug)
     if not sheet:
@@ -493,6 +546,8 @@ def signup():
             db.session.commit()
 
             login_user(user)
+            session.pop("guest", None)
+            session.pop("guest_rl_key", None)
             return jsonify({"success": True, "redirect": url_for("index")})
 
         except Exception as e:
@@ -519,6 +574,8 @@ def login():
                 return jsonify({"error": "Invalid username or password"}), 401
 
             login_user(user)
+            session.pop("guest", None)
+            session.pop("guest_rl_key", None)
             return jsonify({"success": True, "redirect": url_for("index")})
 
         except Exception as e:
@@ -620,13 +677,49 @@ def api_reset_password():
 # AI endpoint — the only place Claude is called from
 # ---------------------------------------------------------------------------
 
+# Guests have no account to throttle by history/quota, so they're the
+# biggest anonymous-abuse risk against the Claude API. Logged-in users are
+# left unlimited for now (no rate limiting exists elsewhere in the app).
+GUEST_GENERATE_LIMIT = 5          # max requests...
+GUEST_GENERATE_WINDOW_SECONDS = 300  # ...per rolling 5-minute window
+_guest_generate_hits = defaultdict(deque)
+
+
+def _guest_rate_limited() -> bool:
+    """True if the current guest session has hit the /generate rate limit.
+
+    Keyed by a random id stashed in the guest's signed session cookie.
+    Recorded as a side effect (a hit is appended) when not rate limited.
+    """
+    now = time.monotonic()
+    hits = _guest_generate_hits[_guest_session_key()]
+    while hits and now - hits[0] > GUEST_GENERATE_WINDOW_SECONDS:
+        hits.popleft()
+    if len(hits) >= GUEST_GENERATE_LIMIT:
+        return True
+    hits.append(now)
+    return False
+
+
+def _guest_session_key() -> str:
+    """Stable per-guest key for rate limiting, stored directly in the cookie
+    session (separate from Flask-Login's own session bookkeeping)."""
+    key = session.get("guest_rl_key")
+    if not key:
+        key = os.urandom(16).hex()
+        session["guest_rl_key"] = key
+    return key
+
+
 @app.route("/generate", methods=["POST"])
-@login_required
+@login_or_guest_required
 def generate():
     """Generate a short Python lesson from a free-form search prompt.
 
     Called by the search bar on the home page. The lesson is also persisted
-    to the `Generation` table so we can build a per-user history view later.
+    to the `Generation` table so we can build a per-user history view later
+    — guests skip persistence entirely since Generation.user_id is required
+    and guests have no User row.
     """
     data = request.get_json(silent=True) or {}
     spec = (data.get("prompt") or "").strip()
@@ -634,8 +727,17 @@ def generate():
     if not spec:
         return jsonify({"error": "Prompt is empty."}), 400
 
+    is_guest = not current_user.is_authenticated
+    if is_guest and _guest_rate_limited():
+        return jsonify({
+            "error": "Rate limit exceeded. Please wait a bit or sign up for unlimited access."
+        }), 429
+
     try:
         lesson = generate_lesson(spec)
+
+        if is_guest:
+            return jsonify(lesson)
 
         # Persist the generation for the user's history. Wrapped in its own
         # try/except because a DB problem here shouldn't block the response —
@@ -670,7 +772,7 @@ def generate():
 # ---------------------------------------------------------------------------
 
 @app.route("/generate/stream")
-@login_required
+@login_or_guest_required
 def generate_stream():
     """Stream a lesson token-by-token via Server-Sent Events.
 
@@ -685,6 +787,12 @@ def generate_stream():
     spec = request.args.get("prompt", "").strip()
     if not spec:
         return jsonify({"error": "Prompt is empty."}), 400
+
+    is_guest = not current_user.is_authenticated
+    if is_guest and _guest_rate_limited():
+        return jsonify({
+            "error": "Rate limit exceeded. Please wait a bit or sign up for unlimited access."
+        }), 429
 
     # Front-door check: if the query maps exactly to a catalog lesson, skip
     # Claude entirely and redirect the client to the hand-authored page.
@@ -702,7 +810,8 @@ def generate_stream():
         return resp
 
     # Capture user id before entering the generator (current_user is request-local).
-    user_id = current_user.id
+    # Guests have no User row, so there's nothing to persist to.
+    user_id = current_user.id if not is_guest else None
 
     def event_stream():
         full_text = ""
@@ -721,6 +830,8 @@ def generate_stream():
             yield f'data: {json.dumps({"error": str(exc)})}\n\n'
         finally:
             yield "data: [DONE]\n\n"
+            if user_id is None:
+                return
             # Persist to Generation history after the stream completes.
             try:
                 title = ((meta or {}).get("title") or spec)[:200]
@@ -748,7 +859,7 @@ def generate_stream():
 # ---------------------------------------------------------------------------
 
 @app.route("/api/progress/complete", methods=["POST"])
-@login_required
+@account_required
 def api_progress_complete():
     """Record that the current user passed the challenge for `slug`.
 

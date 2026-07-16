@@ -159,9 +159,24 @@
           class="text-on-surface-variant hover:text-secondary font-label-md text-label-md hidden sm:inline">{{ current_user.username }}</a>
         <a href="{{ url_for('logout') }}"
           class="bg-primary text-on-primary px-md py-xs font-label-md text-label-md rounded-lg active:opacity-80">Logout</a>
+        {% else %}
+        <a href="{{ url_for('login') }}"
+          class="text-on-surface-variant hover:text-secondary font-label-md text-label-md hidden sm:inline">Log in</a>
+        <a href="{{ url_for('signup') }}"
+          class="bg-primary text-on-primary px-md py-xs font-label-md text-label-md rounded-lg active:opacity-80">Sign up</a>
         {% endif %}
       </div>
     </div>
+    {% if session.get('guest') %}
+    <div class="w-full bg-secondary-container/10 border-t border-outline-variant no-print">
+      <div class="flex items-center justify-center gap-xs px-margin py-1 max-w-7xl mx-auto text-center">
+        <span class="font-label-md text-label-md text-on-surface-variant">
+          You're browsing as a guest —
+          <a href="{{ url_for('signup') }}" class="text-primary underline hover:no-underline">sign up to save your progress</a>.
+        </span>
+      </div>
+    </div>
+    {% endif %}
   </header>
 
   <!-- Sidebar overlay -->

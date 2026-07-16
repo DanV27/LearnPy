@@ -109,6 +109,8 @@
         </div>
       </div>
 
+      <div id="notice" class="hidden bg-secondary-container/10 text-on-surface border border-secondary-container/40 px-sm py-xs rounded-lg font-label-technical text-label-technical"></div>
+
       <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
         <form id="signup-form" class="flex flex-col gap-md">
           <div class="flex flex-col gap-xs">
@@ -147,6 +149,13 @@
         </form>
       </div>
 
+      <form action="{{ url_for('start_guest_session') }}" method="post">
+        <button type="submit"
+          class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface h-12 rounded-lg font-label-technical text-label-technical hover:bg-surface-container-low transition-all">
+          Continue as guest
+        </button>
+      </form>
+
       <p class="font-body-md text-on-surface-variant text-center">
         Already have an account?
         <a href="{{ url_for('login') }}" class="text-secondary-container hover:brightness-110 underline decoration-secondary-container/40">Log in</a>
@@ -168,6 +177,18 @@
   </footer>
 
   <script>
+    (function () {
+      const NOTICES = {
+        save_progress: 'Create a free account to save your progress.',
+      };
+      const notice = NOTICES[new URLSearchParams(window.location.search).get('notice')];
+      if (notice) {
+        const noticeDiv = document.getElementById('notice');
+        noticeDiv.textContent = notice;
+        noticeDiv.classList.remove('hidden');
+      }
+    })();
+
     (function () {
       const form = document.getElementById('signup-form');
       const errorDiv = document.getElementById('error');
