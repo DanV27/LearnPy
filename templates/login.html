@@ -136,6 +136,13 @@
         </form>
       </div>
 
+      <form action="{{ url_for('start_guest_session') }}" method="post">
+        <button type="submit"
+          class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface h-12 rounded-lg font-label-technical text-label-technical hover:bg-surface-container-low transition-all">
+          Continue as guest
+        </button>
+      </form>
+
       <p class="font-body-md text-on-surface-variant text-center">
         Don't have an account?
         <a href="{{ url_for('signup') }}" class="text-secondary-container hover:brightness-110 underline decoration-secondary-container/40">Sign up</a>
