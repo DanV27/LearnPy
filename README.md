@@ -6,7 +6,7 @@ A focused Python learning site — a curated catalog of short, hand-authored les
 <img src="./assets/LearnPy_newGIF.gif" alt="Project Demo" width="900" />
 
 ## TRY NOW
-https://ai-code-generator--danv27.replit.app/
+https://learn-py--danv27.replit.app
 
 ---
 
